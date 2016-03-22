@@ -57,10 +57,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
-
+		
 		if (debug)
 			PrintUtil.printWork(msg);
-
+			
+			
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.hasBeat()) {
@@ -109,6 +110,8 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
+		ctx.channel().writeAndFlush(msg);//KD
+		Thread.sleep(1000);
 	}
 
 	@Override

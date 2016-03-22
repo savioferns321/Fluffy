@@ -98,6 +98,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		while (forever) {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
+					System.out.println("Inside For loop");
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wm = createHB(ei);
 						ei.getChannel().writeAndFlush(wm);
