@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package gash.router.server;
 
 import java.io.BufferedInputStream;
@@ -26,10 +25,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import gash.router.server.edges.EdgeMonitor;
 import gash.router.container.RoutingConf;
-import gash.router.server.tasks.*;
+import gash.router.leaderelection.ElectionManagement;
+import gash.router.server.edges.EdgeMonitor;
+import gash.router.server.tasks.NoOpBalancer;
+import gash.router.server.tasks.TaskList;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -46,7 +46,7 @@ public class MessageServer {
 	// public static final String sPoolSize = "pool.size";
 
 	protected RoutingConf conf;
-	protected boolean background = false;
+	protected boolean background = true;
 
 	/**
 	 * initialize the server with a configuration of it's resources
@@ -65,6 +65,7 @@ public class MessageServer {
 	}
 
 	public void startServer() {
+		
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		logger.info("Work starting");
 
@@ -82,6 +83,16 @@ public class MessageServer {
 			} else
 				comm2.run();
 		}
+
+		System.out.println("-----------------------before nodechannel manager");
+		// Starting the node manager
+		NodeChannelManager.initNodeChannelManager();
+
+		// Check for leader election to happen
+		while (!ElectionManagement.isReadyForElection());
+		ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf);
+		electionManagement.startElection();
+
 	}
 
 	/**
@@ -289,4 +300,3 @@ public class MessageServer {
 	}
 
 }
-

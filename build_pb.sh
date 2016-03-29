@@ -9,10 +9,10 @@
 # have change.
 #
 
-project_base="$( cd "$( /Users/Student/fluffy_repo "${BASH_SOURCE[0]}" )" && pwd )"
+project_base="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # which protoc that you built (if not in your path)
-#PROTOC_HOME=/Users/Student/Desktop/protobuf-2.6.1
+PROTOC_HOME=/usr/local
 
 if [ -d ${project_base}/generated ]; then
   echo "removing contents of ${project_base}/generated"
@@ -23,8 +23,8 @@ else
 fi
 
 
-$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/common.proto
-$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/election.proto
-$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/work.proto
+$PROTOC_HOME/bin/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/common.proto
+$PROTOC_HOME/bin/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/election.proto
+$PROTOC_HOME/bin/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/work.proto
 
-$PROTOC_HOME/src/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/pipe.proto
+$PROTOC_HOME/bin/protoc --proto_path=${project_base}/resources --java_out=${project_base}/generated ${project_base}/resources/pipe.proto

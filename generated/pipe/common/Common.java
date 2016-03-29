@@ -31,15 +31,15 @@ public final class Common {
     long getTime();
 
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     boolean hasMessage();
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     java.lang.String getMessage();
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     com.google.protobuf.ByteString
         getMessageBytes();
@@ -237,13 +237,13 @@ public final class Common {
     public static final int MESSAGE_FIELD_NUMBER = 4;
     private java.lang.Object message_;
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     public boolean hasMessage() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     public java.lang.String getMessage() {
       java.lang.Object ref = message_;
@@ -260,7 +260,7 @@ public final class Common {
       }
     }
     /**
-     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
      */
     public com.google.protobuf.ByteString
         getMessageBytes() {
@@ -342,10 +342,6 @@ public final class Common {
         return false;
       }
       if (!hasTime()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasMessage()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -627,10 +623,6 @@ public final class Common {
           
           return false;
         }
-        if (!hasMessage()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -719,13 +711,13 @@ public final class Common {
 
       private java.lang.Object message_ = "Hello from protoc!!";
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public boolean hasMessage() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public java.lang.String getMessage() {
         java.lang.Object ref = message_;
@@ -742,7 +734,7 @@ public final class Common {
         }
       }
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public com.google.protobuf.ByteString
           getMessageBytes() {
@@ -758,7 +750,7 @@ public final class Common {
         }
       }
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public Builder setMessage(
           java.lang.String value) {
@@ -771,7 +763,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public Builder clearMessage() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -780,7 +772,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       * <code>optional string message = 4 [default = "Hello from protoc!!"];</code>
        */
       public Builder setMessageBytes(
           com.google.protobuf.ByteString value) {
@@ -1564,7 +1556,7 @@ public final class Common {
   static {
     java.lang.String[] descriptorData = {
       "\n\014common.proto\"x\n\006Header\022\017\n\007node_id\030\001 \002(" +
-      "\005\022\014\n\004time\030\002 \002(\003\022$\n\007message\030\004 \002(\t:\023Hello " +
+      "\005\022\014\n\004time\030\002 \002(\003\022$\n\007message\030\004 \001(\t:\023Hello " +
       "from protoc!!\022\023\n\013destination\030\010 \001(\005\022\024\n\010ma" +
       "x_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(\005\022" +
       "\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pipe" +

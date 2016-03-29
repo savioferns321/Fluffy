@@ -21,9 +21,10 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.protobuf.*;
 import pipe.common.Common.Failure;
+import pipe.common.Common.Header;
 import pipe.work.Work.Heartbeat;
+import pipe.work.Work.Heartbeat.Builder;
 import pipe.work.Work.Task;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
@@ -36,7 +37,7 @@ import pipe.work.Work.WorkState;
  * @author gash
  * 
  */
-public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
+public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
 	protected ServerState state;
 	protected boolean debug = true;
@@ -58,11 +59,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
-		
+
 		if (debug)
 			PrintUtil.printWork(msg);
-			
-			
+
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.hasBeat()) {
@@ -73,7 +73,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
 				boolean p = msg.getPing();
 				WorkMessage.Builder rb = WorkMessage.newBuilder();
 				rb.setPing(true);
-				channel.write(rb.build());
+				channel.writeAndFlush(rb.build());
 			} else if (msg.hasErr()) {
 				Failure err = msg.getErr();
 				logger.error("failure from " + msg.getHeader().getNodeId());
@@ -83,7 +83,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
 			}
-		} catch (Exception e) {
+		} catch (NullPointerException e) {
+			System.out.println("Null pointer has occured");
+		}
+
+		catch (Exception e) {
 			// TODO add logging
 			Failure.Builder eb = Failure.newBuilder();
 			eb.setId(state.getConf().getNodeId());
@@ -110,11 +114,31 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
 	 */
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
-		handleMessage(msg, ctx.channel());
-		ctx.channel().writeAndFlush(msg);//KD
-		//ctx.channel().writeAndFlush("hello 123");
-		Thread.sleep(1000);
+		Channel channel = ctx.channel();
+		handleMessage(msg, channel);
+
+		//Should happen via queue?
 		
+		WorkState.Builder sb = WorkState.newBuilder();
+		sb.setEnqueued(-1);
+		sb.setProcessed(-1);
+		
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setSecret(1234);
+		
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(state.getConf().getNodeId());
+		hb.setDestination(msg.getHeader().getNodeId());
+		hb.setTime(System.currentTimeMillis());
+		
+		Heartbeat.Builder heartbeat = Heartbeat.newBuilder();
+		heartbeat.setState(sb);
+		
+		wb.setBeat(heartbeat);
+		wb.setHeader(hb);
+
+		channel.writeAndFlush(wb.build());
+		Thread.sleep(1000);
 	}
 
 	@Override

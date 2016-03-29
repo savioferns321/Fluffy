@@ -18,11 +18,7 @@ package gash.router.server.edges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.app.DemoApp;
-import gash.router.client.CommConnection;
-import gash.router.client.MessageClient;
 import gash.router.container.RoutingConf.RoutingEntry;
-import gash.router.server.CommandInit;
 import gash.router.server.ServerState;
 import gash.router.server.WorkInit;
 import io.netty.bootstrap.Bootstrap;
@@ -38,22 +34,20 @@ import pipe.work.Work.WorkState;
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
 
-	private EdgeList outboundEdges;
-	private EdgeList inboundEdges;
+	private static EdgeList outboundEdges;
+	private static EdgeList inboundEdges;
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
-	private String msg = "Hi";
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
 			throw new RuntimeException("state is null");
 
-		this.outboundEdges = new EdgeList();
-		this.inboundEdges = new EdgeList();
+		outboundEdges = new EdgeList();
+		inboundEdges = new EdgeList();
 		this.state = state;
 		this.state.setEmon(this);
-		
 
 		if (state.getConf().getRouting() != null) {
 			for (RoutingEntry e : state.getConf().getRouting()) {
@@ -71,7 +65,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	private WorkMessage createHB(EdgeInfo ei) {
-		this.msg = msg;
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
 		sb.setProcessed(-1);
@@ -83,7 +76,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
-		hb.setMessage(msg);
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);
@@ -100,49 +92,77 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
+
 			try {
-				for (EdgeInfo ei : this.outboundEdges.map.values()) {
-					System.out.println("Inside For loop");
-					if (ei.isActive() && ei.getChannel() != null) {
-						WorkMessage wm = createHB(ei);
-						ei.getChannel().writeAndFlush(wm);
-						System.out.println("Connected to Channel with host :" + ei.getHost());
-					} else if (ei.getChannel() == null) {
-						// TODO create a client to the node
-						Channel channel = connectToChannel(ei.getHost(), ei.getPort());
-						ei.setChannel(channel);
-						System.out.println("Connected to Channel with host " + ei.getHost());
-						ei.setActive(true);
-						if (channel == null) {
-							logger.info("trying to connect to node " + ei.getRef());
+				for (EdgeInfo ei : outboundEdges.map.values()) {
+					try {
+						System.out.println("Inside For loop" + outboundEdges.map.toString());
+						if (ei.isActive() && ei.getChannel() != null) {
+							WorkMessage wm = createHB(ei);
+							ei.getChannel().writeAndFlush(wm);
+							System.out.println("Connected to Channel with host :" + ei.getHost());
+						} else if (ei.getChannel() == null) {
+							Channel channel = connectToChannel(ei.getHost(), ei.getPort(), this.state);
+							ei.setChannel(channel);
+							System.out.println("Connected to Channel with host " + ei.getHost());
+							ei.setActive(true);
+							if (channel == null) {
+								logger.info("trying to connect to node " + ei.getRef());
+							}
 						}
+					} catch (Exception e) {
+						System.out.println(e);
+						Thread.sleep(dt);
+						continue;
 					}
 				}
 				Thread.sleep(dt);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private Channel connectToChannel(String host, int port) {
+	private Channel connectToChannel(String host, int port, ServerState state) {
 		Bootstrap b = new Bootstrap();
 		NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup();
-		WorkInit workInit = new WorkInit(null, false);
+		WorkInit workInit = new WorkInit(state, false);
 
 		try {
 			b.group(nioEventLoopGroup).channel(NioSocketChannel.class).handler(workInit);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
 			b.option(ChannelOption.TCP_NODELAY, true);
 			b.option(ChannelOption.SO_KEEPALIVE, true);
-
 			// Make the connection attempt.
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return b.connect(host, port).syncUninterruptibly().channel();
 
+	}
+
+	public static EdgeList getOutboundEdges() {
+		return outboundEdges;
+	}
+
+	public static void setOutboundEdges(EdgeList outboundEdges) {
+		EdgeMonitor.outboundEdges = outboundEdges;
+	}
+
+	public static EdgeList getInboundEdges() {
+		return inboundEdges;
+	}
+
+	public static void setInboundEdges(EdgeList inboundEdges) {
+		EdgeMonitor.inboundEdges = inboundEdges;
+	}
+
+	public ServerState getState() {
+		return state;
+	}
+
+	public void setState(ServerState state) {
+		this.state = state;
 	}
 
 	@Override
