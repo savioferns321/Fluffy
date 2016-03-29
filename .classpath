@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/Student/Desktop/mongojars/mongo-java-driver-3.2.2.jar"/>
+	<classpathentry kind="lib" path="/Users/Student/Desktop/apache-commons.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

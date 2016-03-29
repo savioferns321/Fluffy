@@ -1,18 +1,19 @@
 package gash.router.mongodb;
 
-
 import org.bson.Document;
-
+import org.bson.types.Binary;
 import com.mongodb.*;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
-
-
-
 
 public class Dbhandler {
 	
-	public MongoClient getConnection(){
+	public Dbhandler(){
+	
+	}
+	//establish connection with MongoDB
+	public static MongoClient getConnection(){
 		MongoClient client = null;
 		try{
 		client = new MongoClient("localhost", 27017);
@@ -23,29 +24,40 @@ public class Dbhandler {
 		return client;
 	}
 	
-	public void addFile(byte[] input){
+	//add file into collection Fluffy
+	public static void addFile(String fileName,byte[] input){
 	MongoClient client = getConnection();
 	MongoDatabase db = client.getDatabase("Fluffy");
+	MongoCollection<Document> collection = db.getCollection("Fluffy");
 	
+	Document doc = new Document().append("fileName", fileName ).append("bytes", input);
+	collection.insertOne(doc);
+
+	if(collection.count()!=0){
+		System.out.println("sucessful");
+		System.out.println(doc);
+	}else{
+		System.out.println("something went wrong");
+	}
+	client.close();
 	}
 	
-						
-		//GridFS gfs = new GridFS(db,"images");
-				
-		//to read files from a folder
-		/*File folder = new File("/Users/Student/Pictures/fluffyImages");
-		File[] list = folder.listFiles();
-		for(File file: list){
-		GridFSInputFile gridFsInputFile = gfs.createFile(new File("/Users/Student/Pictures/fluffyImages/"+file.getName()));
-		System.out.println(gridFsInputFile);
-		gridFsInputFile.setFilename(file.getName());
-		gridFsInputFile.save();
+	//get file by name from collection Fluffy and return the bytearray representation of file
+	public static byte[] getFile(String fileName){
+		Binary bData= null;
+		byte[] byteData = {};
+		MongoClient client = getConnection();
+		MongoDatabase db = client.getDatabase("Fluffy");
+		MongoCollection<Document> collection = db.getCollection("Fluffy");
+		FindIterable<Document> doc = collection.find(new Document("fileName", fileName));
+		for(Document docs: doc){
+			bData = (Binary) docs.get("bytes");
+			byteData = bData.getData();
 		}
-		for(File file : list){
-		GridFSDBFile outputImageFile = gfs.findOne(file.getName());
-		System.out.println("Total Chunks: " + outputImageFile.numChunks());
-		String imageLocation = "/Users/Student/Pictures/"+file.getName()+".jpeg";
-		outputImageFile.writeTo(imageLocation);
-		}*/	
-	}
+		client.close();
+		return byteData;
+	}					
+		
+}
+	
 
