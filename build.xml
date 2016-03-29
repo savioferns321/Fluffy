@@ -3,6 +3,7 @@
 
 	<target name="init">
 		<property name="src.dir" location="${basedir}/src" />
+		<property name="generated.dir" location="${basedir}/generated" />
 		<property name="test.dir" location="${basedir}/test" />
 		<property name="build.dir" location="${basedir}/classes" />
 
@@ -10,11 +11,19 @@
 		<property name="protobuf.dir" location="/Users/gash/Developer/protobuf/current" />
 		<property name="junit.jar" location="/Users/gash/Developer/junit-4.8.2.jar" />
 		<property name="logging.jar" location="${basedir}/lib/slf4j-log4j12-1.6.1.jar" />
-
+		
+		
 		<path id="project.classpath">
 			<pathelement location="${build.dir}" />
 			<pathelement location="${junit.jar}" />
 			<pathelement location="${logging.jar}" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar.asc" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar.asc.md5" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar.asc.sha1" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar.md5" />
+			<pathelement location="${basedir}/lib/mongo-java-driver-3.2.2.jar.sha1" />
+			
 			<fileset dir="${basedir}/lib">
 				<include name="*.jar" />
 			</fileset>
@@ -33,6 +42,11 @@
 	<target name="build" depends="clean">
 		<mkdir dir="${build.dir}" />
 
+		<javac destdir="${build.dir}" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${generated.dir}" />
+			<classpath refid="project.classpath" />
+		</javac>
+		
 		<javac destdir="${build.dir}" debug="true" deprecation="false" optimize="false" failonerror="true">
 			<src path="${src.dir}" />
 			<classpath refid="project.classpath" />
@@ -68,3 +82,4 @@
 	</target>
 
 </project>
+

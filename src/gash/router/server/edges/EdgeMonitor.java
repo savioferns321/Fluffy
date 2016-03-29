@@ -43,6 +43,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
+	private String msg = "Hi";
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -52,6 +53,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.inboundEdges = new EdgeList();
 		this.state = state;
 		this.state.setEmon(this);
+		
 
 		if (state.getConf().getRouting() != null) {
 			for (RoutingEntry e : state.getConf().getRouting()) {
@@ -69,6 +71,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	private WorkMessage createHB(EdgeInfo ei) {
+		this.msg = msg;
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
 		sb.setProcessed(-1);
@@ -80,6 +83,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
+		hb.setMessage(msg);
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);

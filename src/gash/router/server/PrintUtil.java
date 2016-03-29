@@ -27,6 +27,8 @@ public class PrintUtil {
 		System.out.println("\n-------------------------------------------------------");
 		System.out.println("ID:   " + hdr.getNodeId());
 		System.out.println("Time: " + hdr.getTime());
+		System.out.println("biebgkehn");
+		System.out.println("Msg: "+ hdr.getMessage());
 		if (hdr.hasMaxHops())
 			System.out.println("Hops: " + hdr.getMaxHops());
 		if (hdr.hasDestination())

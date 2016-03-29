@@ -31,6 +31,20 @@ public final class Common {
     long getTime();
 
     /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    boolean hasMessage();
+    /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+
+    /**
      * <code>optional int32 destination = 8;</code>
      *
      * <pre>
@@ -134,13 +148,19 @@ public final class Common {
               time_ = input.readInt64();
               break;
             }
-            case 64: {
+            case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000004;
+              message_ = bs;
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000008;
               destination_ = input.readInt32();
               break;
             }
             case 80: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               maxHops_ = input.readInt32();
               break;
             }
@@ -214,6 +234,48 @@ public final class Common {
       return time_;
     }
 
+    public static final int MESSAGE_FIELD_NUMBER = 4;
+    private java.lang.Object message_;
+    /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    public boolean hasMessage() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          message_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     public static final int DESTINATION_FIELD_NUMBER = 8;
     private int destination_;
     /**
@@ -224,7 +286,7 @@ public final class Common {
      * </pre>
      */
     public boolean hasDestination() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional int32 destination = 8;</code>
@@ -248,7 +310,7 @@ public final class Common {
      * </pre>
      */
     public boolean hasMaxHops() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional int32 max_hops = 10 [default = -1];</code>
@@ -265,6 +327,7 @@ public final class Common {
     private void initFields() {
       nodeId_ = 0;
       time_ = 0L;
+      message_ = "Hello from protoc!!";
       destination_ = 0;
       maxHops_ = -1;
     }
@@ -282,6 +345,10 @@ public final class Common {
         memoizedIsInitialized = 0;
         return false;
       }
+      if (!hasMessage()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -296,9 +363,12 @@ public final class Common {
         output.writeInt64(2, time_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(8, destination_);
+        output.writeBytes(4, getMessageBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(8, destination_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(10, maxHops_);
       }
       getUnknownFields().writeTo(output);
@@ -320,9 +390,13 @@ public final class Common {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, destination_);
+          .computeBytesSize(4, getMessageBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, destination_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, maxHops_);
       }
@@ -453,10 +527,12 @@ public final class Common {
         bitField0_ = (bitField0_ & ~0x00000001);
         time_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
-        destination_ = 0;
+        message_ = "Hello from protoc!!";
         bitField0_ = (bitField0_ & ~0x00000004);
-        maxHops_ = -1;
+        destination_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        maxHops_ = -1;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -496,9 +572,13 @@ public final class Common {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.destination_ = destination_;
+        result.message_ = message_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.destination_ = destination_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.maxHops_ = maxHops_;
         result.bitField0_ = to_bitField0_;
@@ -523,6 +603,11 @@ public final class Common {
         if (other.hasTime()) {
           setTime(other.getTime());
         }
+        if (other.hasMessage()) {
+          bitField0_ |= 0x00000004;
+          message_ = other.message_;
+          onChanged();
+        }
         if (other.hasDestination()) {
           setDestination(other.getDestination());
         }
@@ -539,6 +624,10 @@ public final class Common {
           return false;
         }
         if (!hasTime()) {
+          
+          return false;
+        }
+        if (!hasMessage()) {
           
           return false;
         }
@@ -628,6 +717,82 @@ public final class Common {
         return this;
       }
 
+      private java.lang.Object message_ = "Hello from protoc!!";
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public boolean hasMessage() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            message_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public Builder clearMessage() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string message = 4 [default = "Hello from protoc!!"];</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        message_ = value;
+        onChanged();
+        return this;
+      }
+
       private int destination_ ;
       /**
        * <code>optional int32 destination = 8;</code>
@@ -637,7 +802,7 @@ public final class Common {
        * </pre>
        */
       public boolean hasDestination() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <code>optional int32 destination = 8;</code>
@@ -657,7 +822,7 @@ public final class Common {
        * </pre>
        */
       public Builder setDestination(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         destination_ = value;
         onChanged();
         return this;
@@ -670,7 +835,7 @@ public final class Common {
        * </pre>
        */
       public Builder clearDestination() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         destination_ = 0;
         onChanged();
         return this;
@@ -686,7 +851,7 @@ public final class Common {
        * </pre>
        */
       public boolean hasMaxHops() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional int32 max_hops = 10 [default = -1];</code>
@@ -708,7 +873,7 @@ public final class Common {
        * </pre>
        */
       public Builder setMaxHops(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         maxHops_ = value;
         onChanged();
         return this;
@@ -722,7 +887,7 @@ public final class Common {
        * </pre>
        */
       public Builder clearMaxHops() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         maxHops_ = -1;
         onChanged();
         return this;
@@ -1398,11 +1563,12 @@ public final class Common {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014common.proto\"R\n\006Header\022\017\n\007node_id\030\001 \002(" +
-      "\005\022\014\n\004time\030\002 \002(\003\022\023\n\013destination\030\010 \001(\005\022\024\n\010" +
-      "max_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(" +
-      "\005\022\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pi" +
-      "pe.commonH\001"
+      "\n\014common.proto\"x\n\006Header\022\017\n\007node_id\030\001 \002(" +
+      "\005\022\014\n\004time\030\002 \002(\003\022$\n\007message\030\004 \002(\t:\023Hello " +
+      "from protoc!!\022\023\n\013destination\030\010 \001(\005\022\024\n\010ma" +
+      "x_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(\005\022" +
+      "\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pipe" +
+      ".commonH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1421,7 +1587,7 @@ public final class Common {
     internal_static_Header_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Header_descriptor,
-        new java.lang.String[] { "NodeId", "Time", "Destination", "MaxHops", });
+        new java.lang.String[] { "NodeId", "Time", "Message", "Destination", "MaxHops", });
     internal_static_Failure_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Failure_fieldAccessorTable = new

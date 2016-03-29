@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.protobuf.*;
 import pipe.common.Common.Failure;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.Task;
@@ -35,7 +36,7 @@ import pipe.work.Work.WorkState;
  * @author gash
  * 
  */
-public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
+public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage>  {
 	protected static Logger logger = LoggerFactory.getLogger("work");
 	protected ServerState state;
 	protected boolean debug = true;
@@ -111,7 +112,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
 		ctx.channel().writeAndFlush(msg);//KD
+		//ctx.channel().writeAndFlush("hello 123");
 		Thread.sleep(1000);
+		
 	}
 
 	@Override
