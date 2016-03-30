@@ -8,9 +8,8 @@
 	<classpathentry kind="lib" path="lib/netty-all-4.0.15.Final.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.2.jar"/>
-	<classpathentry kind="lib" path="lib/protobuf-java-2.5.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/Student/Desktop/mongojars/mongo-java-driver-3.2.2.jar"/>
-	<classpathentry kind="lib" path="/Users/Student/Desktop/apache-commons.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-java-driver-3.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/protobuf-java-2.6.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

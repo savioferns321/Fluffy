@@ -15,8 +15,13 @@
  */
 package gash.router.client;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import pipe.common.Common.Header;
 import routing.Pipe.CommandMessage;
+import routing.Pipe.Task;
+import routing.Pipe.Task.TaskType;
 
 /**
  * front-end (proxy) to our service - functional-based
@@ -27,6 +32,8 @@ import routing.Pipe.CommandMessage;
 public class MessageClient {
 	// track requests
 	private long curID = 0;
+	private static int seriesCounter =0;
+	private static int seqID = 1;
 
 	public MessageClient(String host, int port) {
 		init(host, port);
@@ -60,6 +67,32 @@ public class MessageClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void sendReadRequest(String filename) throws UnknownHostException{
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(999);
+		hb.setTime(System.currentTimeMillis());
+		hb.setDestination(-1);
+		
+		CommandMessage.Builder rb = CommandMessage.newBuilder();
+		rb.setHeader(hb);
+		
+		Task.Builder tb = Task.newBuilder();
+		tb.setFilename(filename);
+		tb.setTaskType(TaskType.READ);
+		tb.setSender(InetAddress.getLocalHost().getHostAddress());
+		tb.setSeqId(seqID++);
+		tb.setSeriesId(seriesCounter++);
+		
+		rb.setTask(tb.build());
+		
+		try {
+			CommConnection.getInstance().enqueue(rb.build());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void release() {

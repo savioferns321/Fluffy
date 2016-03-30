@@ -74,6 +74,8 @@ public class MessageServer {
 		cthread.start();
 
 		if (!conf.isInternalNode()) {
+			QueueManager.initManager();
+			
 			StartCommandCommunication comm2 = new StartCommandCommunication(conf);
 			logger.info("Command starting");
 

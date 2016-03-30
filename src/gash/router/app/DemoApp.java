@@ -15,6 +15,8 @@
  */
 package gash.router.app;
 
+import java.net.UnknownHostException;
+
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.MessageClient;
@@ -66,15 +68,16 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = "127.0.0.1";
-		int port = 4568;
+		String host = "localhost";
+		int port = 5101;
 
 		try {
 			MessageClient mc = new MessageClient(host, port);
 			DemoApp da = new DemoApp(mc);
 
 			// do stuff w/ the connection
-			da.ping(2);
+			//da.ping(2);
+			da.sendReadTasks();
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();
@@ -84,5 +87,16 @@ public class DemoApp implements CommListener {
 		} finally {
 			CommConnection.getInstance().release();
 		}
+	}
+	
+	public void sendReadTasks(){
+		try {
+			mc.sendReadRequest("test_1.txt");
+			mc.sendReadRequest("test_2.txt");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

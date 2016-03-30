@@ -91,6 +91,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				Task t = msg.getTask();
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
+			}else{
+				logger.info("Executing from work handler ");
+				
 			}
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer has occured");
@@ -148,6 +151,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		 * channel.writeAndFlush(wb.build());
 		 */
 		Thread.sleep(1000);
+		ctx.channel().writeAndFlush(msg);
 	}
 
 	@Override

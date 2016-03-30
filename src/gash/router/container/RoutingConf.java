@@ -36,6 +36,7 @@ public class RoutingConf {
 	private int commandPort;
 	private int workPort;
 	private boolean internalNode = true;
+	private boolean leader = false;
 	private int heartbeatDt = 2000;
 	private List<RoutingEntry> routing;
 
@@ -89,6 +90,14 @@ public class RoutingConf {
 
 	public void setInternalNode(boolean internalNode) {
 		this.internalNode = internalNode;
+	}
+
+	public boolean isLeader() {
+		return leader;
+	}
+
+	public void setLeader(boolean leader) {
+		this.leader = leader;
 	}
 
 	public int getHeartbeatDt() {

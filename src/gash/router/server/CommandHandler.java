@@ -38,6 +38,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	protected RoutingConf conf;
 
 	public CommandHandler(RoutingConf conf) {
+		
 		if (conf != null) {
 			this.conf = conf;
 		}
@@ -65,7 +66,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				logger.info("ping from " + msg.getHeader().getNodeId());
 			} else if (msg.hasMessage()) {
 				logger.info(msg.getMessage());
-			} else {
+			} else if(msg.hasTask()){
+
+				/**
+				 * TODO Enqueue the command message and the channel into the server queue
+				 */
+				logger.info("Received task from " + msg.getHeader().getNodeId());
+				System.out.println("Queuing task");
+				System.out.flush();
+				QueueManager.getInstance().enqueueInboundMsg(msg, channel);
 			}
 
 		} catch (Exception e) {
