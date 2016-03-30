@@ -1,4 +1,4 @@
-package gash.router.mongodb;
+package gash.router.persistence;
 
 import org.bson.Document;
 import org.bson.types.Binary;

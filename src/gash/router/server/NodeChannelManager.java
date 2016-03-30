@@ -36,7 +36,11 @@ public class NodeChannelManager {
 		return node2ChannelMap.size();
 	}
 
-	//Returns next available channel for taking in read requests
+	public static ConcurrentHashMap<Integer, Channel> getNode2ChannelMap() {
+		return node2ChannelMap;
+	}
+
+	// Returns next available channel for taking in read requests
 	public static Channel getNextReadChannel() {
 		// TODO
 		return null;
