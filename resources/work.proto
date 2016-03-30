@@ -22,10 +22,16 @@ message Task {
     required int32 seq_id = 2;
 }
 
+message RoutingConf {
+  repeated string nodeIp = 1;
+  repeated string nodeId = 2;
+}
+
 // These are messages to keep the network running (not to perform work)
 message WorkMessage {
    required Header header = 1;
    required int64 secret = 2;
+   optional RoutingConf routingEntries = 11;
 
    /**
     * The actions (request or response) is
@@ -44,5 +50,8 @@ message WorkMessage {
       Task task = 6;
       WorkState state = 7;
       LeaderStatus leader = 8;
+
+      bool newNode = 9;
+      bool flagRouting = 10;
    }
 }

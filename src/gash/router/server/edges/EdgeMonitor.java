@@ -15,10 +15,15 @@
  */
 package gash.router.server.edges;
 
+import java.net.InetAddress;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.container.RoutingConf;
 import gash.router.container.RoutingConf.RoutingEntry;
+import gash.router.discovery.NodeDiscoveryManager;
 import gash.router.server.ServerState;
 import gash.router.server.WorkInit;
 import io.netty.bootstrap.Bootstrap;
@@ -39,6 +44,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
+	private ArrayList<InetAddress> liveIps;
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -53,6 +59,24 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			for (RoutingEntry e : state.getConf().getRouting()) {
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
+		} /// WHEN a new node enters it will have no routing entries.
+		else {
+			System.out.println("No routing entries..possibly a new node");
+			try {
+				liveIps = NodeDiscoveryManager.checkHosts();
+				System.out.println(liveIps);
+				// System.out.println(liveIps.get(1).getHostAddress());
+
+				for (InetAddress oneIp : liveIps) {
+					System.out.println(oneIp.getHostAddress());
+				}
+				Channel newNodeChannel = connectToChannel("127.0.0.1", 5100, this.state);
+				WorkMessage wm = createNewNode();
+				newNodeChannel.writeAndFlush(wm);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
 
 		// cannot go below 2 sec
@@ -62,6 +86,56 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
+	}
+
+	public WorkMessage createRoutingMsg() {
+		WorkState.Builder sb = WorkState.newBuilder();
+		sb.setEnqueued(-1);
+		sb.setProcessed(-1);
+
+		pipe.work.Work.RoutingConf.Builder rb = pipe.work.Work.RoutingConf.newBuilder();
+
+		ArrayList<String> ipList = new ArrayList<String>();
+		ArrayList<String> idList = new ArrayList<String>();
+
+		for (RoutingEntry destIp : state.getConf().getRouting()) {
+			ipList.add(destIp.getHost());
+		}
+		for (RoutingEntry destId : state.getConf().getRouting()) {
+			idList.add(destId.getHost());
+		}
+		rb.addAllNodeId(idList);
+		rb.addAllNodeIp(ipList);
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(state.getConf().getNodeId());
+		hb.setDestination(-1);
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb);
+		wb.setSecret(1234);
+		wb.setFlagRouting(true);
+		wb.setRoutingEntries(rb);
+		return wb.build();
+	}
+
+	private WorkMessage createNewNode() {
+		WorkState.Builder sb = WorkState.newBuilder();
+		sb.setEnqueued(-1);
+		sb.setProcessed(-1);
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(state.getConf().getNodeId());
+		hb.setDestination(-1);
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb);
+		wb.setNewNode(true);
+		wb.setSecret(1234);
+
+		return wb.build();
 	}
 
 	private WorkMessage createHB(EdgeInfo ei) {
@@ -135,7 +209,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			b.option(ChannelOption.SO_KEEPALIVE, true);
 			// Make the connection attempt.
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Could not connect to the host " + host);
+			return null;
 		}
 		return b.connect(host, port).syncUninterruptibly().channel();
 

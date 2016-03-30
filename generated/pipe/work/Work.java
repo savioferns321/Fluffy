@@ -1524,6 +1524,688 @@ public final class Work {
     // @@protoc_insertion_point(class_scope:Task)
   }
 
+  public interface RoutingConfOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:RoutingConf)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    com.google.protobuf.ProtocolStringList
+        getNodeIpList();
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    int getNodeIpCount();
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    java.lang.String getNodeIp(int index);
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getNodeIpBytes(int index);
+
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    com.google.protobuf.ProtocolStringList
+        getNodeIdList();
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    int getNodeIdCount();
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    java.lang.String getNodeId(int index);
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getNodeIdBytes(int index);
+  }
+  /**
+   * Protobuf type {@code RoutingConf}
+   */
+  public static final class RoutingConf extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:RoutingConf)
+      RoutingConfOrBuilder {
+    // Use RoutingConf.newBuilder() to construct.
+    private RoutingConf(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private RoutingConf(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RoutingConf defaultInstance;
+    public static RoutingConf getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public RoutingConf getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RoutingConf(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                nodeIp_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              nodeIp_.add(bs);
+              break;
+            }
+            case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                nodeId_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              nodeId_.add(bs);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          nodeIp_ = nodeIp_.getUnmodifiableView();
+        }
+        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          nodeId_ = nodeId_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return pipe.work.Work.internal_static_RoutingConf_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return pipe.work.Work.internal_static_RoutingConf_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              pipe.work.Work.RoutingConf.class, pipe.work.Work.RoutingConf.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<RoutingConf> PARSER =
+        new com.google.protobuf.AbstractParser<RoutingConf>() {
+      public RoutingConf parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RoutingConf(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RoutingConf> getParserForType() {
+      return PARSER;
+    }
+
+    public static final int NODEIP_FIELD_NUMBER = 1;
+    private com.google.protobuf.LazyStringList nodeIp_;
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getNodeIpList() {
+      return nodeIp_;
+    }
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    public int getNodeIpCount() {
+      return nodeIp_.size();
+    }
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    public java.lang.String getNodeIp(int index) {
+      return nodeIp_.get(index);
+    }
+    /**
+     * <code>repeated string nodeIp = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNodeIpBytes(int index) {
+      return nodeIp_.getByteString(index);
+    }
+
+    public static final int NODEID_FIELD_NUMBER = 2;
+    private com.google.protobuf.LazyStringList nodeId_;
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getNodeIdList() {
+      return nodeId_;
+    }
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    public int getNodeIdCount() {
+      return nodeId_.size();
+    }
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    public java.lang.String getNodeId(int index) {
+      return nodeId_.get(index);
+    }
+    /**
+     * <code>repeated string nodeId = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNodeIdBytes(int index) {
+      return nodeId_.getByteString(index);
+    }
+
+    private void initFields() {
+      nodeIp_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      nodeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < nodeIp_.size(); i++) {
+        output.writeBytes(1, nodeIp_.getByteString(i));
+      }
+      for (int i = 0; i < nodeId_.size(); i++) {
+        output.writeBytes(2, nodeId_.getByteString(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < nodeIp_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(nodeIp_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getNodeIpList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < nodeId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(nodeId_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getNodeIdList().size();
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static pipe.work.Work.RoutingConf parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.RoutingConf parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static pipe.work.Work.RoutingConf parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.RoutingConf parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(pipe.work.Work.RoutingConf prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RoutingConf}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:RoutingConf)
+        pipe.work.Work.RoutingConfOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return pipe.work.Work.internal_static_RoutingConf_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return pipe.work.Work.internal_static_RoutingConf_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                pipe.work.Work.RoutingConf.class, pipe.work.Work.RoutingConf.Builder.class);
+      }
+
+      // Construct using pipe.work.Work.RoutingConf.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        nodeIp_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        nodeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return pipe.work.Work.internal_static_RoutingConf_descriptor;
+      }
+
+      public pipe.work.Work.RoutingConf getDefaultInstanceForType() {
+        return pipe.work.Work.RoutingConf.getDefaultInstance();
+      }
+
+      public pipe.work.Work.RoutingConf build() {
+        pipe.work.Work.RoutingConf result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public pipe.work.Work.RoutingConf buildPartial() {
+        pipe.work.Work.RoutingConf result = new pipe.work.Work.RoutingConf(this);
+        int from_bitField0_ = bitField0_;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          nodeIp_ = nodeIp_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.nodeIp_ = nodeIp_;
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          nodeId_ = nodeId_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.nodeId_ = nodeId_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof pipe.work.Work.RoutingConf) {
+          return mergeFrom((pipe.work.Work.RoutingConf)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(pipe.work.Work.RoutingConf other) {
+        if (other == pipe.work.Work.RoutingConf.getDefaultInstance()) return this;
+        if (!other.nodeIp_.isEmpty()) {
+          if (nodeIp_.isEmpty()) {
+            nodeIp_ = other.nodeIp_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureNodeIpIsMutable();
+            nodeIp_.addAll(other.nodeIp_);
+          }
+          onChanged();
+        }
+        if (!other.nodeId_.isEmpty()) {
+          if (nodeId_.isEmpty()) {
+            nodeId_ = other.nodeId_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureNodeIdIsMutable();
+            nodeId_.addAll(other.nodeId_);
+          }
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        pipe.work.Work.RoutingConf parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (pipe.work.Work.RoutingConf) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.LazyStringList nodeIp_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureNodeIpIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          nodeIp_ = new com.google.protobuf.LazyStringArrayList(nodeIp_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getNodeIpList() {
+        return nodeIp_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public int getNodeIpCount() {
+        return nodeIp_.size();
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public java.lang.String getNodeIp(int index) {
+        return nodeIp_.get(index);
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNodeIpBytes(int index) {
+        return nodeIp_.getByteString(index);
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public Builder setNodeIp(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIpIsMutable();
+        nodeIp_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public Builder addNodeIp(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIpIsMutable();
+        nodeIp_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public Builder addAllNodeIp(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureNodeIpIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, nodeIp_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public Builder clearNodeIp() {
+        nodeIp_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeIp = 1;</code>
+       */
+      public Builder addNodeIpBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIpIsMutable();
+        nodeIp_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList nodeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureNodeIdIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          nodeId_ = new com.google.protobuf.LazyStringArrayList(nodeId_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getNodeIdList() {
+        return nodeId_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public int getNodeIdCount() {
+        return nodeId_.size();
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public java.lang.String getNodeId(int index) {
+        return nodeId_.get(index);
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNodeIdBytes(int index) {
+        return nodeId_.getByteString(index);
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public Builder setNodeId(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIdIsMutable();
+        nodeId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public Builder addNodeId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIdIsMutable();
+        nodeId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public Builder addAllNodeId(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureNodeIdIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, nodeId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public Builder clearNodeId() {
+        nodeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string nodeId = 2;</code>
+       */
+      public Builder addNodeIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureNodeIdIsMutable();
+        nodeId_.add(value);
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:RoutingConf)
+    }
+
+    static {
+      defaultInstance = new RoutingConf(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:RoutingConf)
+  }
+
   public interface WorkMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:WorkMessage)
       com.google.protobuf.MessageOrBuilder {
@@ -1549,6 +2231,19 @@ public final class Work {
      * <code>required int64 secret = 2;</code>
      */
     long getSecret();
+
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    boolean hasRoutingEntries();
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    pipe.work.Work.RoutingConf getRoutingEntries();
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    pipe.work.Work.RoutingConfOrBuilder getRoutingEntriesOrBuilder();
 
     /**
      * <code>optional .Failure err = 3;</code>
@@ -1643,6 +2338,24 @@ public final class Work {
      * <code>optional .LeaderStatus leader = 8;</code>
      */
     pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder();
+
+    /**
+     * <code>optional bool newNode = 9;</code>
+     */
+    boolean hasNewNode();
+    /**
+     * <code>optional bool newNode = 9;</code>
+     */
+    boolean getNewNode();
+
+    /**
+     * <code>optional bool flagRouting = 10;</code>
+     */
+    boolean hasFlagRouting();
+    /**
+     * <code>optional bool flagRouting = 10;</code>
+     */
+    boolean getFlagRouting();
   }
   /**
    * Protobuf type {@code WorkMessage}
@@ -1788,6 +2501,29 @@ public final class Work {
               payloadCase_ = 8;
               break;
             }
+            case 72: {
+              payloadCase_ = 9;
+              payload_ = input.readBool();
+              break;
+            }
+            case 80: {
+              payloadCase_ = 10;
+              payload_ = input.readBool();
+              break;
+            }
+            case 90: {
+              pipe.work.Work.RoutingConf.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = routingEntries_.toBuilder();
+              }
+              routingEntries_ = input.readMessage(pipe.work.Work.RoutingConf.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(routingEntries_);
+                routingEntries_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1838,6 +2574,8 @@ public final class Work {
       TASK(6),
       STATE(7),
       LEADER(8),
+      NEWNODE(9),
+      FLAGROUTING(10),
       PAYLOAD_NOT_SET(0);
       private int value = 0;
       private PayloadCase(int value) {
@@ -1851,6 +2589,8 @@ public final class Work {
           case 6: return TASK;
           case 7: return STATE;
           case 8: return LEADER;
+          case 9: return NEWNODE;
+          case 10: return FLAGROUTING;
           case 0: return PAYLOAD_NOT_SET;
           default: throw new java.lang.IllegalArgumentException(
             "Value is undefined for this oneof enum.");
@@ -1901,6 +2641,27 @@ public final class Work {
      */
     public long getSecret() {
       return secret_;
+    }
+
+    public static final int ROUTINGENTRIES_FIELD_NUMBER = 11;
+    private pipe.work.Work.RoutingConf routingEntries_;
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    public boolean hasRoutingEntries() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    public pipe.work.Work.RoutingConf getRoutingEntries() {
+      return routingEntries_;
+    }
+    /**
+     * <code>optional .RoutingConf routingEntries = 11;</code>
+     */
+    public pipe.work.Work.RoutingConfOrBuilder getRoutingEntriesOrBuilder() {
+      return routingEntries_;
     }
 
     public static final int ERR_FIELD_NUMBER = 3;
@@ -2070,9 +2831,44 @@ public final class Work {
       return pipe.election.Election.LeaderStatus.getDefaultInstance();
     }
 
+    public static final int NEWNODE_FIELD_NUMBER = 9;
+    /**
+     * <code>optional bool newNode = 9;</code>
+     */
+    public boolean hasNewNode() {
+      return payloadCase_ == 9;
+    }
+    /**
+     * <code>optional bool newNode = 9;</code>
+     */
+    public boolean getNewNode() {
+      if (payloadCase_ == 9) {
+        return (java.lang.Boolean) payload_;
+      }
+      return false;
+    }
+
+    public static final int FLAGROUTING_FIELD_NUMBER = 10;
+    /**
+     * <code>optional bool flagRouting = 10;</code>
+     */
+    public boolean hasFlagRouting() {
+      return payloadCase_ == 10;
+    }
+    /**
+     * <code>optional bool flagRouting = 10;</code>
+     */
+    public boolean getFlagRouting() {
+      if (payloadCase_ == 10) {
+        return (java.lang.Boolean) payload_;
+      }
+      return false;
+    }
+
     private void initFields() {
       header_ = pipe.common.Common.Header.getDefaultInstance();
       secret_ = 0L;
+      routingEntries_ = pipe.work.Work.RoutingConf.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2154,6 +2950,17 @@ public final class Work {
       if (payloadCase_ == 8) {
         output.writeMessage(8, (pipe.election.Election.LeaderStatus) payload_);
       }
+      if (payloadCase_ == 9) {
+        output.writeBool(
+            9, (boolean)((java.lang.Boolean) payload_));
+      }
+      if (payloadCase_ == 10) {
+        output.writeBool(
+            10, (boolean)((java.lang.Boolean) payload_));
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeMessage(11, routingEntries_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -2195,6 +3002,20 @@ public final class Work {
       if (payloadCase_ == 8) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, (pipe.election.Election.LeaderStatus) payload_);
+      }
+      if (payloadCase_ == 9) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              9, (boolean)((java.lang.Boolean) payload_));
+      }
+      if (payloadCase_ == 10) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              10, (boolean)((java.lang.Boolean) payload_));
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(11, routingEntries_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2310,6 +3131,7 @@ public final class Work {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getHeaderFieldBuilder();
+          getRoutingEntriesFieldBuilder();
         }
       }
       private static Builder create() {
@@ -2326,6 +3148,12 @@ public final class Work {
         bitField0_ = (bitField0_ & ~0x00000001);
         secret_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
+        if (routingEntriesBuilder_ == null) {
+          routingEntries_ = pipe.work.Work.RoutingConf.getDefaultInstance();
+        } else {
+          routingEntriesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
         payloadCase_ = 0;
         payload_ = null;
         return this;
@@ -2368,6 +3196,14 @@ public final class Work {
           to_bitField0_ |= 0x00000002;
         }
         result.secret_ = secret_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        if (routingEntriesBuilder_ == null) {
+          result.routingEntries_ = routingEntries_;
+        } else {
+          result.routingEntries_ = routingEntriesBuilder_.build();
+        }
         if (payloadCase_ == 3) {
           if (errBuilder_ == null) {
             result.payload_ = payload_;
@@ -2406,6 +3242,12 @@ public final class Work {
             result.payload_ = leaderBuilder_.build();
           }
         }
+        if (payloadCase_ == 9) {
+          result.payload_ = payload_;
+        }
+        if (payloadCase_ == 10) {
+          result.payload_ = payload_;
+        }
         result.bitField0_ = to_bitField0_;
         result.payloadCase_ = payloadCase_;
         onBuilt();
@@ -2428,6 +3270,9 @@ public final class Work {
         }
         if (other.hasSecret()) {
           setSecret(other.getSecret());
+        }
+        if (other.hasRoutingEntries()) {
+          mergeRoutingEntries(other.getRoutingEntries());
         }
         switch (other.getPayloadCase()) {
           case ERR: {
@@ -2452,6 +3297,14 @@ public final class Work {
           }
           case LEADER: {
             mergeLeader(other.getLeader());
+            break;
+          }
+          case NEWNODE: {
+            setNewNode(other.getNewNode());
+            break;
+          }
+          case FLAGROUTING: {
+            setFlagRouting(other.getFlagRouting());
             break;
           }
           case PAYLOAD_NOT_SET: {
@@ -2688,6 +3541,122 @@ public final class Work {
         secret_ = 0L;
         onChanged();
         return this;
+      }
+
+      private pipe.work.Work.RoutingConf routingEntries_ = pipe.work.Work.RoutingConf.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.RoutingConf, pipe.work.Work.RoutingConf.Builder, pipe.work.Work.RoutingConfOrBuilder> routingEntriesBuilder_;
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public boolean hasRoutingEntries() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public pipe.work.Work.RoutingConf getRoutingEntries() {
+        if (routingEntriesBuilder_ == null) {
+          return routingEntries_;
+        } else {
+          return routingEntriesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public Builder setRoutingEntries(pipe.work.Work.RoutingConf value) {
+        if (routingEntriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          routingEntries_ = value;
+          onChanged();
+        } else {
+          routingEntriesBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public Builder setRoutingEntries(
+          pipe.work.Work.RoutingConf.Builder builderForValue) {
+        if (routingEntriesBuilder_ == null) {
+          routingEntries_ = builderForValue.build();
+          onChanged();
+        } else {
+          routingEntriesBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public Builder mergeRoutingEntries(pipe.work.Work.RoutingConf value) {
+        if (routingEntriesBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
+              routingEntries_ != pipe.work.Work.RoutingConf.getDefaultInstance()) {
+            routingEntries_ =
+              pipe.work.Work.RoutingConf.newBuilder(routingEntries_).mergeFrom(value).buildPartial();
+          } else {
+            routingEntries_ = value;
+          }
+          onChanged();
+        } else {
+          routingEntriesBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public Builder clearRoutingEntries() {
+        if (routingEntriesBuilder_ == null) {
+          routingEntries_ = pipe.work.Work.RoutingConf.getDefaultInstance();
+          onChanged();
+        } else {
+          routingEntriesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public pipe.work.Work.RoutingConf.Builder getRoutingEntriesBuilder() {
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return getRoutingEntriesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      public pipe.work.Work.RoutingConfOrBuilder getRoutingEntriesOrBuilder() {
+        if (routingEntriesBuilder_ != null) {
+          return routingEntriesBuilder_.getMessageOrBuilder();
+        } else {
+          return routingEntries_;
+        }
+      }
+      /**
+       * <code>optional .RoutingConf routingEntries = 11;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.RoutingConf, pipe.work.Work.RoutingConf.Builder, pipe.work.Work.RoutingConfOrBuilder> 
+          getRoutingEntriesFieldBuilder() {
+        if (routingEntriesBuilder_ == null) {
+          routingEntriesBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.work.Work.RoutingConf, pipe.work.Work.RoutingConf.Builder, pipe.work.Work.RoutingConfOrBuilder>(
+                  getRoutingEntries(),
+                  getParentForChildren(),
+                  isClean());
+          routingEntries_ = null;
+        }
+        return routingEntriesBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilder<
@@ -3453,6 +4422,78 @@ public final class Work {
         return leaderBuilder_;
       }
 
+      /**
+       * <code>optional bool newNode = 9;</code>
+       */
+      public boolean hasNewNode() {
+        return payloadCase_ == 9;
+      }
+      /**
+       * <code>optional bool newNode = 9;</code>
+       */
+      public boolean getNewNode() {
+        if (payloadCase_ == 9) {
+          return (java.lang.Boolean) payload_;
+        }
+        return false;
+      }
+      /**
+       * <code>optional bool newNode = 9;</code>
+       */
+      public Builder setNewNode(boolean value) {
+        payloadCase_ = 9;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool newNode = 9;</code>
+       */
+      public Builder clearNewNode() {
+        if (payloadCase_ == 9) {
+          payloadCase_ = 0;
+          payload_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <code>optional bool flagRouting = 10;</code>
+       */
+      public boolean hasFlagRouting() {
+        return payloadCase_ == 10;
+      }
+      /**
+       * <code>optional bool flagRouting = 10;</code>
+       */
+      public boolean getFlagRouting() {
+        if (payloadCase_ == 10) {
+          return (java.lang.Boolean) payload_;
+        }
+        return false;
+      }
+      /**
+       * <code>optional bool flagRouting = 10;</code>
+       */
+      public Builder setFlagRouting(boolean value) {
+        payloadCase_ = 10;
+        payload_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool flagRouting = 10;</code>
+       */
+      public Builder clearFlagRouting() {
+        if (payloadCase_ == 10) {
+          payloadCase_ = 0;
+          payload_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:WorkMessage)
     }
 
@@ -3480,6 +4521,11 @@ public final class Work {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Task_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_RoutingConf_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_RoutingConf_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_WorkMessage_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3497,13 +4543,16 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\")\n\004Task\022\021\n\tseries_id\030\001 \002(\003\022" +
-      "\016\n\006seq_id\030\002 \002(\005\"\333\001\n\013WorkMessage\022\027\n\006heade" +
-      "r\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022\027\n\003err\030" +
-      "\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004bea" +
-      "t\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\0132\005.Ta" +
-      "skH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006lea" +
-      "der\030\010 \001(\0132\r.LeaderStatusH\000B\t\n\007payloadB\r\n",
-      "\tpipe.workH\001"
+      "\016\n\006seq_id\030\002 \002(\005\"-\n\013RoutingConf\022\016\n\006nodeIp" +
+      "\030\001 \003(\t\022\016\n\006nodeId\030\002 \003(\t\"\253\002\n\013WorkMessage\022\027" +
+      "\n\006header\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022" +
+      "$\n\016routingEntries\030\013 \001(\0132\014.RoutingConf\022\027\n" +
+      "\003err\030\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032" +
+      "\n\004beat\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\013",
+      "2\005.TaskH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037" +
+      "\n\006leader\030\010 \001(\0132\r.LeaderStatusH\000\022\021\n\007newNo" +
+      "de\030\t \001(\010H\000\022\025\n\013flagRouting\030\n \001(\010H\000B\t\n\007pay" +
+      "loadB\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3537,12 +4586,18 @@ public final class Work {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Task_descriptor,
         new java.lang.String[] { "SeriesId", "SeqId", });
-    internal_static_WorkMessage_descriptor =
+    internal_static_RoutingConf_descriptor =
       getDescriptor().getMessageTypes().get(3);
+    internal_static_RoutingConf_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_RoutingConf_descriptor,
+        new java.lang.String[] { "NodeIp", "NodeId", });
+    internal_static_WorkMessage_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "Err", "Ping", "Beat", "Task", "State", "Leader", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
   }

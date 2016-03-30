@@ -68,6 +68,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
+			} else if (msg.hasFlagRouting()) {
+				logger.info("Routing information recieved " + msg.getHeader().getNodeId());
+				logger.info("Routing Entries: " + msg.getRoutingEntries());
+
+			} else if (msg.hasNewNode()) {
+				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
+				WorkMessage wm = state.getEmon().createRoutingMsg();
+				channel.writeAndFlush(wm);
+
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();
@@ -117,27 +126,27 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		Channel channel = ctx.channel();
 		handleMessage(msg, channel);
 
-		//Should happen via queue?
-		
-		WorkState.Builder sb = WorkState.newBuilder();
-		sb.setEnqueued(-1);
-		sb.setProcessed(-1);
-		
-		WorkMessage.Builder wb = WorkMessage.newBuilder();
-		wb.setSecret(1234);
-		
-		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(state.getConf().getNodeId());
-		hb.setDestination(msg.getHeader().getNodeId());
-		hb.setTime(System.currentTimeMillis());
-		
-		Heartbeat.Builder heartbeat = Heartbeat.newBuilder();
-		heartbeat.setState(sb);
-		
-		wb.setBeat(heartbeat);
-		wb.setHeader(hb);
+		// Should happen via queue?
 
-		channel.writeAndFlush(wb.build());
+		/*
+		 * WorkState.Builder sb = WorkState.newBuilder(); sb.setEnqueued(-1);
+		 * sb.setProcessed(-1);
+		 * 
+		 * WorkMessage.Builder wb = WorkMessage.newBuilder();
+		 * wb.setSecret(1234);
+		 * 
+		 * Header.Builder hb = Header.newBuilder();
+		 * hb.setNodeId(state.getConf().getNodeId());
+		 * hb.setDestination(msg.getHeader().getNodeId());
+		 * hb.setTime(System.currentTimeMillis());
+		 * 
+		 * Heartbeat.Builder heartbeat = Heartbeat.newBuilder();
+		 * heartbeat.setState(sb);
+		 * 
+		 * wb.setBeat(heartbeat); wb.setHeader(hb);
+		 * 
+		 * channel.writeAndFlush(wb.build());
+		 */
 		Thread.sleep(1000);
 	}
 
