@@ -12,67 +12,54 @@ import gash.router.server.ServerState;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
 
-public class DataReplicationManager {
-
-	protected static Logger logger = LoggerFactory.getLogger("DataReplicationManager");
+public class ReadHandler {
+	protected static Logger logger = LoggerFactory.getLogger("ReadHandler");
 	protected static ServerState serverState;
 
-	protected static AtomicReference<DataReplicationManager> instance = new AtomicReference<DataReplicationManager>();
+	protected static AtomicReference<ReadHandler> instance = new AtomicReference<ReadHandler>();
 
-	public static DataReplicationManager initNodeChannelManager(ServerState serverState) {
+	public static ReadHandler initNodeChannelManager(ServerState serverState) {
 		DataReplicationManager.serverState = serverState;
-		instance.compareAndSet(null, new DataReplicationManager());
-		System.out.println(" --- Initializing Data Replication Manager --- ");
+		instance.compareAndSet(null, new ReadHandler());
+		System.out.println(" --- Initializing Read Handler --- ");
 		return instance.get();
 	}
 
-	public static DataReplicationManager getInstance() {
+	public static ReadHandler getInstance() {
 		return instance.get();
 	}
-
-	//TODO convert ReplicationInfo to WorkMessage
-	public void replicate(WorkMessage workmessage) {
+	
+	public void readFile(WorkMessage workmessage) {
 		ConcurrentHashMap<Integer, Channel> node2ChannelMap = NodeChannelManager.getNode2ChannelMap();
 		if (node2ChannelMap != null && !node2ChannelMap.isEmpty()) {
 
 			Set<Integer> keySet2 = node2ChannelMap.keySet();
 			for (Integer nodeId : keySet2) {
 				Channel nodeChannel = node2ChannelMap.get(nodeId);
-				Replication replication = new Replication(workmessage, nodeChannel);
+				ReadFile replication = new ReadFile(workmessage, nodeChannel);
 				Thread replicationThread = new Thread(replication);
 				replicationThread.start();
 			}
 
 		}
 	}
-
-	//TODO Remove work message and pass only data  
-	//TODO check if work message hasreplication()
-	/*public boolean writeToDB(WorkMessage workmessage){
-		
-			String fileName = workmessage.getFileName();
-			byte[] fileContent = workmessage.getFileContent().tobytearray();
-			Dbhandler dbHandler = new Dbhandler();
-			if(!dbHandler.addFile(fileName, fileContent)){
-				return false;
-			}else{
-				return true;
-			
-	}
-}*/
-
 	
-	// TODO convert this to Future and Callable
-	private class Replication implements Runnable {
-		//private ReplicationInfo replicationInfo;
+	public void readFileDB(WorkMessage workmessage){
+		//String fileName = workmessage.getFileName();
+		Dbhandler dbhandler = new Dbhandler();
+		//int hash = dbhandler.getFile(fileName);
+		//return hash;
+		
+	}
+	
+	private class ReadFile implements Runnable {
 		private WorkMessage workmessage;
 		private Channel nodeChannel;
 
-		public Replication(WorkMessage workmessage, Channel nodeChannel) {
+		public ReadFile(WorkMessage workmessage, Channel nodeChannel) {
 			this.workmessage = workmessage;
 			this.nodeChannel = nodeChannel;
 		}
-	
 
 		@Override
 		public void run() {
@@ -82,8 +69,5 @@ public class DataReplicationManager {
 				logger.error("The nodeChannel to " + nodeChannel.localAddress() + " is not active");
 			}
 		}
-
 	}
 }
-
-

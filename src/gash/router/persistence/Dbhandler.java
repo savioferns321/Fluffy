@@ -1,32 +1,51 @@
 package gash.router.persistence;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bson.Document;
 import org.bson.types.Binary;
+
+import com.google.protobuf.ByteString;
 import com.mongodb.*;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSUploadStream;
+import com.mongodb.client.gridfs.model.GridFSUploadOptions;
+import com.mongodb.gridfs.GridFS;
 
 public class Dbhandler {
 	
 	public Dbhandler(){
 	
 	}
+	
+	
+	
 	//establish connection with MongoDB
-	public static MongoClient getConnection() throws Exception{
+	public MongoClient getConnection(){
 		MongoClient client = null;
 		try{
 		client = new MongoClient("localhost", 27017);
 		System.out.println("connection established!");
 		}catch(Exception e){
 			System.out.println("Couldnot establish connection !!");
-			throw e;
 	}
 		return client;
 	}
 	
 	//add file into collection Fluffy
-	public static void addFile(String fileName,byte[] input) throws Exception{
+	public boolean addFile(String fileName,byte[] input){
 	MongoClient client = getConnection();
 	MongoDatabase db = client.getDatabase("Fluffy");
 	MongoCollection<Document> collection = db.getCollection("Fluffy");
@@ -35,16 +54,35 @@ public class Dbhandler {
 	collection.insertOne(doc);
 
 	if(collection.count()!=0){
-		System.out.println("sucessful");
-		System.out.println(doc);
+		client.close();
+		return true;
 	}else{
-		System.out.println("something went wrong");
-	}
-	client.close();
+		client.close();
+		return false;
 	}
 	
+	}
+	
+	//adding file that has been chuncked
+	public boolean addFile(String fileName,byte[] input, int noOfChuncks, int chunckId){
+		MongoClient client = getConnection();
+		MongoDatabase db = client.getDatabase("Fluffy");
+		MongoCollection<Document> collection = db.getCollection("Fluffy");
+		
+		Document doc = new Document().append("fileName", fileName ).append("bytes", input).append("noOfChuncks", noOfChuncks).append("chunckId", chunckId);
+		collection.insertOne(doc);
+
+		if(collection.count()!=0){
+			client.close();
+			return true;
+		}else{
+			client.close();
+			return false;
+		}
+		
+		}
 	//get file by name from collection Fluffy and return the bytearray representation of file
-	public static byte[] getFile(String fileName) throws Exception{
+	public byte[] getFile(String fileName){
 		Binary bData= null;
 		byte[] byteData = {};
 		MongoClient client = getConnection();
@@ -57,8 +95,64 @@ public class Dbhandler {
 		}
 		client.close();
 		return byteData;
-	}					
+	}	
+	
+	public int getChuncks(String fileName){
+		int numchuncks = 0;
+		MongoClient client = getConnection();
+		MongoDatabase db = client.getDatabase("Fluffy");
+		MongoCollection<Document> collection = db.getCollection("Fluffy");
+		FindIterable<Document> doc = collection.find(new Document("fileName", fileName));
+		for(Document docs: doc){
+			numchuncks = (Integer) docs.get("noOfChuncks");
+		}
+		client.close();
+		return numchuncks;
 		
+	}
+	
+	//TODO changes should be made
+	//to get file that has been chuncked
+	public Map getFilewithChuncks(String fileName, int chunckId){
+		Map<String,ArrayList<MessageDetails>> messageMap = new HashMap<String,ArrayList<MessageDetails>>();
+		ArrayList<MessageDetails> data = new ArrayList<MessageDetails>();
+		Binary bData= null;
+		byte[] byteData = {};
+		int numchuncks = 0;
+		int chunckid =0;
+		String filename = "";
+		MongoClient client = getConnection();
+		MongoDatabase db = client.getDatabase("Fluffy");
+		MongoCollection<Document> collection = db.getCollection("Fluffy");
+		FindIterable<Document> doc = collection.find(new Document("fileName", fileName));
+		for(Document docs: doc){
+			bData = (Binary) docs.get("bytes");
+			byteData = bData.getData();
+			numchuncks = (Integer) docs.get("noOfChuncks");
+			chunckid = (Integer) docs.get("chunckId");
+			MessageDetails msgdata = new MessageDetails(byteData,numchuncks,chunckid);
+			data.add(msgdata);
+			filename = docs.getString("fileName");
+			messageMap.put(filename, data);
+			data.clear();
+			
+		}
+		client.close();
+		return messageMap;
+	}
+	
+
+}
+class MessageDetails{
+	byte[] byteData;
+	int noOfChuncks;
+	int chunckId;
+	
+	public MessageDetails(byte[] bytedata,int noofchunck,int chunckid){
+		this.byteData = bytedata;
+		this.noOfChuncks = noofchunck;
+		this.chunckId = chunckid;
+	}	
 }
 	
 
