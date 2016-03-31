@@ -9,6 +9,16 @@ public class ReplicationInfo {
 	public ReplicationInfo() {
 
 	}
+	
+	public ReplicationInfo(String fileName, byte[] fileContent, int chunkOrder) {
+		super();
+		this.fileName = fileName;
+		this.fileContent = fileContent;
+		this.chunkOrder = chunkOrder;
+	}
+
+
+
 
 	public String getFileName() {
 		return fileName;

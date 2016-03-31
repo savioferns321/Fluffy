@@ -1,5 +1,6 @@
 package gash.router.server;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -11,6 +12,7 @@ import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
 import io.netty.channel.Channel;
+import routing.Pipe.CommandMessage;
 
 public class NodeChannelManager {
 	protected static Logger logger = LoggerFactory.getLogger("NodeChannelManager");
@@ -18,6 +20,7 @@ public class NodeChannelManager {
 	protected static AtomicReference<NodeChannelManager> instance = new AtomicReference<NodeChannelManager>();
 
 	public static ConcurrentHashMap<Integer, Channel> node2ChannelMap = new ConcurrentHashMap<Integer, Channel>();
+	public static ConcurrentHashMap<CommandMessage, Channel> clientChannelMap = new ConcurrentHashMap<CommandMessage, Channel>();
 	private static int delay = 3000;
 
 	public NodeChannelManager() {
@@ -97,5 +100,33 @@ public class NodeChannelManager {
 			}
 		}
 
+	}
+	
+	/**
+	 * @author savio
+	 * @param message
+	 * @param channel
+	 */
+	public static void addClientToMap(CommandMessage message, Channel channel){
+		clientChannelMap.put(message, channel);
+	}
+	
+	/**
+	 * @author savio
+	 * @param client
+	 * @param filename
+	 * @return
+	 */
+	public static Channel getClientChannelFromMap(String client, String filename){
+		
+		//TODO Problem : If the client has sent multiple requests for the same filename - what do we do?
+		for (CommandMessage msg : clientChannelMap.keySet()) {
+			if(msg.getTask().getFilename().equals(filename) && msg.getTask().getSender().equals(client))
+			{
+				return clientChannelMap.remove(msg);
+			}
+		}
+		
+		return null;
 	}
 }

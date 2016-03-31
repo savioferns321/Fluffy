@@ -6,15 +6,15 @@ import org.slf4j.LoggerFactory;
 import gash.router.server.QueueManager.CommandMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
-public class OutboundQueueWorker extends Thread{
+public class OutboundCommander extends Thread{
 
 	private QueueManager manager;
 	protected static Logger logger = LoggerFactory.getLogger("OutboundQueueWorker");
 	
-	public OutboundQueueWorker(QueueManager manager) {
+	public OutboundCommander(QueueManager manager) {
 		super();
 		this.manager = manager;
-		if (manager.inbound == null)
+		if (manager.outboundCommQ == null)
 			throw new RuntimeException("Manager has a null queue");
 	}
 	
@@ -24,7 +24,7 @@ public class OutboundQueueWorker extends Thread{
 
 			try {
 				// block until a message is enqueued
-				CommandMessageChannelCombo msg = QueueManager.getInstance().dequeueOutboundMsg();
+				CommandMessageChannelCombo msg = QueueManager.getInstance().dequeueOutboundCommmand();
 
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getCommandMessage().getHeader().getDestination());
@@ -37,12 +37,12 @@ public class OutboundQueueWorker extends Thread{
 						cf.awaitUninterruptibly();
 						rtn = cf.isSuccess();
 						if (!rtn)
-							manager.returnOutboundMsg(msg);
+							manager.returnOutboundCommand(msg);
 					}
 
 				} else {
 					logger.info("channel to node " + msg.getCommandMessage().getHeader().getDestination() + " is not writable");
-					manager.returnOutboundMsg(msg);
+					manager.returnOutboundCommand(msg);
 				}
 			} catch (InterruptedException ie) {
 				break;

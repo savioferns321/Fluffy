@@ -13,19 +13,20 @@ public class Dbhandler {
 	
 	}
 	//establish connection with MongoDB
-	public static MongoClient getConnection(){
+	public static MongoClient getConnection() throws Exception{
 		MongoClient client = null;
 		try{
 		client = new MongoClient("localhost", 27017);
 		System.out.println("connection established!");
 		}catch(Exception e){
 			System.out.println("Couldnot establish connection !!");
+			throw e;
 	}
 		return client;
 	}
 	
 	//add file into collection Fluffy
-	public static void addFile(String fileName,byte[] input){
+	public static void addFile(String fileName,byte[] input) throws Exception{
 	MongoClient client = getConnection();
 	MongoDatabase db = client.getDatabase("Fluffy");
 	MongoCollection<Document> collection = db.getCollection("Fluffy");
@@ -43,7 +44,7 @@ public class Dbhandler {
 	}
 	
 	//get file by name from collection Fluffy and return the bytearray representation of file
-	public static byte[] getFile(String fileName){
+	public static byte[] getFile(String fileName) throws Exception{
 		Binary bData= null;
 		byte[] byteData = {};
 		MongoClient client = getConnection();

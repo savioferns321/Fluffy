@@ -24,7 +24,7 @@ message Task {
 message CommandMessage {
    required Header header = 1;
 
-   required Task task= 2;
+   optional Task task= 2;
 
     oneof payload {
       // a client (external) sanity check for testing

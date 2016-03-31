@@ -55,30 +55,29 @@ public final class Pipe {
 
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     boolean hasFilename();
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     java.lang.String getFilename();
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     com.google.protobuf.ByteString
         getFilenameBytes();
-
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    boolean hasCmdMsg();
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    routing.Pipe.CommandMessage getCmdMsg();
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    routing.Pipe.CommandMessageOrBuilder getCmdMsgOrBuilder();
   }
   /**
    * Protobuf type {@code Task}
@@ -168,19 +167,6 @@ public final class Pipe {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000010;
               filename_ = bs;
-              break;
-            }
-            case 58: {
-              routing.Pipe.CommandMessage.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000020) == 0x00000020)) {
-                subBuilder = cmdMsg_.toBuilder();
-              }
-              cmdMsg_ = input.readMessage(routing.Pipe.CommandMessage.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(cmdMsg_);
-                cmdMsg_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000020;
               break;
             }
           }
@@ -396,12 +382,20 @@ public final class Pipe {
     private java.lang.Object filename_;
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     public boolean hasFilename() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     public java.lang.String getFilename() {
       java.lang.Object ref = filename_;
@@ -419,6 +413,10 @@ public final class Pipe {
     }
     /**
      * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
      */
     public com.google.protobuf.ByteString
         getFilenameBytes() {
@@ -434,34 +432,12 @@ public final class Pipe {
       }
     }
 
-    public static final int CMDMSG_FIELD_NUMBER = 7;
-    private routing.Pipe.CommandMessage cmdMsg_;
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    public boolean hasCmdMsg() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    public routing.Pipe.CommandMessage getCmdMsg() {
-      return cmdMsg_;
-    }
-    /**
-     * <code>optional .CommandMessage cmdMsg = 7;</code>
-     */
-    public routing.Pipe.CommandMessageOrBuilder getCmdMsgOrBuilder() {
-      return cmdMsg_;
-    }
-
     private void initFields() {
       seriesId_ = 0L;
       seqId_ = 0;
       taskType_ = routing.Pipe.Task.TaskType.READ;
       sender_ = "";
       filename_ = "";
-      cmdMsg_ = routing.Pipe.CommandMessage.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -489,12 +465,6 @@ public final class Pipe {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (hasCmdMsg()) {
-        if (!getCmdMsg().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -516,9 +486,6 @@ public final class Pipe {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBytes(5, getFilenameBytes());
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(7, cmdMsg_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -548,10 +515,6 @@ public final class Pipe {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(5, getFilenameBytes());
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, cmdMsg_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -667,7 +630,6 @@ public final class Pipe {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getCmdMsgFieldBuilder();
         }
       }
       private static Builder create() {
@@ -686,12 +648,6 @@ public final class Pipe {
         bitField0_ = (bitField0_ & ~0x00000008);
         filename_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        if (cmdMsgBuilder_ == null) {
-          cmdMsg_ = routing.Pipe.CommandMessage.getDefaultInstance();
-        } else {
-          cmdMsgBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -740,14 +696,6 @@ public final class Pipe {
           to_bitField0_ |= 0x00000010;
         }
         result.filename_ = filename_;
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000020;
-        }
-        if (cmdMsgBuilder_ == null) {
-          result.cmdMsg_ = cmdMsg_;
-        } else {
-          result.cmdMsg_ = cmdMsgBuilder_.build();
-        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -783,9 +731,6 @@ public final class Pipe {
           filename_ = other.filename_;
           onChanged();
         }
-        if (other.hasCmdMsg()) {
-          mergeCmdMsg(other.getCmdMsg());
-        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -810,12 +755,6 @@ public final class Pipe {
         if (!hasFilename()) {
           
           return false;
-        }
-        if (hasCmdMsg()) {
-          if (!getCmdMsg().isInitialized()) {
-            
-            return false;
-          }
         }
         return true;
       }
@@ -1017,12 +956,20 @@ public final class Pipe {
       private java.lang.Object filename_ = "";
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public boolean hasFilename() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public java.lang.String getFilename() {
         java.lang.Object ref = filename_;
@@ -1040,6 +987,10 @@ public final class Pipe {
       }
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public com.google.protobuf.ByteString
           getFilenameBytes() {
@@ -1056,6 +1007,10 @@ public final class Pipe {
       }
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public Builder setFilename(
           java.lang.String value) {
@@ -1069,6 +1024,10 @@ public final class Pipe {
       }
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public Builder clearFilename() {
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -1078,6 +1037,10 @@ public final class Pipe {
       }
       /**
        * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
        */
       public Builder setFilenameBytes(
           com.google.protobuf.ByteString value) {
@@ -1088,122 +1051,6 @@ public final class Pipe {
         filename_ = value;
         onChanged();
         return this;
-      }
-
-      private routing.Pipe.CommandMessage cmdMsg_ = routing.Pipe.CommandMessage.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          routing.Pipe.CommandMessage, routing.Pipe.CommandMessage.Builder, routing.Pipe.CommandMessageOrBuilder> cmdMsgBuilder_;
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public boolean hasCmdMsg() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public routing.Pipe.CommandMessage getCmdMsg() {
-        if (cmdMsgBuilder_ == null) {
-          return cmdMsg_;
-        } else {
-          return cmdMsgBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public Builder setCmdMsg(routing.Pipe.CommandMessage value) {
-        if (cmdMsgBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          cmdMsg_ = value;
-          onChanged();
-        } else {
-          cmdMsgBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000020;
-        return this;
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public Builder setCmdMsg(
-          routing.Pipe.CommandMessage.Builder builderForValue) {
-        if (cmdMsgBuilder_ == null) {
-          cmdMsg_ = builderForValue.build();
-          onChanged();
-        } else {
-          cmdMsgBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000020;
-        return this;
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public Builder mergeCmdMsg(routing.Pipe.CommandMessage value) {
-        if (cmdMsgBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
-              cmdMsg_ != routing.Pipe.CommandMessage.getDefaultInstance()) {
-            cmdMsg_ =
-              routing.Pipe.CommandMessage.newBuilder(cmdMsg_).mergeFrom(value).buildPartial();
-          } else {
-            cmdMsg_ = value;
-          }
-          onChanged();
-        } else {
-          cmdMsgBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000020;
-        return this;
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public Builder clearCmdMsg() {
-        if (cmdMsgBuilder_ == null) {
-          cmdMsg_ = routing.Pipe.CommandMessage.getDefaultInstance();
-          onChanged();
-        } else {
-          cmdMsgBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000020);
-        return this;
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public routing.Pipe.CommandMessage.Builder getCmdMsgBuilder() {
-        bitField0_ |= 0x00000020;
-        onChanged();
-        return getCmdMsgFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      public routing.Pipe.CommandMessageOrBuilder getCmdMsgOrBuilder() {
-        if (cmdMsgBuilder_ != null) {
-          return cmdMsgBuilder_.getMessageOrBuilder();
-        } else {
-          return cmdMsg_;
-        }
-      }
-      /**
-       * <code>optional .CommandMessage cmdMsg = 7;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          routing.Pipe.CommandMessage, routing.Pipe.CommandMessage.Builder, routing.Pipe.CommandMessageOrBuilder> 
-          getCmdMsgFieldBuilder() {
-        if (cmdMsgBuilder_ == null) {
-          cmdMsgBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              routing.Pipe.CommandMessage, routing.Pipe.CommandMessage.Builder, routing.Pipe.CommandMessageOrBuilder>(
-                  getCmdMsg(),
-                  getParentForChildren(),
-                  isClean());
-          cmdMsg_ = null;
-        }
-        return cmdMsgBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:Task)
@@ -1235,15 +1082,15 @@ public final class Pipe {
     pipe.common.Common.HeaderOrBuilder getHeaderOrBuilder();
 
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     boolean hasTask();
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     routing.Pipe.Task getTask();
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     routing.Pipe.TaskOrBuilder getTaskOrBuilder();
 
@@ -1506,19 +1353,19 @@ public final class Pipe {
     public static final int TASK_FIELD_NUMBER = 2;
     private routing.Pipe.Task task_;
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     public boolean hasTask() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     public routing.Pipe.Task getTask() {
       return task_;
     }
     /**
-     * <code>required .Task task = 2;</code>
+     * <code>optional .Task task = 2;</code>
      */
     public routing.Pipe.TaskOrBuilder getTaskOrBuilder() {
       return task_;
@@ -1655,17 +1502,15 @@ public final class Pipe {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasTask()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       if (!getHeader().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!getTask().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
+      if (hasTask()) {
+        if (!getTask().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       if (hasErr()) {
         if (!getErr().isInitialized()) {
@@ -1983,17 +1828,15 @@ public final class Pipe {
           
           return false;
         }
-        if (!hasTask()) {
-          
-          return false;
-        }
         if (!getHeader().isInitialized()) {
           
           return false;
         }
-        if (!getTask().isInitialized()) {
-          
-          return false;
+        if (hasTask()) {
+          if (!getTask().isInitialized()) {
+            
+            return false;
+          }
         }
         if (hasErr()) {
           if (!getErr().isInitialized()) {
@@ -2158,13 +2001,13 @@ public final class Pipe {
       private com.google.protobuf.SingleFieldBuilder<
           routing.Pipe.Task, routing.Pipe.Task.Builder, routing.Pipe.TaskOrBuilder> taskBuilder_;
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public boolean hasTask() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public routing.Pipe.Task getTask() {
         if (taskBuilder_ == null) {
@@ -2174,7 +2017,7 @@ public final class Pipe {
         }
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public Builder setTask(routing.Pipe.Task value) {
         if (taskBuilder_ == null) {
@@ -2190,7 +2033,7 @@ public final class Pipe {
         return this;
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public Builder setTask(
           routing.Pipe.Task.Builder builderForValue) {
@@ -2204,7 +2047,7 @@ public final class Pipe {
         return this;
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public Builder mergeTask(routing.Pipe.Task value) {
         if (taskBuilder_ == null) {
@@ -2223,7 +2066,7 @@ public final class Pipe {
         return this;
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public Builder clearTask() {
         if (taskBuilder_ == null) {
@@ -2236,7 +2079,7 @@ public final class Pipe {
         return this;
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public routing.Pipe.Task.Builder getTaskBuilder() {
         bitField0_ |= 0x00000002;
@@ -2244,7 +2087,7 @@ public final class Pipe {
         return getTaskFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       public routing.Pipe.TaskOrBuilder getTaskOrBuilder() {
         if (taskBuilder_ != null) {
@@ -2254,7 +2097,7 @@ public final class Pipe {
         }
       }
       /**
-       * <code>required .Task task = 2;</code>
+       * <code>optional .Task task = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           routing.Pipe.Task, routing.Pipe.Task.Builder, routing.Pipe.TaskOrBuilder> 
@@ -2613,16 +2456,15 @@ public final class Pipe {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\npipe.proto\032\014common.proto\"\260\001\n\004Task\022\021\n\ts" +
+      "\n\npipe.proto\032\014common.proto\"\217\001\n\004Task\022\021\n\ts" +
       "eries_id\030\001 \002(\003\022\016\n\006seq_id\030\002 \002(\005\022!\n\ttask_t" +
       "ype\030\003 \002(\0162\016.Task.TaskType\022\016\n\006sender\030\004 \002(" +
-      "\t\022\020\n\010filename\030\005 \002(\t\022\037\n\006cmdMsg\030\007 \001(\0132\017.Co" +
-      "mmandMessage\"\037\n\010TaskType\022\010\n\004READ\020\001\022\t\n\005WR" +
-      "ITE\020\002\"\234\001\n\016CommandMessage\022\027\n\006header\030\001 \002(\013" +
-      "2\007.Header\022\023\n\004task\030\002 \002(\0132\005.Task\022\016\n\004ping\030\003" +
-      " \001(\010H\000\022\021\n\007message\030\004 \001(\tH\000\022\027\n\003err\030\005 \001(\0132\010" +
-      ".FailureH\000\022\025\n\013fileContent\030\006 \001(\014H\000B\t\n\007pay" +
-      "loadB\013\n\007routingH\001"
+      "\t\022\020\n\010filename\030\005 \002(\t\"\037\n\010TaskType\022\010\n\004READ\020" +
+      "\001\022\t\n\005WRITE\020\002\"\234\001\n\016CommandMessage\022\027\n\006heade" +
+      "r\030\001 \002(\0132\007.Header\022\023\n\004task\030\002 \001(\0132\005.Task\022\016\n" +
+      "\004ping\030\003 \001(\010H\000\022\021\n\007message\030\004 \001(\tH\000\022\027\n\003err\030" +
+      "\005 \001(\0132\010.FailureH\000\022\025\n\013fileContent\030\006 \001(\014H\000" +
+      "B\t\n\007payloadB\013\n\007routingH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2642,7 +2484,7 @@ public final class Pipe {
     internal_static_Task_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Task_descriptor,
-        new java.lang.String[] { "SeriesId", "SeqId", "TaskType", "Sender", "Filename", "CmdMsg", });
+        new java.lang.String[] { "SeriesId", "SeqId", "TaskType", "Sender", "Filename", });
     internal_static_CommandMessage_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_CommandMessage_fieldAccessorTable = new

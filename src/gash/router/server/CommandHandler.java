@@ -74,7 +74,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				logger.info("Received task from " + msg.getHeader().getNodeId());
 				System.out.println("Queuing task");
 				System.out.flush();
-				QueueManager.getInstance().enqueueInboundMsg(msg, channel);
+				QueueManager.getInstance().enqueueInboundCommmand(msg, channel);
 			}
 
 		} catch (Exception e) {
