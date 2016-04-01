@@ -18,14 +18,13 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
-import pipe.common.Common.Header;
+import pipe.common.Common.Task;
 import pipe.work.Work.Heartbeat;
-import pipe.work.Work.Heartbeat.Builder;
-import pipe.work.Work.Task;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
 
@@ -61,13 +60,21 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		}
 
 		if (debug)
-			PrintUtil.printWork(msg);
+			//PrintUtil.printWork(msg);
 
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
+				//logger.info("heartbeat from " + msg.getHeader().getNodeId());
+
+				//TODO Generate Heartbeat response. Currently returns null. Write this response to the channel synchronously.
+				//WorkMessage message = MessageGeneratorUtil.getInstance().generateHeartbeat();
+				WorkMessage message = msg;
+				synchronized (channel) {
+					channel.writeAndFlush(message);
+				}
+
 			} else if (msg.hasFlagRouting()) {
 				logger.info("Routing information recieved " + msg.getHeader().getNodeId());
 				logger.info("Routing Entries: " + msg.getRoutingEntries());
@@ -82,18 +89,21 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				boolean p = msg.getPing();
 				WorkMessage.Builder rb = WorkMessage.newBuilder();
 				rb.setPing(true);
-				channel.writeAndFlush(rb.build());
+				//channel.writeAndFlush(rb.build());
 			} else if (msg.hasErr()) {
 				Failure err = msg.getErr();
 				logger.error("failure from " + msg.getHeader().getNodeId());
 				// PrintUtil.printFailure(err);
 			} else if (msg.hasTask()) {
-				Task t = msg.getTask();
+
+				//Enqueue it to the inbound work queue
+				QueueManager.getInstance().enqueueInboundWork(msg, channel);
+
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
 			}else{
 				logger.info("Executing from work handler ");
-				
+
 			}
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer has occured");
@@ -150,8 +160,8 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		 * 
 		 * channel.writeAndFlush(wb.build());
 		 */
-		Thread.sleep(1000);
-		ctx.channel().writeAndFlush(msg);
+		/*Thread.sleep(1000);
+		ctx.channel().writeAndFlush(msg);*/
 	}
 
 	@Override

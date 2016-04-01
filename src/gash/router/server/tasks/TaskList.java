@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pipe.work.Work.Task;
+import pipe.common.Common.Task;
 
 /**
  * Processing of tasks

@@ -23,3 +23,20 @@ message Failure {
     optional int32 ref_id = 2;
     optional string message = 3;
 }
+
+/**
+ * description of the work
+ */
+message Task {  
+    optional int32 chunk_no = 1;
+    optional int32 no_of_chunks = 2;   
+    optional bytes chunk = 6;
+    enum TaskType {
+      READ = 1;
+      WRITE = 2;
+   }
+   required TaskType task_type = 3;
+   required string sender = 4;
+   required string filename = 5;
+   //optional CommandMessage cmdMsg = 7;   
+}

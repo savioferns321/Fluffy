@@ -1536,6 +1536,1127 @@ public final class Common {
     // @@protoc_insertion_point(class_scope:Failure)
   }
 
+  public interface TaskOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Task)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional int32 chunk_no = 1;</code>
+     */
+    boolean hasChunkNo();
+    /**
+     * <code>optional int32 chunk_no = 1;</code>
+     */
+    int getChunkNo();
+
+    /**
+     * <code>optional int32 no_of_chunks = 2;</code>
+     */
+    boolean hasNoOfChunks();
+    /**
+     * <code>optional int32 no_of_chunks = 2;</code>
+     */
+    int getNoOfChunks();
+
+    /**
+     * <code>optional bytes chunk = 8;</code>
+     */
+    boolean hasChunk();
+    /**
+     * <code>optional bytes chunk = 8;</code>
+     */
+    com.google.protobuf.ByteString getChunk();
+
+    /**
+     * <code>required .Task.TaskType task_type = 3;</code>
+     */
+    boolean hasTaskType();
+    /**
+     * <code>required .Task.TaskType task_type = 3;</code>
+     */
+    pipe.common.Common.Task.TaskType getTaskType();
+
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    boolean hasSender();
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    java.lang.String getSender();
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getSenderBytes();
+
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    boolean hasFilename();
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    java.lang.String getFilename();
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getFilenameBytes();
+  }
+  /**
+   * Protobuf type {@code Task}
+   *
+   * <pre>
+   **
+   * description of the work
+   * </pre>
+   */
+  public static final class Task extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Task)
+      TaskOrBuilder {
+    // Use Task.newBuilder() to construct.
+    private Task(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private Task(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Task defaultInstance;
+    public static Task getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public Task getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Task(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              chunkNo_ = input.readInt32();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              noOfChunks_ = input.readInt32();
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+              pipe.common.Common.Task.TaskType value = pipe.common.Common.Task.TaskType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(3, rawValue);
+              } else {
+                bitField0_ |= 0x00000008;
+                taskType_ = value;
+              }
+              break;
+            }
+            case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000010;
+              sender_ = bs;
+              break;
+            }
+            case 42: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000020;
+              filename_ = bs;
+              break;
+            }
+            case 66: {
+              bitField0_ |= 0x00000004;
+              chunk_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return pipe.common.Common.internal_static_Task_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return pipe.common.Common.internal_static_Task_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              pipe.common.Common.Task.class, pipe.common.Common.Task.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Task> PARSER =
+        new com.google.protobuf.AbstractParser<Task>() {
+      public Task parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Task(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Task> getParserForType() {
+      return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code Task.TaskType}
+     */
+    public enum TaskType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>READ = 1;</code>
+       */
+      READ(0, 1),
+      /**
+       * <code>WRITE = 2;</code>
+       */
+      WRITE(1, 2),
+      ;
+
+      /**
+       * <code>READ = 1;</code>
+       */
+      public static final int READ_VALUE = 1;
+      /**
+       * <code>WRITE = 2;</code>
+       */
+      public static final int WRITE_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static TaskType valueOf(int value) {
+        switch (value) {
+          case 1: return READ;
+          case 2: return WRITE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<TaskType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<TaskType>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<TaskType>() {
+              public TaskType findValueByNumber(int number) {
+                return TaskType.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return pipe.common.Common.Task.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final TaskType[] VALUES = values();
+
+      public static TaskType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private TaskType(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:Task.TaskType)
+    }
+
+    private int bitField0_;
+    public static final int CHUNK_NO_FIELD_NUMBER = 1;
+    private int chunkNo_;
+    /**
+     * <code>optional int32 chunk_no = 1;</code>
+     */
+    public boolean hasChunkNo() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int32 chunk_no = 1;</code>
+     */
+    public int getChunkNo() {
+      return chunkNo_;
+    }
+
+    public static final int NO_OF_CHUNKS_FIELD_NUMBER = 2;
+    private int noOfChunks_;
+    /**
+     * <code>optional int32 no_of_chunks = 2;</code>
+     */
+    public boolean hasNoOfChunks() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 no_of_chunks = 2;</code>
+     */
+    public int getNoOfChunks() {
+      return noOfChunks_;
+    }
+
+    public static final int CHUNK_FIELD_NUMBER = 8;
+    private com.google.protobuf.ByteString chunk_;
+    /**
+     * <code>optional bytes chunk = 8;</code>
+     */
+    public boolean hasChunk() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bytes chunk = 8;</code>
+     */
+    public com.google.protobuf.ByteString getChunk() {
+      return chunk_;
+    }
+
+    public static final int TASK_TYPE_FIELD_NUMBER = 3;
+    private pipe.common.Common.Task.TaskType taskType_;
+    /**
+     * <code>required .Task.TaskType task_type = 3;</code>
+     */
+    public boolean hasTaskType() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>required .Task.TaskType task_type = 3;</code>
+     */
+    public pipe.common.Common.Task.TaskType getTaskType() {
+      return taskType_;
+    }
+
+    public static final int SENDER_FIELD_NUMBER = 4;
+    private java.lang.Object sender_;
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    public boolean hasSender() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    public java.lang.String getSender() {
+      java.lang.Object ref = sender_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          sender_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string sender = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSenderBytes() {
+      java.lang.Object ref = sender_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sender_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FILENAME_FIELD_NUMBER = 5;
+    private java.lang.Object filename_;
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    public boolean hasFilename() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    public java.lang.String getFilename() {
+      java.lang.Object ref = filename_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          filename_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string filename = 5;</code>
+     *
+     * <pre>
+     *optional CommandMessage cmdMsg = 7;   
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getFilenameBytes() {
+      java.lang.Object ref = filename_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filename_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      chunkNo_ = 0;
+      noOfChunks_ = 0;
+      chunk_ = com.google.protobuf.ByteString.EMPTY;
+      taskType_ = pipe.common.Common.Task.TaskType.READ;
+      sender_ = "";
+      filename_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasTaskType()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasSender()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFilename()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt32(1, chunkNo_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, noOfChunks_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeEnum(3, taskType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(4, getSenderBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(5, getFilenameBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(8, chunk_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, chunkNo_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, noOfChunks_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, taskType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getSenderBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getFilenameBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(8, chunk_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static pipe.common.Common.Task parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.common.Common.Task parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.common.Common.Task parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.common.Common.Task parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.common.Common.Task parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.common.Common.Task parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static pipe.common.Common.Task parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static pipe.common.Common.Task parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static pipe.common.Common.Task parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.common.Common.Task parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(pipe.common.Common.Task prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Task}
+     *
+     * <pre>
+     **
+     * description of the work
+     * </pre>
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Task)
+        pipe.common.Common.TaskOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return pipe.common.Common.internal_static_Task_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return pipe.common.Common.internal_static_Task_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                pipe.common.Common.Task.class, pipe.common.Common.Task.Builder.class);
+      }
+
+      // Construct using pipe.common.Common.Task.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        chunkNo_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        noOfChunks_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        chunk_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        taskType_ = pipe.common.Common.Task.TaskType.READ;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        sender_ = "";
+        bitField0_ = (bitField0_ & ~0x00000010);
+        filename_ = "";
+        bitField0_ = (bitField0_ & ~0x00000020);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return pipe.common.Common.internal_static_Task_descriptor;
+      }
+
+      public pipe.common.Common.Task getDefaultInstanceForType() {
+        return pipe.common.Common.Task.getDefaultInstance();
+      }
+
+      public pipe.common.Common.Task build() {
+        pipe.common.Common.Task result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public pipe.common.Common.Task buildPartial() {
+        pipe.common.Common.Task result = new pipe.common.Common.Task(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.chunkNo_ = chunkNo_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.noOfChunks_ = noOfChunks_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.chunk_ = chunk_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.taskType_ = taskType_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.sender_ = sender_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.filename_ = filename_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof pipe.common.Common.Task) {
+          return mergeFrom((pipe.common.Common.Task)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(pipe.common.Common.Task other) {
+        if (other == pipe.common.Common.Task.getDefaultInstance()) return this;
+        if (other.hasChunkNo()) {
+          setChunkNo(other.getChunkNo());
+        }
+        if (other.hasNoOfChunks()) {
+          setNoOfChunks(other.getNoOfChunks());
+        }
+        if (other.hasChunk()) {
+          setChunk(other.getChunk());
+        }
+        if (other.hasTaskType()) {
+          setTaskType(other.getTaskType());
+        }
+        if (other.hasSender()) {
+          bitField0_ |= 0x00000010;
+          sender_ = other.sender_;
+          onChanged();
+        }
+        if (other.hasFilename()) {
+          bitField0_ |= 0x00000020;
+          filename_ = other.filename_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasTaskType()) {
+          
+          return false;
+        }
+        if (!hasSender()) {
+          
+          return false;
+        }
+        if (!hasFilename()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        pipe.common.Common.Task parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (pipe.common.Common.Task) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private int chunkNo_ ;
+      /**
+       * <code>optional int32 chunk_no = 1;</code>
+       */
+      public boolean hasChunkNo() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional int32 chunk_no = 1;</code>
+       */
+      public int getChunkNo() {
+        return chunkNo_;
+      }
+      /**
+       * <code>optional int32 chunk_no = 1;</code>
+       */
+      public Builder setChunkNo(int value) {
+        bitField0_ |= 0x00000001;
+        chunkNo_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 chunk_no = 1;</code>
+       */
+      public Builder clearChunkNo() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        chunkNo_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int noOfChunks_ ;
+      /**
+       * <code>optional int32 no_of_chunks = 2;</code>
+       */
+      public boolean hasNoOfChunks() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional int32 no_of_chunks = 2;</code>
+       */
+      public int getNoOfChunks() {
+        return noOfChunks_;
+      }
+      /**
+       * <code>optional int32 no_of_chunks = 2;</code>
+       */
+      public Builder setNoOfChunks(int value) {
+        bitField0_ |= 0x00000002;
+        noOfChunks_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 no_of_chunks = 2;</code>
+       */
+      public Builder clearNoOfChunks() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        noOfChunks_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString chunk_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes chunk = 8;</code>
+       */
+      public boolean hasChunk() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bytes chunk = 8;</code>
+       */
+      public com.google.protobuf.ByteString getChunk() {
+        return chunk_;
+      }
+      /**
+       * <code>optional bytes chunk = 8;</code>
+       */
+      public Builder setChunk(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        chunk_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes chunk = 8;</code>
+       */
+      public Builder clearChunk() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        chunk_ = getDefaultInstance().getChunk();
+        onChanged();
+        return this;
+      }
+
+      private pipe.common.Common.Task.TaskType taskType_ = pipe.common.Common.Task.TaskType.READ;
+      /**
+       * <code>required .Task.TaskType task_type = 3;</code>
+       */
+      public boolean hasTaskType() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>required .Task.TaskType task_type = 3;</code>
+       */
+      public pipe.common.Common.Task.TaskType getTaskType() {
+        return taskType_;
+      }
+      /**
+       * <code>required .Task.TaskType task_type = 3;</code>
+       */
+      public Builder setTaskType(pipe.common.Common.Task.TaskType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required .Task.TaskType task_type = 3;</code>
+       */
+      public Builder clearTaskType() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        taskType_ = pipe.common.Common.Task.TaskType.READ;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object sender_ = "";
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public boolean hasSender() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public java.lang.String getSender() {
+        java.lang.Object ref = sender_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            sender_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSenderBytes() {
+        java.lang.Object ref = sender_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sender_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public Builder setSender(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public Builder clearSender() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        sender_ = getDefaultInstance().getSender();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string sender = 4;</code>
+       */
+      public Builder setSenderBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        sender_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object filename_ = "";
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public boolean hasFilename() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public java.lang.String getFilename() {
+        java.lang.Object ref = filename_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            filename_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getFilenameBytes() {
+        java.lang.Object ref = filename_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filename_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public Builder setFilename(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        filename_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public Builder clearFilename() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        filename_ = getDefaultInstance().getFilename();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string filename = 5;</code>
+       *
+       * <pre>
+       *optional CommandMessage cmdMsg = 7;   
+       * </pre>
+       */
+      public Builder setFilenameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        filename_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Task)
+    }
+
+    static {
+      defaultInstance = new Task(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:Task)
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Header_descriptor;
   private static
@@ -1546,6 +2667,11 @@ public final class Common {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Failure_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Task_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Task_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1559,8 +2685,12 @@ public final class Common {
       "\005\022\014\n\004time\030\002 \002(\003\022$\n\007message\030\004 \001(\t:\023Hello " +
       "from protoc!!\022\023\n\013destination\030\010 \001(\005\022\024\n\010ma" +
       "x_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(\005\022" +
-      "\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pipe" +
-      ".commonH\001"
+      "\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\t\"\243\001\n\004Tas" +
+      "k\022\020\n\010chunk_no\030\001 \001(\005\022\024\n\014no_of_chunks\030\002 \001(" +
+      "\005\022\r\n\005chunk\030\010 \001(\014\022!\n\ttask_type\030\003 \002(\0162\016.Ta" +
+      "sk.TaskType\022\016\n\006sender\030\004 \002(\t\022\020\n\010filename\030" +
+      "\005 \002(\t\"\037\n\010TaskType\022\010\n\004READ\020\001\022\t\n\005WRITE\020\002B\017" +
+      "\n\013pipe.commonH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1586,6 +2716,12 @@ public final class Common {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Failure_descriptor,
         new java.lang.String[] { "Id", "RefId", "Message", });
+    internal_static_Task_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_Task_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Task_descriptor,
+        new java.lang.String[] { "ChunkNo", "NoOfChunks", "Chunk", "TaskType", "Sender", "Filename", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -19,9 +19,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import pipe.common.Common.Header;
+import pipe.common.Common.Task;
+import pipe.common.Common.Task.TaskType;
 import routing.Pipe.CommandMessage;
-import routing.Pipe.Task;
-import routing.Pipe.Task.TaskType;
 
 /**
  * front-end (proxy) to our service - functional-based
@@ -82,8 +82,8 @@ public class MessageClient {
 		tb.setFilename(filename);
 		tb.setTaskType(TaskType.READ);
 		tb.setSender(InetAddress.getLocalHost().getHostAddress());
-		tb.setSeqId(seqID++);
-		tb.setSeriesId(seriesCounter++);
+		/*tb.setSeqId(seqID++);
+		tb.setSeriesId(seriesCounter++);*/
 		
 		rb.setTask(tb.build());
 		

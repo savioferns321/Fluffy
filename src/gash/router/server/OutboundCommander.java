@@ -24,7 +24,7 @@ public class OutboundCommander extends Thread{
 
 			try {
 				// block until a message is enqueued
-				CommandMessageChannelCombo msg = QueueManager.getInstance().dequeueOutboundCommmand();
+				CommandMessageChannelCombo msg = this.manager.dequeueOutboundCommmand();
 
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getCommandMessage().getHeader().getDestination());

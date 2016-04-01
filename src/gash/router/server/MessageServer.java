@@ -27,9 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf;
 import gash.router.leaderelection.ElectionManagement;
+import gash.router.persistence.DataReplicationManager;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.tasks.NoOpBalancer;
 import gash.router.server.tasks.TaskList;
+import gash.server.util.MessageGeneratorUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -47,6 +49,7 @@ public class MessageServer {
 
 	protected RoutingConf conf;
 	protected boolean background = true;
+	private static int nodeId;
 
 	/**
 	 * initialize the server with a configuration of it's resources
@@ -65,7 +68,11 @@ public class MessageServer {
 	}
 
 	public void startServer() {
+
 		
+		QueueManager.initManager();
+		DataReplicationManager.initDataReplicationManager();
+		MessageGeneratorUtil.initGenerator();
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		logger.info("Work starting");
 
@@ -74,7 +81,6 @@ public class MessageServer {
 		cthread.start();
 
 		if (!conf.isInternalNode()) {
-			QueueManager.initManager();
 			
 			StartCommandCommunication comm2 = new StartCommandCommunication(conf);
 			logger.info("Command starting");
@@ -118,6 +124,7 @@ public class MessageServer {
 			conf = JsonUtil.decode(new String(raw), RoutingConf.class);
 			if (!verifyConf(conf))
 				throw new RuntimeException("verification of configuration failed");
+			nodeId = conf.getNodeId();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -133,6 +140,10 @@ public class MessageServer {
 
 	private boolean verifyConf(RoutingConf conf) {
 		return (conf != null);
+	}
+	
+	public static int getNodeId(){
+		return nodeId;
 	}
 
 	/**

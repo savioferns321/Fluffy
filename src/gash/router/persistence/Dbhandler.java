@@ -26,14 +26,18 @@ import com.mongodb.gridfs.GridFS;
 
 public class Dbhandler {
 	
-	public Dbhandler(){
+	/*public Dbhandler(){
 	
+	}*/
+	
+	public static void main(String[] args){
+		System.out.println(getFilewithChunckId("HoliVideo.mov",2));
 	}
 	
 	
 	
 	//establish connection with MongoDB
-	public MongoClient getConnection(){
+	public static MongoClient getConnection(){
 		MongoClient client = null;
 		try{
 		client = new MongoClient("localhost", 27017);
@@ -45,7 +49,7 @@ public class Dbhandler {
 	}
 	
 	//add file into collection Fluffy
-	public boolean addFile(String fileName,byte[] input){
+	public static boolean addFile(String fileName,byte[] input){
 	MongoClient client = getConnection();
 	MongoDatabase db = client.getDatabase("Fluffy");
 	MongoCollection<Document> collection = db.getCollection("Fluffy");
@@ -64,7 +68,7 @@ public class Dbhandler {
 	}
 	
 	//adding file that has been chuncked
-	public boolean addFile(String fileName,byte[] input, int noOfChuncks, int chunckId){
+	public static boolean addFile(String fileName,byte[] input, int noOfChuncks, int chunckId){
 		MongoClient client = getConnection();
 		MongoDatabase db = client.getDatabase("Fluffy");
 		MongoCollection<Document> collection = db.getCollection("Fluffy");
@@ -97,7 +101,7 @@ public class Dbhandler {
 		return byteData;
 	}	
 	
-	public int getChuncks(String fileName){
+	public static int getChuncks(String fileName){
 		int numchuncks = 0;
 		MongoClient client = getConnection();
 		MongoDatabase db = client.getDatabase("Fluffy");
@@ -130,7 +134,7 @@ public class Dbhandler {
 			byteData = bData.getData();
 			numchuncks = (Integer) docs.get("noOfChuncks");
 			chunckid = (Integer) docs.get("chunckId");
-			MessageDetails msgdata = new MessageDetails(byteData,numchuncks,chunckid);
+			MessageDetails msgdata = new MessageDetails(fileName, byteData,numchuncks,chunckid);
 			data.add(msgdata);
 			filename = docs.getString("fileName");
 			messageMap.put(filename, data);
@@ -142,17 +146,36 @@ public class Dbhandler {
 	}
 	
 
-}
-class MessageDetails{
-	byte[] byteData;
-	int noOfChuncks;
-	int chunckId;
-	
-	public MessageDetails(byte[] bytedata,int noofchunck,int chunckid){
-		this.byteData = bytedata;
-		this.noOfChuncks = noofchunck;
-		this.chunckId = chunckid;
-	}	
-}
-	
 
+
+	
+	//TODO changes should be made
+	//to get file that has been chuncked
+	public static  MessageDetails getFilewithChunckId(String fileName, int chunckId){
+		Binary bData= null;
+		byte[] byteData = {};
+		int numchuncks = 0;
+		int chunckid =0;
+		String filename = "";
+		MessageDetails msgdata = null;
+		MongoClient client = getConnection();
+		MongoDatabase db = client.getDatabase("Fluffy");
+		MongoCollection<Document> collection = db.getCollection("Fluffy");
+		FindIterable<Document> doc = collection.find(new Document("fileName" , fileName).append("chunckId", chunckId));
+		for(Document docs: doc){
+			bData = (Binary) docs.get("bytes");
+			byteData = bData.getData();
+			numchuncks = (Integer) docs.get("noOfChuncks");
+			chunckid = (Integer) docs.get("chunckId");
+		    msgdata = new MessageDetails(fileName,byteData,numchuncks,chunckid);
+			
+		}
+		client.close();
+		System.out.println(msgdata.getChunckId());
+		System.out.println(msgdata.getNoOfChuncks());
+		System.out.println(msgdata.getFileName());
+		System.out.println(msgdata.getByteData());
+		return msgdata;
+	}
+	
+}

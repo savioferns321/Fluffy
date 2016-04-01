@@ -37,19 +37,24 @@ public class PrintUtil {
 	public static void printCommand(CommandMessage msg) {
 		PrintUtil.printHeader(msg.getHeader());
 
-		System.out.print("\nCommand: ");
-		if (msg.hasErr()) {
-			System.out.println("Failure");
-			System.out.println(PrintUtil.gap + "Code:    " + msg.getErr().getId());
-			System.out.println(PrintUtil.gap + "Ref ID:  " + msg.getErr().getRefId());
-			System.out.println(PrintUtil.gap + "Message: " + msg.getErr().getMessage());
-		} else if (msg.hasPing())
-			System.out.println("Ping");
-		else if (msg.hasMessage()) {
-			System.out.println("Message");
-			System.out.println(PrintUtil.gap + "Msg:  " + msg.getMessage());
-		} else
-			System.out.println("Unknown");
+		try {
+			System.out.print("\nCommand: ");
+			if (msg.hasErr()) {
+				System.out.println("Failure");
+				System.out.println(PrintUtil.gap + "Code:    " + msg.getErr().getId());
+				System.out.println(PrintUtil.gap + "Ref ID:  " + msg.getErr().getRefId());
+				System.out.println(PrintUtil.gap + "Message: " + msg.getErr().getMessage());
+			} else if (msg.hasPing())
+				System.out.println("Ping");
+			else if (msg.hasMessage()) {
+				System.out.println("Message");
+				System.out.println(PrintUtil.gap + "Msg:  " + msg.getMessage());
+			} else
+				System.out.println("Unknown");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static void printWork(WorkMessage msg) {

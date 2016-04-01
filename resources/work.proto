@@ -17,11 +17,13 @@ message Heartbeat {
 /**
  * description of the work
  */
+ 
+/* Commented as we need the same task as common.proto Task
 message Task {  
     required int64 series_id = 1;
     required int32 seq_id = 2;
 }
-
+*/
 message RoutingConf {
   repeated string nodeIp = 1;
   repeated string nodeId = 2;
@@ -32,6 +34,17 @@ message WorkMessage {
    required Header header = 1;
    required int64 secret = 2;
    optional RoutingConf routingEntries = 11;
+   optional bool isProcessed = 13;
+   optional requestId = 15;
+   
+   enum Worktype {
+      LEADER_WRITE;
+      SLAVE_WRITTEN;
+      LEADER_READ;
+      SLAVE_READ_DONE;
+   }
+   
+   optional Worktype worktype = 14;
 
    /**
     * The actions (request or response) is

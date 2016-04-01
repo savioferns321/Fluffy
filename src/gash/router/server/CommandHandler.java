@@ -34,11 +34,11 @@ import routing.Pipe.CommandMessage;
  * 
  */
 public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
-	protected static Logger logger = LoggerFactory.getLogger("cmd");
+	protected static Logger logger = LoggerFactory.getLogger(CommandHandler.class);
 	protected RoutingConf conf;
 
 	public CommandHandler(RoutingConf conf) {
-		
+
 		if (conf != null) {
 			this.conf = conf;
 		}
@@ -79,13 +79,18 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		} catch (Exception e) {
 			// TODO add logging
-			Failure.Builder eb = Failure.newBuilder();
-			eb.setId(conf.getNodeId());
-			eb.setRefId(msg.getHeader().getNodeId());
-			eb.setMessage(e.getMessage());
-			CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
-			rb.setErr(eb);
-			channel.write(rb.build());
+			try {
+
+				Failure.Builder eb = Failure.newBuilder();
+				eb.setId(conf.getNodeId());
+				eb.setRefId(msg.getHeader().getNodeId());
+				eb.setMessage(e.getMessage());
+				CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
+				rb.setErr(eb);
+				channel.write(rb.build());
+			}catch (Exception e2) {
+				e.printStackTrace();
+			}
 		}
 
 		System.out.flush();

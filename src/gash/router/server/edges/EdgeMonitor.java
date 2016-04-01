@@ -169,15 +169,15 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			try {
 				for (EdgeInfo ei : outboundEdges.map.values()) {
 					try {
-						System.out.println("Inside For loop" + outboundEdges.map.toString());
+						//System.out.println("Inside For loop" + outboundEdges.map.toString());
 						if (ei.isActive() && ei.getChannel() != null) {
 							WorkMessage wm = createHB(ei);
 							ei.getChannel().writeAndFlush(wm);
-							System.out.println("Connected to Channel with host :" + ei.getHost());
+							//System.out.println("Connected to Channel with host :" + ei.getHost());
 						} else if (ei.getChannel() == null) {
 							Channel channel = connectToChannel(ei.getHost(), ei.getPort(), this.state);
 							ei.setChannel(channel);
-							System.out.println("Connected to Channel with host " + ei.getHost());
+							//System.out.println("Connected to Channel with host " + ei.getHost());
 							ei.setActive(true);
 							if (channel == null) {
 								logger.info("trying to connect to node " + ei.getRef());

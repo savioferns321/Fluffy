@@ -3,24 +3,6 @@ option java_package = "routing";
 
 import "common.proto";
 
-/**
- * description of the work
- */
-message Task {  
-    required int64 series_id = 1;
-    required int32 seq_id = 2;
-    enum TaskType {
-      READ = 1;
-      WRITE = 2;
-   }
-   required TaskType task_type = 3;
-   required string sender = 4;
-   required string filename = 5;
-   //optional CommandMessage cmdMsg = 7;   
-}
-
-
-
 message CommandMessage {
    required Header header = 1;
 

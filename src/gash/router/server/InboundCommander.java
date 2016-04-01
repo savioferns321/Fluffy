@@ -1,17 +1,22 @@
 package gash.router.server;
 
+import java.rmi.UnexpectedException;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.protobuf.ByteString;
+
 import gash.router.persistence.DataReplicationManager;
 import gash.router.persistence.Dbhandler;
-import gash.router.persistence.ReplicationInfo;
 import gash.router.server.QueueManager.CommandMessageChannelCombo;
+import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
-import pipe.common.Common.Header;
+import pipe.common.Common.Task;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
-import routing.Pipe.Task;
+import sun.security.pkcs11.Secmod.DbMode;
 
 public class InboundCommander extends Thread{
 
@@ -33,8 +38,10 @@ public class InboundCommander extends Thread{
 			boolean isSuccess = false;
 			try {
 				CommandMessageChannelCombo currCombo = manager.dequeueInboundCommmand();
-				Task task = currCombo.getCommandMessage().getTask();
-				switch (currCombo.getCommandMessage().getTask().getTaskType()) {
+				Channel currChannel = currCombo.getChannel();
+				CommandMessage currMsg = currCombo.getCommandMessage();
+				Task currTask = currCombo.getCommandMessage().getTask();
+				switch (currTask.getTaskType()) {
 				case WRITE:
 					//TODO Write it to this(master) node. Send ACK to the client and asynchronously start replication on the remaining servers.
 
@@ -46,22 +53,30 @@ public class InboundCommander extends Thread{
 					
 					//Writing to itself
 					try {
-						Dbhandler.addFile(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray());
-						isSuccess = true;
+						
+						//If file size has only 1 chunk, write to in memory DB, else write to the standard DB.
+						if(currTask.getNoOfChunks() == 1){
+							//TODO Write to in memory DB
+							//Dbhandler.addFile(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray());
+						}else{
+							//TODO Write to standard DB
+							Dbhandler.addFile(currTask.getFilename(), currMsg.getFileContent().toByteArray(), currTask.getNoOfChunks(), currTask.getChunkNo());
+							isSuccess = true;
+						}
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 						logger.error(e.getMessage());
 					}
 
-					//Starting replication
+					//Starting asynchronous replication
 					//TODO is replication working properly?
-					DataReplicationManager.getInstance().replicate(new ReplicationInfo(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray(), 0));
-
+					DataReplicationManager.getInstance().replicate(currMsg);
 					
 					//Send ACK to the client
-					CommandMessage response = generateResponseMessage(isSuccess);
-					manager.enqueueOutboundCommand(response, currCombo.getChannel());
-					logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename()+" from client : "+currCombo.getChannel().remoteAddress());
+					CommandMessage response = MessageGeneratorUtil.getInstance().generateClientResponseMsg(isSuccess);
+					manager.enqueueOutboundCommand(response, currChannel);
+					logger.info("Finished processing task "+currTask.getFilename()+" from client : "+currChannel.remoteAddress());
 					
 					break;
 
@@ -74,18 +89,25 @@ public class InboundCommander extends Thread{
 					 * Also, store the client channel so that we can send the read file to him directly.
 					 */
 					
-					//Get the next node to delegate the request
+					//TODO Get the next node to delegate the request
 					Channel nextChannel= NodeChannelManager.getNextReadChannel();
 					
-					//TODO Generate proper work message to send to next client. Current implementation is faulty.
-					WorkMessage message = generateDelegationMessage(currCombo.getCommandMessage());
+					//Get the no. of chunks in the file FROM ITS OWN DB, although the file is to be read from another node.
+					int chunkCount = Dbhandler.getChuncks(currMsg.getTask().getFilename());
+					//Setting the chunk count to be decremented each time this file's chunk is sent back to the client.
+					currCombo.setChunkCount(chunkCount);
 					
-					//TODO Should we directly write these messages on the channel?	
-					nextChannel.writeAndFlush(message);
-										
-					//Thread.sleep(10000);
-					logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename());
-					NodeChannelManager.addClientToMap(currCombo.getCommandMessage(), nextChannel);
+					//Store the client channel so it can be used later to reply back to the client.
+					String requestId = NodeChannelManager.addClientToMap(currCombo);
+					
+					//Generate proper work message to send to next client.
+					WorkMessage message = MessageGeneratorUtil.getInstance().generateDelegationMessage(currMsg, requestId);
+					
+					//Enqueue the generated message to the outbound work queue
+					QueueManager.getInstance().enqueueOutboundWork(message, nextChannel);
+					
+					/*Thread.sleep(10000);
+					logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename());*/
 					break;	
 
 				default:
@@ -93,47 +115,16 @@ public class InboundCommander extends Thread{
 				}
 
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				logger.error(e.getMessage());				
+				e.printStackTrace();
+			} catch (UnexpectedException e) {
+				logger.error(e.getMessage());	
+				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
 	}
 
-	//TODO Place this method in a relevant class
-	public CommandMessage generateResponseMessage(boolean isSuccess){
-		Header.Builder hb = Header.newBuilder();
-		//TODO Get node ID
-		hb.setNodeId(999);
-		hb.setTime(System.currentTimeMillis());
-
-
-		CommandMessage.Builder rb = CommandMessage.newBuilder();
-		rb.setHeader(hb);
-		if(isSuccess)
-			rb.setMessage(" File saved ");
-		else
-			rb.setMessage(" Operation Failed ");
-
-		return rb.build();
-
-	}
-	
-	public WorkMessage generateDelegationMessage(CommandMessage commandMessage){
-		
-		Header.Builder hb = Header.newBuilder();
-		//TODO Get node ID
-		hb.setNodeId(999);
-		hb.setTime(System.currentTimeMillis());
-		
-		WorkMessage.Builder wb = WorkMessage.newBuilder();
-		wb.setHeader(hb.build());
-		//TODO Set the filename in the request
-		commandMessage.getTask().getFilename();
-		
-		//TODO Set the secret
-		wb.setSecret(1234);
-		
-		return wb.build();
-	}
 }

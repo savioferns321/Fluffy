@@ -100,4 +100,8 @@ public class DemoApp implements CommListener {
 		}
 
 	}
+	
+	public void sendWriteTasks(){
+		
+	}
 }

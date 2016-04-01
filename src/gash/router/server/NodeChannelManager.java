@@ -1,13 +1,14 @@
 package gash.router.server;
 
-import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.server.QueueManager.CommandMessageChannelCombo;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
@@ -20,7 +21,7 @@ public class NodeChannelManager {
 	protected static AtomicReference<NodeChannelManager> instance = new AtomicReference<NodeChannelManager>();
 
 	public static ConcurrentHashMap<Integer, Channel> node2ChannelMap = new ConcurrentHashMap<Integer, Channel>();
-	public static ConcurrentHashMap<CommandMessage, Channel> clientChannelMap = new ConcurrentHashMap<CommandMessage, Channel>();
+	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
 	private static int delay = 3000;
 
 	public NodeChannelManager() {
@@ -45,7 +46,12 @@ public class NodeChannelManager {
 
 	// Returns next available channel for taking in read requests
 	public static Channel getNextReadChannel() {
-		// TODO
+		// TODO Crude implementation. Need to update this.
+		if (!node2ChannelMap.isEmpty()) {
+			for (Integer i : node2ChannelMap.keySet())
+				return node2ChannelMap.get(i);
+		}
+
 		return null;
 	}
 
@@ -77,22 +83,26 @@ public class NodeChannelManager {
 					ConcurrentHashMap<Integer, EdgeInfo> edgeListMap = inboundEdges.getEdgeListMap();
 					if (edgeListMap != null && !edgeListMap.isEmpty()) {
 						Set<Integer> keySet2 = edgeListMap.keySet();
-						for (Integer nodeId : keySet2) {
-							if (nodeId != null && !node2ChannelMap.containsKey(nodeId)) {
-								node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+						if (keySet2 != null)
+							for (Integer nodeId : keySet2) {
+								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
+										&& edgeListMap.get(nodeId).getChannel()!= null) {
+									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+								}
 							}
-						}
 					}
 				}
 				if (outboundEdges != null) {
 					ConcurrentHashMap<Integer, EdgeInfo> edgeListMap = outboundEdges.getEdgeListMap();
 					if (edgeListMap != null && !edgeListMap.isEmpty()) {
 						Set<Integer> keySet2 = edgeListMap.keySet();
-						for (Integer nodeId : keySet2) {
-							if (nodeId != null && !node2ChannelMap.containsKey(nodeId)) {
-								node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+						if (keySet2 != null)
+							for (Integer nodeId : keySet2) {
+								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
+										&& edgeListMap.get(nodeId).getChannel()!= null) {
+									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+								}
 							}
-						}
 					}
 				}
 			} catch (Exception exception) {
@@ -101,32 +111,56 @@ public class NodeChannelManager {
 		}
 
 	}
-	
+
 	/**
+	 * Generates a UID String which serves as a key for storing a client channel
+	 * in the server's map, while serving READ requests.
+	 * 
 	 * @author savio
 	 * @param message
 	 * @param channel
 	 */
-	public static void addClientToMap(CommandMessage message, Channel channel){
-		clientChannelMap.put(message, channel);
+	public static String addClientToMap(CommandMessageChannelCombo combo) {
+		UUID uuid = UUID.randomUUID();
+		String uidString = uuid.toString();
+		clientChannelMap.put(uidString, combo);
+		return uidString;
 	}
-	
+
 	/**
+	 * Retrieves the client's channel from the stored map
+	 * 
 	 * @author savio
 	 * @param client
 	 * @param filename
 	 * @return
 	 */
-	public static Channel getClientChannelFromMap(String client, String filename){
-		
-		//TODO Problem : If the client has sent multiple requests for the same filename - what do we do?
-		for (CommandMessage msg : clientChannelMap.keySet()) {
-			if(msg.getTask().getFilename().equals(filename) && msg.getTask().getSender().equals(client))
-			{
-				return clientChannelMap.remove(msg);
-			}
+	public static synchronized CommandMessageChannelCombo getClientChannelFromMap(String requestId) {
+
+		// TODO Problem : If the client has sent multiple requests for the same
+		// filename - what do we do?
+		// Solved - Generated a UID for every request and UID is the key
+
+		if (clientChannelMap.containsKey(requestId) && clientChannelMap.get(requestId) != null) {
+			return clientChannelMap.get(requestId);
 		}
-		
+		logger.error("Unable to find the channel for request ID : " + requestId);
 		return null;
+	}
+
+	/**
+	 * Deletes the client's channel from the map.
+	 * 
+	 * @param requestId
+	 * @throws Exception
+	 */
+	public static synchronized void removeClientChannelFromMap(String requestId) throws Exception {
+		if (clientChannelMap.containsKey(requestId) && clientChannelMap.get(requestId) != null) {
+			clientChannelMap.remove(requestId);
+		} else {
+			logger.error("Unable to find the channel for request ID : " + requestId);
+			throw new Exception("Unable to find the node for this request ID : " + requestId);
+		}
+
 	}
 }

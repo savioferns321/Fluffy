@@ -8,18 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.server.NodeChannelManager;
-import gash.router.server.ServerState;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
 
 public class ReadHandler {
 	protected static Logger logger = LoggerFactory.getLogger("ReadHandler");
-	protected static ServerState serverState;
 
 	protected static AtomicReference<ReadHandler> instance = new AtomicReference<ReadHandler>();
 
-	public static ReadHandler initNodeChannelManager(ServerState serverState) {
-		DataReplicationManager.serverState = serverState;
+	public static ReadHandler initReadHandler() {
 		instance.compareAndSet(null, new ReadHandler());
 		System.out.println(" --- Initializing Read Handler --- ");
 		return instance.get();
