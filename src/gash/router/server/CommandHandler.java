@@ -87,7 +87,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				eb.setMessage(e.getMessage());
 				CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
 				rb.setErr(eb);
-				channel.write(rb.build());
+				channel.writeAndFlush(rb.build());
 			}catch (Exception e2) {
 				e.printStackTrace();
 			}

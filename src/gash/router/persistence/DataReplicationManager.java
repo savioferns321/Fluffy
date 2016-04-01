@@ -104,6 +104,7 @@ public class DataReplicationManager {
 				
 				//Push this message to the outbound work queue 
 				try {
+					logger.info("Sending message for replication ");
 					QueueManager.getInstance().enqueueOutboundWork(workMsg, nodeChannel);
 				} catch (Exception e) {
 					logger.error(e.getMessage());

@@ -39,7 +39,7 @@ public class InboundWorker extends Thread {
 				switch (currWork.getWorktype()) {
 				case LEADER_READ:
 					//Message from leader to READ a file stored on this machine
-					
+					logger.info(" Received msg to read a file on this system ");
 					int chunkCount = Dbhandler.getChuncks(t.getFilename());
 					for (int i = 1; i <= chunkCount; i++) {
 						//Get the file chunks
@@ -47,14 +47,14 @@ public class InboundWorker extends Thread {
 						//Construct a work message for each chunk. Set the destination as the leader. Set the message type as SLAVE_READ_DONE
 						WorkMessage msg = MessageGeneratorUtil.getInstance().generateDelegationRespMsg(t, details.getByteData(), i, chunkCount, currWork.getRequestId());
 						//Send these messages to the outbound work queue
-						QueueManager.getInstance().enqueueOutboundWork(msg, currChannel);
+						manager.enqueueOutboundWork(msg, currChannel);
 					}
 					
 					break;
 
 				case SLAVE_READ_DONE:
 					//Message from a slave which has sent some data to be sent to the client.
-									
+					logger.info(" Slave returned some data to be forwarded to client ");				
 					//Get the client channel from the map
 					CommandMessageChannelCombo cmCombo = NodeChannelManager.getClientChannelFromMap(currWork.getRequestId());
 					Channel cliChannel =  cmCombo.getChannel();
@@ -70,26 +70,26 @@ public class InboundWorker extends Thread {
 					//Create a command message for this chunk
 					CommandMessage outputMsg = MessageGeneratorUtil.getInstance().forwardChunkToClient(currWork);
 					//Send the generated command message to the outbound command queue.
-					QueueManager.getInstance().enqueueOutboundCommand(outputMsg, cliChannel);
+					manager.enqueueOutboundCommand(outputMsg, cliChannel);
 
 					break;
 
 				case LEADER_WRITE:
 					//Message from a leader to replicate/write some data.
-					
+					logger.info("Got message to replicate some data ");
 					//Write the data to in memory db / persistent DB depending on chunk size
 					Dbhandler.addFile(t.getFilename(), t.getChunk().toByteArray(), t.getNoOfChunks(), t.getChunkNo());
 					//Generate a work message with flag for Worktype SLAVE_WRITTEN.
 					WorkMessage wm = MessageGeneratorUtil.getInstance().generateReplicationAckMessage(currWork);
 					//Send this message to the outbound queue
-					QueueManager.getInstance().enqueueOutboundWork(wm, currChannel);
+					manager.enqueueOutboundWork(wm, currChannel);
 
 					break;
 
 				case SLAVE_WRITTEN:
 					//TODO Message from a slave saying that it has completed the replication.
 					//To be implemented later after completing basic functionality.
-					
+					logger.info("Slave replicated the data ");
 
 					break;
 

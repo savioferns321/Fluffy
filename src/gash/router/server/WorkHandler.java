@@ -164,7 +164,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			eb.setMessage(e.getMessage());
 			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
 			rb.setErr(eb);
-			channel.write(rb.build());
+			channel.writeAndFlush(rb.build());
 		}
 
 		System.out.flush();

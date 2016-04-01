@@ -19,7 +19,7 @@ public class ElectionManagement {
 	private static RaftStateMachine raftStateMachine;
 	private static Timer electionTimer;
 	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
-	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 3;
+	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 2;
 	private static int currentVoteCount = 1;
 	private NodeState currentNodeState;
 

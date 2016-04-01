@@ -25,24 +25,31 @@ public class OutboundWorker extends Thread{
 
 			try {
 				// block until a message is enqueued
-				WorkMessageChannelCombo msg = QueueManager.getInstance().dequeueOutboundWork();
+				WorkMessageChannelCombo msg = manager.dequeueOutboundWork();
 
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getWorkMessage().getHeader().getDestination());
+				
+				logger.info("Received outbound work message");
 
-				if (msg.getChannel().isWritable()) {
+				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
+					logger.info("Channel is open ");
 					boolean rtn = false;
-					if (msg.getChannel()!= null && msg.getChannel().isOpen() && msg.getChannel().isWritable()) {
-						ChannelFuture cf = msg.getChannel().write(msg);
+					if (msg.getChannel().isWritable()) {
+						logger.info("Writing to channel now : ");
+						ChannelFuture cf = msg.getChannel().writeAndFlush(msg);
 
 						cf.awaitUninterruptibly();
+						logger.info("Completed writing to channel now : ");
 						rtn = cf.isSuccess();
+						logger.info("Wrote msg to the channel ? "+rtn);
 						if (!rtn)
 							manager.returnOutboundWork(msg);
 					}
 
 				} else {
 					logger.info("channel to node " + msg.getWorkMessage().getHeader().getDestination() + " is not writable");
+					logger.info("Is channel null : "+(msg.getChannel() == null));
 					manager.returnOutboundWork(msg);
 				}
 			} catch (InterruptedException ie) {

@@ -104,7 +104,7 @@ public class InboundCommander extends Thread{
 					WorkMessage message = MessageGeneratorUtil.getInstance().generateDelegationMessage(currMsg, requestId);
 					
 					//Enqueue the generated message to the outbound work queue
-					QueueManager.getInstance().enqueueOutboundWork(message, nextChannel);
+					manager.enqueueOutboundWork(message, nextChannel);
 					
 					/*Thread.sleep(10000);
 					logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename());*/

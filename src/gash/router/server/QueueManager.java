@@ -30,8 +30,8 @@ public class QueueManager {
 
 	protected LinkedBlockingDeque<WorkMessageChannelCombo> inboundWorkQ;
 	protected LinkedBlockingDeque<WorkMessageChannelCombo> outboundWorkQ;
-	protected InboundCommander inboundWorker;
-	protected OutboundCommander outboundWorker;
+	protected InboundWorker inboundWorker;
+	protected OutboundWorker outboundWorker;
 
 	public static QueueManager initManager() {
 		instance.compareAndSet(null, new QueueManager());
@@ -56,9 +56,9 @@ public class QueueManager {
 
 		inboundWorkQ = new LinkedBlockingDeque<QueueManager.WorkMessageChannelCombo>();
 		outboundWorkQ = new LinkedBlockingDeque<QueueManager.WorkMessageChannelCombo>();
-		inboundWorker = new InboundCommander(this);
+		inboundWorker = new InboundWorker(this);
 		inboundWorker.start();
-		outboundWorker = new OutboundCommander(this);
+		outboundWorker = new OutboundWorker(this);
 		outboundWorker.start();
 	}
 
