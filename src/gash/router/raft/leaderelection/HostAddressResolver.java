@@ -10,14 +10,18 @@ public class HostAddressResolver {
 
 	public static String getLocalHostAddress() {
 
-		String interfaceName = "eth0";
-		String otherInterfaceName = "en0";
+		String interfaceName1 = "eth0";
+		String interfaceName2 = "en0";
+		String interfaceName3 = "enp4s0";
 		String ip = "";
 		NetworkInterface networkInterface;
 		try {
-			networkInterface = NetworkInterface.getByName(interfaceName);
+			networkInterface = NetworkInterface.getByName(interfaceName1);
 			if (networkInterface == null) {
-				networkInterface = NetworkInterface.getByName(otherInterfaceName);
+				networkInterface = NetworkInterface.getByName(interfaceName2);
+			}
+			if (networkInterface == null) {
+				networkInterface = NetworkInterface.getByName(interfaceName3);
 			}
 			Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
 			InetAddress currentAddress;
