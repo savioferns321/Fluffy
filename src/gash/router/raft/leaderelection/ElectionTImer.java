@@ -13,6 +13,12 @@ public class ElectionTImer implements Runnable {
 		 * "Current Node State Leader ID " + currentNodeState.getLeaderId()); }
 		 * } else { System.out.println("ElectionManagement is Null "); }
 		 */
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ElectionManagement.resetElection();
 		ElectionManagement.startElection();
 	}

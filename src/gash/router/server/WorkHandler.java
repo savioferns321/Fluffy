@@ -19,20 +19,17 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.raft.leaderelection.ElectionManagement;
-import gash.router.raft.leaderelection.ElectionTImer;
-import gash.router.raft.leaderelection.RandomTimeoutGenerator;
-import gash.server.util.MessageGeneratorUtil;
+import gash.router.raft.leaderelection.MessageBuilder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
-import pipe.common.Common.Task;
+import pipe.election.Election.LeaderStatus.LeaderQuery;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
@@ -87,6 +84,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				// Thread.sleep(1000);
 				// electionTimer.purge();
 				// this.startElectionTimer();
+			} else if (msg.hasLeader() && msg.getLeader().getAction() == LeaderQuery.WHOISTHELEADER) {
+				WorkMessage buildNewNodeLeaderStatusResponseMessage = MessageBuilder
+						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
+								NodeChannelManager.currentLeaderAddress);
+				channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
+			} else if (msg.hasLeader() && msg.getLeader().getAction() == LeaderQuery.THELEADERIS) {
+				NodeChannelManager.currentLeaderID = msg.getLeader().getLeaderId();
+				NodeChannelManager.currentLeaderAddress = msg.getLeader().getLeaderHost();
+				logger.debug("The leader is " + NodeChannelManager.currentLeaderID);
 			}
 
 			if (msg.hasBeat()) {
@@ -197,31 +203,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		Channel channel = ctx.channel();
 		handleMessage(msg, channel);
 
-		// Should happen via queue?
-
-		/*
-		 * WorkState.Builder sb = WorkState.newBuilder(); sb.setEnqueued(-1);
-		 * sb.setProcessed(-1);
-		 * 
-		 * WorkMessage.Builder wb = WorkMessage.newBuilder();
-		 * wb.setSecret(1234);
-		 * 
-		 * Header.Builder hb = Header.newBuilder();
-		 * hb.setNodeId(state.getConf().getNodeId());
-		 * hb.setDestination(msg.getHeader().getNodeId());
-		 * hb.setTime(System.currentTimeMillis());
-		 * 
-		 * Heartbeat.Builder heartbeat = Heartbeat.newBuilder();
-		 * heartbeat.setState(sb);
-		 * 
-		 * wb.setBeat(heartbeat); wb.setHeader(hb);
-		 * 
-		 * channel.writeAndFlush(wb.build());
-		 */
-		/*
-		 * Thread.sleep(1000); ctx.channel().writeAndFlush(msg);
-		 */
-		Thread.sleep(1000);
+		Thread.sleep(300);
 	}
 
 	@Override

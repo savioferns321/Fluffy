@@ -97,6 +97,8 @@ public class ElectionManagement {
 						NodeChannelManager.broadcast(leaderResponseMessage);
 						// Current Node is the leader
 						NodeChannelManager.currentLeaderID = routingConf.getNodeId();
+						NodeChannelManager.currentLeaderAddress = leaderResponseMessage.getRaftMessage()
+								.getLeaderHost();
 					} catch (Exception exception) {
 						System.out.println("An error has occured while broadcasting the message.");
 					}
@@ -118,6 +120,7 @@ public class ElectionManagement {
 				// Saving current leader id in NodeChannelManager to use it
 				// across the node
 				NodeChannelManager.currentLeaderID = electionWorkMessage.getRaftMessage().getLeaderId();
+				NodeChannelManager.currentLeaderAddress = electionWorkMessage.getRaftMessage().getLeaderHost();
 
 			} catch (Exception exception) {
 				System.out.println("Something is not correct");
@@ -129,6 +132,11 @@ public class ElectionManagement {
 		// TODO put logic to count the number of votes received so far and
 		// decide the leader
 		if (electionWorkMessage.getRaftMessage().getRequestVote().getVoteGranted()) {
+			/*currentVoteCount++;
+			if (currentVoteCount > ((NodeChannelManager.getNode2ChannelMap().size() / 2) + 1))
+				return true;
+			else
+				return false;*/
 			return true;
 		}
 		return false;

@@ -25,7 +25,8 @@ public class NodeChannelManager {
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
 
 	public static int currentLeaderID;
-
+	public static String currentLeaderAddress;
+	
 	private static int delay = 3000;
 
 	public static NodeChannelManager getInstance() {

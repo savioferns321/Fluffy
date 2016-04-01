@@ -1,6 +1,5 @@
 package gash.router.server;
 
-import java.rmi.UnexpectedException;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicReference;
 

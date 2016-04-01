@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.discovery.NodeDiscoveryManager;
-import gash.router.raft.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.MessageBuilder;
 import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.ServerState;
@@ -74,8 +74,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				for (InetAddress oneIp : liveIps) {
 					System.out.println(oneIp.getHostAddress());
 				}
+				// TODO Iterate over all the nodes and send the message
 				Channel newNodeChannel = connectToChannel("127.0.0.1", 5100, this.state);
-				WorkMessage wm = createNewNode();
+				// Sends out a message to know the
+				WorkMessage wm = MessageBuilder.buildNewNodeLeaderStatusMessage();
 				newNodeChannel.writeAndFlush(wm);
 			} catch (Exception e) {
 				e.printStackTrace();

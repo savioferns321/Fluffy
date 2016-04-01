@@ -1,7 +1,11 @@
 package gash.router.raft.leaderelection;
 
 import gash.router.container.RoutingConf;
+import gash.router.server.NodeChannelManager;
 import pipe.common.Common.Header;
+import pipe.election.Election.LeaderStatus;
+import pipe.election.Election.LeaderStatus.LeaderQuery;
+import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.election.Election.RaftMessage;
 import pipe.election.Election.RaftMessage.ElectionAction;
 import pipe.election.Election.VoteRequestMsg;
@@ -68,9 +72,54 @@ public class MessageBuilder {
 		raftMessageBuilder.setAction(ElectionAction.LEADER);
 		raftMessageBuilder.setLeaderId(leaderId);
 		raftMessageBuilder.setLeaderHost(HostAddressResolver.getLocalHostAddress());
-		
+
 		workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERALIVE);
 		workMessageBuilder.setRaftMessage(raftMessageBuilder);
+		workMessageBuilder.setHeader(headerBuilder);
+		workMessageBuilder.setSecret(1234);
+
+		return workMessageBuilder.build();
+	}
+
+	public static WorkMessage buildNewNodeLeaderStatusMessage() {
+		WorkMessage.Builder workMessageBuilder = WorkMessage.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
+		LeaderStatus.Builder leaderStatusBuilder = LeaderStatus.newBuilder();
+
+		leaderStatusBuilder.setAction(LeaderQuery.WHOISTHELEADER);
+		leaderStatusBuilder.setState(LeaderState.LEADERUNKNOWN);
+
+		headerBuilder.setElection(false);
+		headerBuilder.setNodeId(routingConf.getNodeId());
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
+		workMessageBuilder.setLeader(leaderStatusBuilder);
+		workMessageBuilder.setHeader(headerBuilder);
+		workMessageBuilder.setSecret(1234);
+
+		return workMessageBuilder.build();
+	}
+
+	public static WorkMessage buildNewNodeLeaderStatusResponseMessage(int leaderId, String leaderHostAddress) {
+		WorkMessage.Builder workMessageBuilder = WorkMessage.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
+		LeaderStatus.Builder leaderStatusBuilder = LeaderStatus.newBuilder();
+
+		leaderStatusBuilder.setAction(LeaderQuery.THELEADERIS);
+		leaderStatusBuilder.setLeaderId(leaderId);
+		leaderStatusBuilder.setLeaderHost(leaderHostAddress);
+
+		headerBuilder.setElection(false);
+		headerBuilder.setNodeId(routingConf.getNodeId());
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		if (routingConf.getNodeId() == NodeChannelManager.currentLeaderID)
+			workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERALIVE);
+		else
+			workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERKNOWN);
+
+		workMessageBuilder.setLeader(leaderStatusBuilder);
 		workMessageBuilder.setHeader(headerBuilder);
 		workMessageBuilder.setSecret(1234);
 
