@@ -11,11 +11,14 @@ public class HostAddressResolver {
 	public static String getLocalHostAddress() {
 
 		String interfaceName = "eth0";
+		String otherInterfaceName = "en0";
 		String ip = "";
 		NetworkInterface networkInterface;
 		try {
 			networkInterface = NetworkInterface.getByName(interfaceName);
-
+			if (networkInterface == null) {
+				networkInterface = NetworkInterface.getByName(otherInterfaceName);
+			}
 			Enumeration<InetAddress> inetAddress = networkInterface.getInetAddresses();
 			InetAddress currentAddress;
 			currentAddress = inetAddress.nextElement();
