@@ -30,11 +30,11 @@ public class InboundWorker extends Thread {
 	public void run() {
 		try {
 			//Poll the queue for messages
-			WorkMessageChannelCombo wmCombo = manager.dequeueInboundWork();
-			WorkMessage currWork = wmCombo.getWorkMessage();
-			Channel currChannel = wmCombo.getChannel();
-			Task t = currWork.getTask();
 			while(true){
+				WorkMessageChannelCombo wmCombo = manager.dequeueInboundWork();
+				WorkMessage currWork = wmCombo.getWorkMessage();
+				Channel currChannel = wmCombo.getChannel();
+				Task t = currWork.getTask();
 				//Message can be from leader or from a slave.
 				switch (currWork.getWorktype()) {
 				case LEADER_READ:
@@ -49,7 +49,7 @@ public class InboundWorker extends Thread {
 						//Send these messages to the outbound work queue
 						manager.enqueueOutboundWork(msg, currChannel);
 					}
-					
+
 					break;
 
 				case SLAVE_READ_DONE:
@@ -58,15 +58,15 @@ public class InboundWorker extends Thread {
 					//Get the client channel from the map
 					CommandMessageChannelCombo cmCombo = NodeChannelManager.getClientChannelFromMap(currWork.getRequestId());
 					Channel cliChannel =  cmCombo.getChannel();
-					
+
 					//Decrement the client's chunk count
 					cmCombo.decrementChunkCount();
-					
+
 					//Handle the client channel map, remove the client's channel if it is the last chunk
 					if(cmCombo.getChunkCount() ==0){
 						NodeChannelManager.removeClientChannelFromMap(currWork.getRequestId());
 					}
-					
+
 					//Create a command message for this chunk
 					CommandMessage outputMsg = MessageGeneratorUtil.getInstance().forwardChunkToClient(currWork);
 					//Send the generated command message to the outbound command queue.
@@ -104,7 +104,7 @@ public class InboundWorker extends Thread {
 			logger.error(e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 }

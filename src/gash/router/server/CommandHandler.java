@@ -62,11 +62,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		try {
 			// TODO How can you implement this without if-else statements?
-			if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-			} else if (msg.hasMessage()) {
-				logger.info(msg.getMessage());
-			} else if(msg.hasTask()){
+			if(msg.hasTask()){
 
 				/**
 				 * TODO Enqueue the command message and the channel into the server queue
@@ -75,7 +71,12 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				System.out.println("Queuing task");
 				System.out.flush();
 				QueueManager.getInstance().enqueueInboundCommmand(msg, channel);
-			}
+			}else			
+			if (msg.hasPing()) {
+				logger.info("ping from " + msg.getHeader().getNodeId());
+			} else if (msg.hasMessage()) {
+				logger.info(msg.getMessage());
+			}  
 
 		} catch (Exception e) {
 			// TODO add logging

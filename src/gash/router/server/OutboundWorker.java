@@ -30,17 +30,12 @@ public class OutboundWorker extends Thread{
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getWorkMessage().getHeader().getDestination());
 				
-				logger.info("Received outbound work message");
 
 				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
-					logger.info("Channel is open ");
 					boolean rtn = false;
 					if (msg.getChannel().isWritable()) {
-						logger.info("Writing to channel now : ");
-						ChannelFuture cf = msg.getChannel().writeAndFlush(msg);
-
+						ChannelFuture cf = msg.getChannel().writeAndFlush(msg.getWorkMessage());
 						cf.awaitUninterruptibly();
-						logger.info("Completed writing to channel now : ");
 						rtn = cf.isSuccess();
 						logger.info("Wrote msg to the channel ? "+rtn);
 						if (!rtn)
@@ -50,7 +45,7 @@ public class OutboundWorker extends Thread{
 				} else {
 					logger.info("channel to node " + msg.getWorkMessage().getHeader().getDestination() + " is not writable");
 					logger.info("Is channel null : "+(msg.getChannel() == null));
-					manager.returnOutboundWork(msg);
+					//manager.returnOutboundWork(msg);
 				}
 			} catch (InterruptedException ie) {
 				break;

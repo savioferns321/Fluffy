@@ -103,6 +103,12 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 					channel.writeAndFlush(message);
 				}
 
+			} else if (msg.hasTask()) {
+
+				// Enqueue it to the inbound work queue
+				logger.info("Received inbound work ");
+				QueueManager.getInstance().enqueueInboundWork(msg, channel);
+
 			} else if (msg.hasFlagRouting()) {
 				logger.info("Routing information recieved " + msg.getHeader().getNodeId());
 				logger.info("Routing Entries: " + msg.getRoutingEntries());
@@ -141,11 +147,6 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				Failure err = msg.getErr();
 				logger.error("failure from " + msg.getHeader().getNodeId());
 				// PrintUtil.printFailure(err);
-			} else if (msg.hasTask()) {
-
-				// Enqueue it to the inbound work queue
-				QueueManager.getInstance().enqueueInboundWork(msg, channel);
-
 			} else if (msg.hasState()) {
 				WorkState s = msg.getState();
 			} else {

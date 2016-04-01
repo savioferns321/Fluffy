@@ -50,11 +50,11 @@ public class MessageGeneratorUtil {
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
-		wb.setHeader(hb.build());
+		wb.setHeader(hb);
 
 		Task.Builder tb = Task.newBuilder(message.getTask());
 		tb.setChunk(message.getFileContent());
-		wb.setTask(tb.build());
+		wb.setTask(tb);
 		//TODO Generate secret
 		wb.setSecret(1234);
 		wb.setIsProcessed(false);
@@ -182,6 +182,7 @@ public class MessageGeneratorUtil {
 		tb.clearNoOfChunks();
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb.build());
 		wb.setWorktype(Worktype.SLAVE_WRITTEN);
 		//TODO Set the secret
 		wb.setSecret(1234);
