@@ -77,6 +77,7 @@ public class MessageServer {
 		QueueManager.initManager();
 		DataReplicationManager.initDataReplicationManager();
 		MessageGeneratorUtil.initGenerator();
+		MessageGeneratorUtil.setRoutingConf(conf);
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		logger.info("Work starting");
 
