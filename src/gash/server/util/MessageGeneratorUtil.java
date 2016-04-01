@@ -7,15 +7,20 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import gash.router.container.RoutingConf;
 import gash.router.server.MessageServer;
+import gash.router.server.NodeChannelManager;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;
 import pipe.work.Work.WorkMessage;
+import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkMessage.Worktype;
 import routing.Pipe.CommandMessage;
 
 public class MessageGeneratorUtil {
+	
+	private static RoutingConf conf;
 
 	protected static Logger logger = LoggerFactory.getLogger(MessageGeneratorUtil.class);
 	protected static AtomicReference<MessageGeneratorUtil> instance = new AtomicReference<MessageGeneratorUtil>();
@@ -54,6 +59,7 @@ public class MessageGeneratorUtil {
 		wb.setSecret(1234);
 		wb.setIsProcessed(false);
 		wb.setWorktype(Worktype.LEADER_WRITE);
+		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
 	}
@@ -100,6 +106,7 @@ public class MessageGeneratorUtil {
 		wb.setSecret(1234);
 		wb.setRequestId(requestID);
 		wb.setWorktype(Worktype.LEADER_READ);
+		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
 	}
@@ -135,6 +142,7 @@ public class MessageGeneratorUtil {
 		}
 
 		wb.setTask(tb.build());
+		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
 	}
@@ -178,6 +186,7 @@ public class MessageGeneratorUtil {
 		//TODO Set the secret
 		wb.setSecret(1234);
 		wb.setTask(tb.build());
+		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
 	}
@@ -197,6 +206,22 @@ public class MessageGeneratorUtil {
 	 */
 	public WorkMessage generateHeartbeatResponse(){
 		return null;
+	}
+	
+
+	private void addLeaderFieldToWorkMessage(WorkMessage.Builder wb) {
+		if (NodeChannelManager.currentLeaderID == 0) {
+			wb.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
+		} else if (NodeChannelManager.currentLeaderID == conf.getNodeId()) {
+			// Current Node is the leader
+			wb.setStateOfLeader(StateOfLeader.LEADERALIVE);
+		} else {
+			wb.setStateOfLeader(StateOfLeader.LEADERKNOWN);
+		}
+	}
+
+	public static void setRoutingConf(RoutingConf routingConf) {
+		MessageGeneratorUtil.conf = routingConf;
 	}
 
 }
