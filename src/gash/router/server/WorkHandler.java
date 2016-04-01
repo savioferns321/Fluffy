@@ -51,7 +51,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected ServerState state;
 	protected boolean debug = false;
 	// private static Timer electionTimer;
-	ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+	private static ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
 
 	public WorkHandler(ServerState state) {
 		// electionTimer = new Timer();
@@ -79,14 +79,12 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.getStateOfLeader() == StateOfLeader.LEADERALIVE) {
-				// exec.shutdownNow();
-				// int currentTimeout = RandomTimeoutGenerator.randTimeout() *
-				// this.state.getConf().getNodeId();
-				// exec = Executors.newSingleThreadScheduledExecutor();
-				// exec.schedule(new ElectionTImer(), (long) currentTimeout,
-				// TimeUnit.MILLISECONDS);
+				//exec.shutdownNow();
+				//int currentTimeout = RandomTimeoutGenerator.randTimeout() * this.state.getConf().getNodeId();
+				//exec = Executors.newSingleThreadScheduledExecutor();
+				//exec.schedule(new ElectionTImer(), (long) currentTimeout, TimeUnit.MILLISECONDS);
 				// System.out.println("Leader is Alive ");
-				Thread.sleep(1000);
+				// Thread.sleep(1000);
 				// electionTimer.purge();
 				// this.startElectionTimer();
 			}
@@ -222,6 +220,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		/*
 		 * Thread.sleep(1000); ctx.channel().writeAndFlush(msg);
 		 */
+		Thread.sleep(1000);
 	}
 
 	@Override
