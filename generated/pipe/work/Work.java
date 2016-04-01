@@ -1770,27 +1770,36 @@ public final class Work {
     boolean getIsProcessed();
 
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     boolean hasRequestId();
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     java.lang.String getRequestId();
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     com.google.protobuf.ByteString
         getRequestIdBytes();
 
     /**
-     * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+     * <code>optional .WorkMessage.Worktype worktype = 15;</code>
      */
     boolean hasWorktype();
     /**
-     * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+     * <code>optional .WorkMessage.Worktype worktype = 15;</code>
      */
     pipe.work.Work.WorkMessage.Worktype getWorktype();
+
+    /**
+     * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+     */
+    boolean hasStateOfLeader();
+    /**
+     * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+     */
+    pipe.work.Work.WorkMessage.StateOfLeader getStateOfLeader();
 
     /**
      * <code>optional .Failure err = 3;</code>
@@ -1903,6 +1912,31 @@ public final class Work {
      * <code>optional bool flagRouting = 10;</code>
      */
     boolean getFlagRouting();
+
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    boolean hasRaftMessage();
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    pipe.election.Election.RaftMessage getRaftMessage();
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    pipe.election.Election.RaftMessageOrBuilder getRaftMessageOrBuilder();
   }
   /**
    * Protobuf type {@code WorkMessage}
@@ -2076,21 +2110,45 @@ public final class Work {
               isProcessed_ = input.readBool();
               break;
             }
-            case 112: {
+            case 114: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000010;
+              requestId_ = bs;
+              break;
+            }
+            case 120: {
               int rawValue = input.readEnum();
               pipe.work.Work.WorkMessage.Worktype value = pipe.work.Work.WorkMessage.Worktype.valueOf(rawValue);
               if (value == null) {
-                unknownFields.mergeVarintField(14, rawValue);
+                unknownFields.mergeVarintField(15, rawValue);
               } else {
                 bitField0_ |= 0x00000020;
                 worktype_ = value;
               }
               break;
             }
-            case 154: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000010;
-              requestId_ = bs;
+            case 128: {
+              int rawValue = input.readEnum();
+              pipe.work.Work.WorkMessage.StateOfLeader value = pipe.work.Work.WorkMessage.StateOfLeader.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(16, rawValue);
+              } else {
+                bitField0_ |= 0x00000040;
+                stateOfLeader_ = value;
+              }
+              break;
+            }
+            case 138: {
+              pipe.election.Election.RaftMessage.Builder subBuilder = null;
+              if (payloadCase_ == 17) {
+                subBuilder = ((pipe.election.Election.RaftMessage) payload_).toBuilder();
+              }
+              payload_ = input.readMessage(pipe.election.Election.RaftMessage.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((pipe.election.Election.RaftMessage) payload_);
+                payload_ = subBuilder.buildPartial();
+              }
+              payloadCase_ = 17;
               break;
             }
           }
@@ -2138,49 +2196,49 @@ public final class Work {
     public enum Worktype
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
-       * <code>LEADER_WRITE = 15;</code>
+       * <code>LEADER_WRITE = 1;</code>
        */
-      LEADER_WRITE(0, 15),
+      LEADER_WRITE(0, 1),
       /**
-       * <code>SLAVE_WRITTEN = 16;</code>
+       * <code>SLAVE_WRITTEN = 2;</code>
        */
-      SLAVE_WRITTEN(1, 16),
+      SLAVE_WRITTEN(1, 2),
       /**
-       * <code>LEADER_READ = 17;</code>
+       * <code>LEADER_READ = 3;</code>
        */
-      LEADER_READ(2, 17),
+      LEADER_READ(2, 3),
       /**
-       * <code>SLAVE_READ_DONE = 18;</code>
+       * <code>SLAVE_READ_DONE = 4;</code>
        */
-      SLAVE_READ_DONE(3, 18),
+      SLAVE_READ_DONE(3, 4),
       ;
 
       /**
-       * <code>LEADER_WRITE = 15;</code>
+       * <code>LEADER_WRITE = 1;</code>
        */
-      public static final int LEADER_WRITE_VALUE = 15;
+      public static final int LEADER_WRITE_VALUE = 1;
       /**
-       * <code>SLAVE_WRITTEN = 16;</code>
+       * <code>SLAVE_WRITTEN = 2;</code>
        */
-      public static final int SLAVE_WRITTEN_VALUE = 16;
+      public static final int SLAVE_WRITTEN_VALUE = 2;
       /**
-       * <code>LEADER_READ = 17;</code>
+       * <code>LEADER_READ = 3;</code>
        */
-      public static final int LEADER_READ_VALUE = 17;
+      public static final int LEADER_READ_VALUE = 3;
       /**
-       * <code>SLAVE_READ_DONE = 18;</code>
+       * <code>SLAVE_READ_DONE = 4;</code>
        */
-      public static final int SLAVE_READ_DONE_VALUE = 18;
+      public static final int SLAVE_READ_DONE_VALUE = 4;
 
 
       public final int getNumber() { return value; }
 
       public static Worktype valueOf(int value) {
         switch (value) {
-          case 15: return LEADER_WRITE;
-          case 16: return SLAVE_WRITTEN;
-          case 17: return LEADER_READ;
-          case 18: return SLAVE_READ_DONE;
+          case 1: return LEADER_WRITE;
+          case 2: return SLAVE_WRITTEN;
+          case 3: return LEADER_READ;
+          case 4: return SLAVE_READ_DONE;
           default: return null;
         }
       }
@@ -2232,6 +2290,106 @@ public final class Work {
       // @@protoc_insertion_point(enum_scope:WorkMessage.Worktype)
     }
 
+    /**
+     * Protobuf enum {@code WorkMessage.StateOfLeader}
+     */
+    public enum StateOfLeader
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>LEADERALIVE = 1;</code>
+       */
+      LEADERALIVE(0, 1),
+      /**
+       * <code>LEADERDEAD = 2;</code>
+       */
+      LEADERDEAD(1, 2),
+      /**
+       * <code>LEADERUNKNOWN = 3;</code>
+       */
+      LEADERUNKNOWN(2, 3),
+      /**
+       * <code>LEADERKNOWN = 4;</code>
+       */
+      LEADERKNOWN(3, 4),
+      ;
+
+      /**
+       * <code>LEADERALIVE = 1;</code>
+       */
+      public static final int LEADERALIVE_VALUE = 1;
+      /**
+       * <code>LEADERDEAD = 2;</code>
+       */
+      public static final int LEADERDEAD_VALUE = 2;
+      /**
+       * <code>LEADERUNKNOWN = 3;</code>
+       */
+      public static final int LEADERUNKNOWN_VALUE = 3;
+      /**
+       * <code>LEADERKNOWN = 4;</code>
+       */
+      public static final int LEADERKNOWN_VALUE = 4;
+
+
+      public final int getNumber() { return value; }
+
+      public static StateOfLeader valueOf(int value) {
+        switch (value) {
+          case 1: return LEADERALIVE;
+          case 2: return LEADERDEAD;
+          case 3: return LEADERUNKNOWN;
+          case 4: return LEADERKNOWN;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<StateOfLeader>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<StateOfLeader>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<StateOfLeader>() {
+              public StateOfLeader findValueByNumber(int number) {
+                return StateOfLeader.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return pipe.work.Work.WorkMessage.getDescriptor().getEnumTypes().get(1);
+      }
+
+      private static final StateOfLeader[] VALUES = values();
+
+      public static StateOfLeader valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private StateOfLeader(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:WorkMessage.StateOfLeader)
+    }
+
     private int bitField0_;
     private int payloadCase_ = 0;
     private java.lang.Object payload_;
@@ -2245,6 +2403,7 @@ public final class Work {
       LEADER(8),
       NEWNODE(9),
       FLAGROUTING(10),
+      RAFTMESSAGE(17),
       PAYLOAD_NOT_SET(0);
       private int value = 0;
       private PayloadCase(int value) {
@@ -2260,6 +2419,7 @@ public final class Work {
           case 8: return LEADER;
           case 9: return NEWNODE;
           case 10: return FLAGROUTING;
+          case 17: return RAFTMESSAGE;
           case 0: return PAYLOAD_NOT_SET;
           default: throw new java.lang.IllegalArgumentException(
             "Value is undefined for this oneof enum.");
@@ -2348,16 +2508,16 @@ public final class Work {
       return isProcessed_;
     }
 
-    public static final int REQUESTID_FIELD_NUMBER = 19;
+    public static final int REQUESTID_FIELD_NUMBER = 14;
     private java.lang.Object requestId_;
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     public boolean hasRequestId() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     public java.lang.String getRequestId() {
       java.lang.Object ref = requestId_;
@@ -2374,7 +2534,7 @@ public final class Work {
       }
     }
     /**
-     * <code>optional string requestId = 19;</code>
+     * <code>optional string requestId = 14;</code>
      */
     public com.google.protobuf.ByteString
         getRequestIdBytes() {
@@ -2390,19 +2550,34 @@ public final class Work {
       }
     }
 
-    public static final int WORKTYPE_FIELD_NUMBER = 14;
+    public static final int WORKTYPE_FIELD_NUMBER = 15;
     private pipe.work.Work.WorkMessage.Worktype worktype_;
     /**
-     * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+     * <code>optional .WorkMessage.Worktype worktype = 15;</code>
      */
     public boolean hasWorktype() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+     * <code>optional .WorkMessage.Worktype worktype = 15;</code>
      */
     public pipe.work.Work.WorkMessage.Worktype getWorktype() {
       return worktype_;
+    }
+
+    public static final int STATEOFLEADER_FIELD_NUMBER = 16;
+    private pipe.work.Work.WorkMessage.StateOfLeader stateOfLeader_;
+    /**
+     * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+     */
+    public boolean hasStateOfLeader() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+     */
+    public pipe.work.Work.WorkMessage.StateOfLeader getStateOfLeader() {
+      return stateOfLeader_;
     }
 
     public static final int ERR_FIELD_NUMBER = 3;
@@ -2606,6 +2781,44 @@ public final class Work {
       return false;
     }
 
+    public static final int RAFTMESSAGE_FIELD_NUMBER = 17;
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    public boolean hasRaftMessage() {
+      return payloadCase_ == 17;
+    }
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    public pipe.election.Election.RaftMessage getRaftMessage() {
+      if (payloadCase_ == 17) {
+         return (pipe.election.Election.RaftMessage) payload_;
+      }
+      return pipe.election.Election.RaftMessage.getDefaultInstance();
+    }
+    /**
+     * <code>optional .RaftMessage raftMessage = 17;</code>
+     *
+     * <pre>
+     *RaftMessage
+     * </pre>
+     */
+    public pipe.election.Election.RaftMessageOrBuilder getRaftMessageOrBuilder() {
+      if (payloadCase_ == 17) {
+         return (pipe.election.Election.RaftMessage) payload_;
+      }
+      return pipe.election.Election.RaftMessage.getDefaultInstance();
+    }
+
     private void initFields() {
       header_ = pipe.common.Common.Header.getDefaultInstance();
       secret_ = 0L;
@@ -2613,6 +2826,7 @@ public final class Work {
       isProcessed_ = false;
       requestId_ = "";
       worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
+      stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2625,6 +2839,10 @@ public final class Work {
         return false;
       }
       if (!hasSecret()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasStateOfLeader()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -2658,6 +2876,12 @@ public final class Work {
       }
       if (hasLeader()) {
         if (!getLeader().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (hasRaftMessage()) {
+        if (!getRaftMessage().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -2708,11 +2932,17 @@ public final class Work {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBool(13, isProcessed_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeEnum(14, worktype_.getNumber());
-      }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(19, getRequestIdBytes());
+        output.writeBytes(14, getRequestIdBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeEnum(15, worktype_.getNumber());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeEnum(16, stateOfLeader_.getNumber());
+      }
+      if (payloadCase_ == 17) {
+        output.writeMessage(17, (pipe.election.Election.RaftMessage) payload_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2774,13 +3004,21 @@ public final class Work {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(13, isProcessed_);
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(14, worktype_.getNumber());
-      }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(19, getRequestIdBytes());
+          .computeBytesSize(14, getRequestIdBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(15, worktype_.getNumber());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(16, stateOfLeader_.getNumber());
+      }
+      if (payloadCase_ == 17) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, (pipe.election.Election.RaftMessage) payload_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2925,6 +3163,8 @@ public final class Work {
         bitField0_ = (bitField0_ & ~0x00000010);
         worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
         bitField0_ = (bitField0_ & ~0x00000020);
+        stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
+        bitField0_ = (bitField0_ & ~0x00000040);
         payloadCase_ = 0;
         payload_ = null;
         return this;
@@ -2987,6 +3227,10 @@ public final class Work {
           to_bitField0_ |= 0x00000020;
         }
         result.worktype_ = worktype_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.stateOfLeader_ = stateOfLeader_;
         if (payloadCase_ == 3) {
           if (errBuilder_ == null) {
             result.payload_ = payload_;
@@ -3031,6 +3275,13 @@ public final class Work {
         if (payloadCase_ == 10) {
           result.payload_ = payload_;
         }
+        if (payloadCase_ == 17) {
+          if (raftMessageBuilder_ == null) {
+            result.payload_ = payload_;
+          } else {
+            result.payload_ = raftMessageBuilder_.build();
+          }
+        }
         result.bitField0_ = to_bitField0_;
         result.payloadCase_ = payloadCase_;
         onBuilt();
@@ -3068,6 +3319,9 @@ public final class Work {
         if (other.hasWorktype()) {
           setWorktype(other.getWorktype());
         }
+        if (other.hasStateOfLeader()) {
+          setStateOfLeader(other.getStateOfLeader());
+        }
         switch (other.getPayloadCase()) {
           case ERR: {
             mergeErr(other.getErr());
@@ -3101,6 +3355,10 @@ public final class Work {
             setFlagRouting(other.getFlagRouting());
             break;
           }
+          case RAFTMESSAGE: {
+            mergeRaftMessage(other.getRaftMessage());
+            break;
+          }
           case PAYLOAD_NOT_SET: {
             break;
           }
@@ -3115,6 +3373,10 @@ public final class Work {
           return false;
         }
         if (!hasSecret()) {
+          
+          return false;
+        }
+        if (!hasStateOfLeader()) {
           
           return false;
         }
@@ -3148,6 +3410,12 @@ public final class Work {
         }
         if (hasLeader()) {
           if (!getLeader().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasRaftMessage()) {
+          if (!getRaftMessage().isInitialized()) {
             
             return false;
           }
@@ -3487,13 +3755,13 @@ public final class Work {
 
       private java.lang.Object requestId_ = "";
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public boolean hasRequestId() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public java.lang.String getRequestId() {
         java.lang.Object ref = requestId_;
@@ -3510,7 +3778,7 @@ public final class Work {
         }
       }
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public com.google.protobuf.ByteString
           getRequestIdBytes() {
@@ -3526,7 +3794,7 @@ public final class Work {
         }
       }
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public Builder setRequestId(
           java.lang.String value) {
@@ -3539,7 +3807,7 @@ public final class Work {
         return this;
       }
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public Builder clearRequestId() {
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -3548,7 +3816,7 @@ public final class Work {
         return this;
       }
       /**
-       * <code>optional string requestId = 19;</code>
+       * <code>optional string requestId = 14;</code>
        */
       public Builder setRequestIdBytes(
           com.google.protobuf.ByteString value) {
@@ -3563,19 +3831,19 @@ public final class Work {
 
       private pipe.work.Work.WorkMessage.Worktype worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
       /**
-       * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+       * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public boolean hasWorktype() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+       * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public pipe.work.Work.WorkMessage.Worktype getWorktype() {
         return worktype_;
       }
       /**
-       * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+       * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public Builder setWorktype(pipe.work.Work.WorkMessage.Worktype value) {
         if (value == null) {
@@ -3587,11 +3855,46 @@ public final class Work {
         return this;
       }
       /**
-       * <code>optional .WorkMessage.Worktype worktype = 14;</code>
+       * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public Builder clearWorktype() {
         bitField0_ = (bitField0_ & ~0x00000020);
         worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
+        onChanged();
+        return this;
+      }
+
+      private pipe.work.Work.WorkMessage.StateOfLeader stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
+      /**
+       * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+       */
+      public boolean hasStateOfLeader() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+       */
+      public pipe.work.Work.WorkMessage.StateOfLeader getStateOfLeader() {
+        return stateOfLeader_;
+      }
+      /**
+       * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+       */
+      public Builder setStateOfLeader(pipe.work.Work.WorkMessage.StateOfLeader value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000040;
+        stateOfLeader_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
+       */
+      public Builder clearStateOfLeader() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
         onChanged();
         return this;
       }
@@ -4431,6 +4734,177 @@ public final class Work {
         return this;
       }
 
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.election.Election.RaftMessage, pipe.election.Election.RaftMessage.Builder, pipe.election.Election.RaftMessageOrBuilder> raftMessageBuilder_;
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public boolean hasRaftMessage() {
+        return payloadCase_ == 17;
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public pipe.election.Election.RaftMessage getRaftMessage() {
+        if (raftMessageBuilder_ == null) {
+          if (payloadCase_ == 17) {
+            return (pipe.election.Election.RaftMessage) payload_;
+          }
+          return pipe.election.Election.RaftMessage.getDefaultInstance();
+        } else {
+          if (payloadCase_ == 17) {
+            return raftMessageBuilder_.getMessage();
+          }
+          return pipe.election.Election.RaftMessage.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public Builder setRaftMessage(pipe.election.Election.RaftMessage value) {
+        if (raftMessageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          payload_ = value;
+          onChanged();
+        } else {
+          raftMessageBuilder_.setMessage(value);
+        }
+        payloadCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public Builder setRaftMessage(
+          pipe.election.Election.RaftMessage.Builder builderForValue) {
+        if (raftMessageBuilder_ == null) {
+          payload_ = builderForValue.build();
+          onChanged();
+        } else {
+          raftMessageBuilder_.setMessage(builderForValue.build());
+        }
+        payloadCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public Builder mergeRaftMessage(pipe.election.Election.RaftMessage value) {
+        if (raftMessageBuilder_ == null) {
+          if (payloadCase_ == 17 &&
+              payload_ != pipe.election.Election.RaftMessage.getDefaultInstance()) {
+            payload_ = pipe.election.Election.RaftMessage.newBuilder((pipe.election.Election.RaftMessage) payload_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            payload_ = value;
+          }
+          onChanged();
+        } else {
+          if (payloadCase_ == 17) {
+            raftMessageBuilder_.mergeFrom(value);
+          }
+          raftMessageBuilder_.setMessage(value);
+        }
+        payloadCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public Builder clearRaftMessage() {
+        if (raftMessageBuilder_ == null) {
+          if (payloadCase_ == 17) {
+            payloadCase_ = 0;
+            payload_ = null;
+            onChanged();
+          }
+        } else {
+          if (payloadCase_ == 17) {
+            payloadCase_ = 0;
+            payload_ = null;
+          }
+          raftMessageBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public pipe.election.Election.RaftMessage.Builder getRaftMessageBuilder() {
+        return getRaftMessageFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      public pipe.election.Election.RaftMessageOrBuilder getRaftMessageOrBuilder() {
+        if ((payloadCase_ == 17) && (raftMessageBuilder_ != null)) {
+          return raftMessageBuilder_.getMessageOrBuilder();
+        } else {
+          if (payloadCase_ == 17) {
+            return (pipe.election.Election.RaftMessage) payload_;
+          }
+          return pipe.election.Election.RaftMessage.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .RaftMessage raftMessage = 17;</code>
+       *
+       * <pre>
+       *RaftMessage
+       * </pre>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.election.Election.RaftMessage, pipe.election.Election.RaftMessage.Builder, pipe.election.Election.RaftMessageOrBuilder> 
+          getRaftMessageFieldBuilder() {
+        if (raftMessageBuilder_ == null) {
+          if (!(payloadCase_ == 17)) {
+            payload_ = pipe.election.Election.RaftMessage.getDefaultInstance();
+          }
+          raftMessageBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.election.Election.RaftMessage, pipe.election.Election.RaftMessage.Builder, pipe.election.Election.RaftMessageOrBuilder>(
+                  (pipe.election.Election.RaftMessage) payload_,
+                  getParentForChildren(),
+                  isClean());
+          payload_ = null;
+        }
+        payloadCase_ = 17;
+        return raftMessageBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:WorkMessage)
     }
 
@@ -4475,19 +4949,23 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\"-\n\013RoutingConf\022\016\n\006nodeIp\030\001 " +
-      "\003(\t\022\016\n\006nodeId\030\002 \003(\t\"\323\003\n\013WorkMessage\022\027\n\006h" +
+      "\003(\t\022\016\n\006nodeId\030\002 \003(\t\"\201\005\n\013WorkMessage\022\027\n\006h" +
       "eader\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022$\n\016" +
       "routingEntries\030\013 \001(\0132\014.RoutingConf\022\023\n\013is" +
-      "Processed\030\r \001(\010\022\021\n\trequestId\030\023 \001(\t\022\'\n\010wo" +
-      "rktype\030\016 \001(\0162\025.WorkMessage.Worktype\022\027\n\003e" +
-      "rr\030\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004",
-      "beat\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\0132\005" +
-      ".TaskH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006" +
-      "leader\030\010 \001(\0132\r.LeaderStatusH\000\022\021\n\007newNode" +
-      "\030\t \001(\010H\000\022\025\n\013flagRouting\030\n \001(\010H\000\"U\n\010Workt" +
-      "ype\022\020\n\014LEADER_WRITE\020\017\022\021\n\rSLAVE_WRITTEN\020\020" +
-      "\022\017\n\013LEADER_READ\020\021\022\023\n\017SLAVE_READ_DONE\020\022B\t" +
-      "\n\007payloadB\r\n\tpipe.workH\001"
+      "Processed\030\r \001(\010\022\021\n\trequestId\030\016 \001(\t\022\'\n\010wo" +
+      "rktype\030\017 \001(\0162\025.WorkMessage.Worktype\0221\n\rs" +
+      "tateOfLeader\030\020 \002(\0162\032.WorkMessage.StateOf",
+      "Leader\022\027\n\003err\030\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030" +
+      "\004 \001(\010H\000\022\032\n\004beat\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004t" +
+      "ask\030\006 \001(\0132\005.TaskH\000\022\033\n\005state\030\007 \001(\0132\n.Work" +
+      "StateH\000\022\037\n\006leader\030\010 \001(\0132\r.LeaderStatusH\000" +
+      "\022\021\n\007newNode\030\t \001(\010H\000\022\025\n\013flagRouting\030\n \001(\010" +
+      "H\000\022#\n\013raftMessage\030\021 \001(\0132\014.RaftMessageH\000\"" +
+      "U\n\010Worktype\022\020\n\014LEADER_WRITE\020\001\022\021\n\rSLAVE_W" +
+      "RITTEN\020\002\022\017\n\013LEADER_READ\020\003\022\023\n\017SLAVE_READ_" +
+      "DONE\020\004\"T\n\rStateOfLeader\022\017\n\013LEADERALIVE\020\001" +
+      "\022\016\n\nLEADERDEAD\020\002\022\021\n\rLEADERUNKNOWN\020\003\022\017\n\013L",
+      "EADERKNOWN\020\004B\t\n\007payloadB\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4526,7 +5004,7 @@ public final class Work {
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Worktype", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Worktype", "StateOfLeader", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "RaftMessage", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
   }

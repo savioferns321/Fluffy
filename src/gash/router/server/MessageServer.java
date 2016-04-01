@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf;
-import gash.router.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.tasks.NoOpBalancer;
@@ -51,6 +52,9 @@ public class MessageServer {
 	protected boolean background = true;
 	private static int nodeId;
 
+	// State of the node (Leader/Non-leader, LeaderIP and LeaderID)
+	protected NodeState nodeState;
+
 	/**
 	 * initialize the server with a configuration of it's resources
 	 * 
@@ -62,13 +66,13 @@ public class MessageServer {
 
 	public MessageServer(RoutingConf conf) {
 		this.conf = conf;
+		this.nodeState = NodeState.getInstance();
 	}
 
 	public void release() {
 	}
 
 	public void startServer() {
-
 		
 		QueueManager.initManager();
 		DataReplicationManager.initDataReplicationManager();
@@ -92,14 +96,13 @@ public class MessageServer {
 				comm2.run();
 		}
 
-		System.out.println("-----------------------before nodechannel manager");
 		// Starting the node manager
 		NodeChannelManager.initNodeChannelManager();
 
 		// Check for leader election to happen
 		while (!ElectionManagement.isReadyForElection());
-		ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf);
-		electionManagement.startElection();
+		ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf, nodeState);
+		ElectionManagement.startElection();
 
 	}
 

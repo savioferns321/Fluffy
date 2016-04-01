@@ -16,6 +16,8 @@ message Header {
     // This factor limits the distance that a msg travels from the originating 
     // node. Default (-1) is the whole network (not restricted).
     optional int32 max_hops = 10 [default = -1];
+    
+    optional bool election = 11;
 }
 
 message Failure {

@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.discovery.NodeDiscoveryManager;
+import gash.router.raft.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.NodeState;
+import gash.router.server.NodeChannelManager;
 import gash.router.server.ServerState;
 import gash.router.server.WorkInit;
 import io.netty.bootstrap.Bootstrap;
@@ -33,6 +36,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.common.Common.Header;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
+import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkState;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
@@ -44,6 +48,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private ServerState state;
 	private boolean forever = true;
 	private ArrayList<InetAddress> liveIps;
+	private NodeState nodeState;
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -85,6 +90,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
+		System.out.println("--- Inbound Edges : " + inboundEdges.map.toString());
+
+	}
+
+	public void createOutboundIfNew(int ref, String host, int port) {
+		outboundEdges.createIfNew(ref, host, port);
 	}
 
 	public WorkMessage createRoutingMsg() {
@@ -154,8 +165,19 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		wb.setHeader(hb);
 		wb.setBeat(bb);
 		wb.setSecret(1234);
-
+		addLeaderFieldToWorkMessage(wb);
 		return wb.build();
+	}
+
+	private void addLeaderFieldToWorkMessage(WorkMessage.Builder wb) {
+		if (NodeChannelManager.currentLeaderID == 0) {
+			wb.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
+		} else if (NodeChannelManager.currentLeaderID == this.state.getConf().getNodeId()) {
+			// Current Node is the leader
+			wb.setStateOfLeader(StateOfLeader.LEADERALIVE);
+		} else {
+			wb.setStateOfLeader(StateOfLeader.LEADERKNOWN);
+		}
 	}
 
 	public void shutdown() {
@@ -237,6 +259,14 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	public void setState(ServerState state) {
 		this.state = state;
+	}
+
+	public NodeState getNodeState() {
+		return nodeState;
+	}
+
+	public void setNodeState(NodeState nodeState) {
+		this.nodeState = nodeState;
 	}
 
 	@Override

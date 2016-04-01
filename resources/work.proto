@@ -35,16 +35,24 @@ message WorkMessage {
    required int64 secret = 2;
    optional RoutingConf routingEntries = 11;
    optional bool isProcessed = 13;
-   optional requestId = 15;
+   optional string requestId = 14;
    
    enum Worktype {
-      LEADER_WRITE;
-      SLAVE_WRITTEN;
-      LEADER_READ;
-      SLAVE_READ_DONE;
+      LEADER_WRITE = 1;
+      SLAVE_WRITTEN = 2;
+      LEADER_READ = 3;
+      SLAVE_READ_DONE = 4;
    }
    
-   optional Worktype worktype = 14;
+   optional Worktype worktype = 15;
+   required StateOfLeader stateOfLeader = 16;
+   
+   enum StateOfLeader {
+      LEADERALIVE = 1;
+      LEADERDEAD = 2;
+      LEADERUNKNOWN = 3;
+      LEADERKNOWN = 4;
+   }
 
    /**
     * The actions (request or response) is
@@ -66,5 +74,9 @@ message WorkMessage {
 
       bool newNode = 9;
       bool flagRouting = 10;
+      
+      //RaftMessage
+      RaftMessage raftMessage=17;
+      
    }
 }

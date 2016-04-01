@@ -1,5 +1,6 @@
 package gash.router.server;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +14,7 @@ import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
 import io.netty.channel.Channel;
-import routing.Pipe.CommandMessage;
+import pipe.work.Work.WorkMessage;
 
 public class NodeChannelManager {
 	protected static Logger logger = LoggerFactory.getLogger("NodeChannelManager");
@@ -22,7 +23,16 @@ public class NodeChannelManager {
 
 	public static ConcurrentHashMap<Integer, Channel> node2ChannelMap = new ConcurrentHashMap<Integer, Channel>();
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
+
+	public static int currentLeaderID;
+
 	private static int delay = 3000;
+
+	public static NodeChannelManager getInstance() {
+		if (instance.get() == null)
+			instance.compareAndSet(null, new NodeChannelManager());
+		return instance.get();
+	}
 
 	public NodeChannelManager() {
 		NodeMonitor nodeMonitor = new NodeMonitor();
@@ -55,6 +65,18 @@ public class NodeChannelManager {
 		return null;
 	}
 
+	public static synchronized void broadcast(WorkMessage message) throws Exception {
+		if (node2ChannelMap.isEmpty()) {
+			System.out.println("----- No nodes are availble -----");
+			return;
+		}
+		Collection<Channel> allChannel = node2ChannelMap.values();
+		for (Channel channel : allChannel) {
+			System.out.println("Sending message to Channel " + channel.toString());
+			channel.writeAndFlush(message);
+		}
+	}
+
 	// To continuously check addition and removal of nodes to the current node
 	private class NodeMonitor implements Runnable {
 		private boolean forever = true;
@@ -66,7 +88,8 @@ public class NodeChannelManager {
 					EdgeList inboundEdges = EdgeMonitor.getInboundEdges();
 					EdgeList outboundEdges = EdgeMonitor.getOutboundEdges();
 					addToNode2ChannelMap(inboundEdges, outboundEdges);
-					System.out.println("node2Channel Map : " + node2ChannelMap.toString());
+					// System.out.println("node2Channel Map : " +
+					// node2ChannelMap.toString());
 					// Make it efficient
 					Thread.sleep(NodeChannelManager.delay);
 				}

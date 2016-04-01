@@ -15,8 +15,9 @@
  */
 package gash.router.server.edges;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import io.netty.channel.Channel;
 
 public class EdgeList {
 	protected ConcurrentHashMap<Integer, EdgeInfo> map = new ConcurrentHashMap<Integer, EdgeInfo>();
@@ -29,6 +30,17 @@ public class EdgeList {
 			return getNode(ref);
 		else
 			return addNode(ref, host, port);
+	}
+
+	public EdgeInfo createIfNew(int ref, String host, int port, Channel channel) {
+		if (hasNode(ref))
+			return getNode(ref);
+		else {
+			EdgeInfo edgeInfo = addNode(ref, host, port);
+			edgeInfo.setChannel(channel);
+			edgeInfo.setActive(true);
+			return edgeInfo;
+		}
 	}
 
 	public EdgeInfo addNode(int ref, String host, int port) {
