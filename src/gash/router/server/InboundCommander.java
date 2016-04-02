@@ -60,7 +60,7 @@ public class InboundCommander extends Thread{
 							//Dbhandler.addFile(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray());
 						}else{
 							//TODO Write to standard DB
-							Dbhandler.addFile(currTask.getFilename(), currMsg.getFileContent().toByteArray(), currTask.getNoOfChunks(), currTask.getChunkNo());
+							Dbhandler.addFile(currTask.getFilename(), currMsg.getTask().getChunk().toByteArray(), currTask.getNoOfChunks(), currTask.getChunkNo());
 							isSuccess = true;
 						}
 						

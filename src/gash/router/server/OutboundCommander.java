@@ -29,9 +29,9 @@ public class OutboundCommander extends Thread{
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getCommandMessage().getHeader().getDestination());
 
-				if (msg.getChannel().isWritable()) {
+				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
 					boolean rtn = false;
-					if (msg.getChannel()!= null && msg.getChannel().isOpen() && msg.getChannel().isWritable()) {
+					if (msg.getChannel().isWritable()) {
 						ChannelFuture cf = msg.getChannel().writeAndFlush(msg.getCommandMessage());
 
 						cf.awaitUninterruptibly();
@@ -41,7 +41,7 @@ public class OutboundCommander extends Thread{
 					}
 
 				} else {
-					logger.info("channel to node " + msg.getCommandMessage().getHeader().getDestination() + " is not writable");
+					//logger.info("channel to node " + msg.getCommandMessage().getHeader().getDestination() + " is not writable");
 					manager.returnOutboundCommand(msg);
 				}
 			} catch (InterruptedException ie) {

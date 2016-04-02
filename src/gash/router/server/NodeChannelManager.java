@@ -26,7 +26,7 @@ public class NodeChannelManager {
 
 	public static int currentLeaderID;
 	public static String currentLeaderAddress;
-	
+
 	private static int delay = 3000;
 
 	public static NodeChannelManager getInstance() {
@@ -59,10 +59,12 @@ public class NodeChannelManager {
 	public static Channel getNextReadChannel() {
 		// TODO Crude implementation. Need to update this.
 		if (!node2ChannelMap.isEmpty()) {
-			for (Integer i : node2ChannelMap.keySet())
+			for (Integer i : node2ChannelMap.keySet()){
+				logger.info("Found channel ");
 				return node2ChannelMap.get(i);
+			}
 		}
-
+		logger.info("No channel found ");
 		return null;
 	}
 
@@ -168,7 +170,7 @@ public class NodeChannelManager {
 		if (clientChannelMap.containsKey(requestId) && clientChannelMap.get(requestId) != null) {
 			return clientChannelMap.get(requestId);
 		}
-		logger.error("Unable to find the channel for request ID : " + requestId);
+		logger.info("Unable to find the channel for request ID : " + requestId);
 		return null;
 	}
 

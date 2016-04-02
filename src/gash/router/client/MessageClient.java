@@ -18,6 +18,10 @@ package gash.router.client;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import com.google.protobuf.ByteString;
+
+import gash.router.server.NodeChannelManager;
+import gash.router.server.edges.EdgeMonitor;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;
@@ -82,6 +86,8 @@ public class MessageClient {
 		tb.setFilename(filename);
 		tb.setTaskType(TaskType.READ);
 		tb.setSender(InetAddress.getLocalHost().getHostAddress());
+		
+		rb.setMessage(filename);
 		/*tb.setSeqId(seqID++);
 		tb.setSeriesId(seriesCounter++);*/
 		
@@ -107,5 +113,40 @@ public class MessageClient {
 	 */
 	private synchronized long nextId() {
 		return ++curID;
+	}
+	
+	public void sendFile(ByteString bs, String filename, int numOfChunks, int chunkId) {
+		// construct the message to send
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(999);
+		hb.setTime(System.currentTimeMillis());
+		hb.setDestination(-1);
+		
+		Task.Builder tb = Task.newBuilder();
+		tb.setNoOfChunks(numOfChunks); //Num of chunks
+		tb.setChunkNo(chunkId);    //chunk id
+		tb.setTaskType(Task.TaskType.WRITE);
+		try {
+			tb.setSender(InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		}
+		tb.setFilename(filename);
+		tb.setChunk(bs);
+		
+		CommandMessage.Builder rb = CommandMessage.newBuilder();
+		rb.setHeader(hb);
+		rb.setTask(tb);
+		rb.setMessage(filename);
+		
+		try {
+			// direct no queue
+			// CommConnection.getInstance().write(rb.build());
+
+			// using queue
+			CommConnection.getInstance().enqueue(rb.build());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

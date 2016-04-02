@@ -15,15 +15,29 @@
  */
 package gash.router.app;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.protobuf.ByteString;
 
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.MessageClient;
+import routing.Pipe;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private MessageClient mc;
+	private Map<String, ArrayList<CommandMessage>> byteList = new HashMap<String, ArrayList<CommandMessage>>();
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -59,9 +73,58 @@ public class DemoApp implements CommListener {
 
 	@Override
 	public void onMessage(CommandMessage msg) {
-		System.out.println("---> " + msg+" ---Message : "+msg.getMessage());
+		//System.out.println("---> " + msg+" ---Message : "+msg.getMessage());
+		if(msg.hasTask()){
+			/*System.out.println(msg.getTask().getFilename());
+			System.out.println(msg.getTask().getChunkNo());
+			System.out.println(msg.getTask().getNoOfChunks());*/
+			
+			
+			if(!byteList.containsKey(msg.getTask().getFilename())){
+				byteList.put(msg.getTask().getFilename(), new ArrayList<Pipe.CommandMessage>());
+				System.out.println("Chunk list created ");
+			}
+			byteList.get(msg.getTask().getFilename()).add(msg);
+			if(byteList.get(msg.getTask().getFilename()).size() == msg.getTask().getNoOfChunks()){
+				
+				
+				try {
+					File file = new File(msg.getTask().getFilename());
+					file.createNewFile();
+					List<ByteString> byteString = new ArrayList<ByteString>();
+					FileOutputStream outputStream = new FileOutputStream(file);
+					int i=1;
+					while(i <= msg.getTask().getNoOfChunks()){
+						for(int j=0; j < byteList.get(msg.getTask().getFilename()).size(); j++){
+							System.out.println("Inside the for loop ");
+							if(byteList.get(msg.getTask().getFilename()).get(j).getTask().getChunkNo() == i){
+								System.out.println("Added chunk to file "+i);
+								byteString.add(byteList.get(msg.getTask().getFilename()).get(j).getTask().getChunk());
+								System.out.println(byteList.get(msg.getTask().getFilename()).get(j).getTask().getChunk().size());
+								//outputStream.write(byteList.get(msg.getTask().getFilename()).get(j).getTask().getChunk().toByteArray());
+								
+								i++;
+								break;
+							}
+						}
+						
+					}
+					ByteString bs = ByteString.copyFrom(byteString);
+					outputStream.write(bs.toByteArray());
+					outputStream.flush();
+					outputStream.close();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		}
 		System.out.flush();
 	}
+	
+	
 
 	/**
 	 * sample application (client) use of our messaging service
@@ -69,7 +132,7 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = "localhost";
+		String host = "192.168.0.4";
 		int port = 5101;
 
 		try {
@@ -79,10 +142,11 @@ public class DemoApp implements CommListener {
 			// do stuff w/ the connection
 			//da.ping(2);
 			da.sendReadTasks();
+			//da.splitFile(new File("intro.pdf"));
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();
-			Thread.sleep(10 * 1000);
+			Thread.sleep(10 * 100000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -92,16 +156,48 @@ public class DemoApp implements CommListener {
 	
 	public void sendReadTasks(){
 		try {
-			mc.sendReadRequest("test_1.txt");
-			mc.sendReadRequest("test_2.txt");
+			mc.sendReadRequest("introductions3.pdf");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
-	
-	public void sendWriteTasks(){
-		
-	}
+	private void splitFile(File f) throws IOException {
+    	ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
+        
+        int sizeOfFiles = 1024 * 1024;// 1MB
+        int numOfChunks = 0;
+        byte[] buffer = new byte[sizeOfFiles];
+
+        try {
+        	BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));
+            String name = f.getName();
+
+            int tmp = 0;
+            while ((tmp = bis.read(buffer)) > 0) {
+                try {
+                	ByteString bs = ByteString.copyFrom(buffer, 0, tmp);
+                	chunkedFile.add(bs);
+                	numOfChunks++;
+                }
+                catch (Exception ex) {
+        			ex.printStackTrace();
+        		} 
+            }
+            
+            for(int x=0;x<chunkedFile.size();x++){
+            	mc.sendFile(chunkedFile.get(x), name,numOfChunks,x+1);   //x -> chunk id
+            }
+            
+        }
+        catch (Exception ex) {
+			ex.printStackTrace();
+		}
+        System.out.println(chunkedFile.size());
+        
+        
+        
+    }
+
 }

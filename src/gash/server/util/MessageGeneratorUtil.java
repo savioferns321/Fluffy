@@ -53,7 +53,7 @@ public class MessageGeneratorUtil {
 		wb.setHeader(hb);
 
 		Task.Builder tb = Task.newBuilder(message.getTask());
-		tb.setChunk(message.getFileContent());
+		tb.setChunk(message.getTask().getChunk());
 		wb.setTask(tb);
 		//TODO Generate secret
 		wb.setSecret(1234);
@@ -161,6 +161,8 @@ public class MessageGeneratorUtil {
 		CommandMessage.Builder cb = CommandMessage.newBuilder();
 		cb.setHeader(hb.build());
 		cb.setTask(message.getTask());
+		cb.setMessage("Success");
+		
 
 		return cb.build();
 	}
