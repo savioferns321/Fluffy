@@ -37,6 +37,7 @@ import pipe.common.Common.Header;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
+import pipe.work.Work.WorkMessage.Worktype;
 import pipe.work.Work.WorkState;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
@@ -63,22 +64,31 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			for (RoutingEntry e : state.getConf().getRouting()) {
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
-		} /// WHEN a new node enters it will have no routing entries.
-		else {
+		} 
+		
+		/// WHEN a new node enters it will have no routing entries.
+		if(outboundEdges.isEmpty() && inboundEdges.isEmpty()) {
 			System.out.println("No routing entries..possibly a new node");
 			try {
 				liveIps = NodeDiscoveryManager.checkHosts();
-				System.out.println(liveIps);
-				// System.out.println(liveIps.get(1).getHostAddress());
 
 				for (InetAddress oneIp : liveIps) {
-					System.out.println(oneIp.getHostAddress());
+					System.out.println("Potential Server Node found of Network.. Trying to connect to:  "+oneIp.getHostAddress());
+					try{
+						
+						Channel newNodeChannel = connectToChannel(oneIp.getHostAddress(), 5100, this.state);
+						if(newNodeChannel.isOpen() && newNodeChannel!=null)
+						{
+							System.out.println("Channel connected to: "+ oneIp.getHostAddress());
+							WorkMessage wm = createNewNode();
+							newNodeChannel.writeAndFlush(wm);
+						}
+					}
+					catch(Exception e){
+						System.out.println("Unable to connect to the potential client: "+oneIp.getHostAddress());
+					}
 				}
-				// TODO Iterate over all the nodes and send the message
-				Channel newNodeChannel = connectToChannel("127.0.0.1", 5100, this.state);
-				// Sends out a message to know the
-				WorkMessage wm = MessageBuilder.buildNewNodeLeaderStatusMessage();
-				newNodeChannel.writeAndFlush(wm);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -133,9 +143,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	private WorkMessage createNewNode() {
-		WorkState.Builder sb = WorkState.newBuilder();
-		sb.setEnqueued(-1);
-		sb.setProcessed(-1);
 
 		Header.Builder hb = Header.newBuilder();
 		hb.setNodeId(state.getConf().getNodeId());
@@ -143,10 +150,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
-		wb.setHeader(hb);
+		wb.setHeader(hb.build());
 		wb.setNewNode(true);
 		wb.setSecret(1234);
-
+		wb.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
 		return wb.build();
 	}
 
