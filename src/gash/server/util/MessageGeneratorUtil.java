@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 
 import gash.router.container.RoutingConf;
+import gash.router.persistence.MessageDetails;
 import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
+import gash.router.server.edges.EdgeMonitor;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;
@@ -19,7 +21,7 @@ import pipe.work.Work.WorkMessage.Worktype;
 import routing.Pipe.CommandMessage;
 
 public class MessageGeneratorUtil {
-	
+
 	private static RoutingConf conf;
 
 	protected static Logger logger = LoggerFactory.getLogger(MessageGeneratorUtil.class);
@@ -162,7 +164,7 @@ public class MessageGeneratorUtil {
 		cb.setHeader(hb.build());
 		cb.setTask(message.getTask());
 		cb.setMessage("Success");
-		
+
 
 		return cb.build();
 	}
@@ -177,7 +179,7 @@ public class MessageGeneratorUtil {
 		//TODO Get node ID
 		hb.setNodeId(MessageServer.getNodeId());
 		hb.setTime(System.currentTimeMillis());
-		
+
 		Task.Builder tb = Task.newBuilder(message.getTask());
 		tb.clearChunk();
 		tb.clearChunkNo();
@@ -189,6 +191,32 @@ public class MessageGeneratorUtil {
 		//TODO Set the secret
 		wb.setSecret(1234);
 		wb.setTask(tb.build());
+		addLeaderFieldToWorkMessage(wb);
+
+		return wb.build();
+	}
+
+
+	public WorkMessage generateNewNodeReplicationMsg(MessageDetails details,String sender){
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(MessageServer.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb.build());
+
+		Task.Builder tb = Task.newBuilder();
+		tb.setChunkNo(details.getChunckId());
+		tb.setNoOfChunks(details.getNoOfChuncks());
+		tb.setChunk(ByteString.copyFrom(details.getByteData()));
+		tb.setTaskType(TaskType.WRITE);
+		tb.setSender(sender);
+		tb.setFilename(details.getFileName());
+		wb.setTask(tb);
+		//TODO Generate secret
+		wb.setSecret(1234);
+		wb.setIsProcessed(false);
+		wb.setWorktype(Worktype.LEADER_WRITE);
 		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
@@ -210,7 +238,7 @@ public class MessageGeneratorUtil {
 	public WorkMessage generateHeartbeatResponse(){
 		return null;
 	}
-	
+
 
 	private void addLeaderFieldToWorkMessage(WorkMessage.Builder wb) {
 		if (NodeChannelManager.currentLeaderID == 0) {

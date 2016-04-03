@@ -84,4 +84,11 @@ public class EdgeList {
 	public void clear() {
 		map.clear();
 	}
+	
+	public boolean isEmpty(){
+		if(map.size()>0){
+			return false;
+		}
+		return true;
+	}
 }

@@ -1,5 +1,9 @@
 package gash.router.persistence;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,6 +53,24 @@ public class DataReplicationManager {
 		}
 	}
 	*/
+	
+	public void replicateToNewNode(Channel channel){
+		
+		//DB handler returns a list of Work Messages with 
+		Map<String, ArrayList<MessageDetails>> fileMap = Dbhandler.getAllFilesForReplication();	
+		for(String filename : fileMap.keySet()){
+			for(MessageDetails details : fileMap.get(filename)){
+				try {
+					WorkMessage workMessage = MessageGeneratorUtil.getInstance().generateNewNodeReplicationMsg(details, InetAddress.getLocalHost().getHostAddress());
+					channel.writeAndFlush(workMessage);
+				} catch (UnknownHostException e) {
+					logger.error(e.getMessage());
+				}
+			}
+			
+		}
+	}
+	
 	public void replicate(CommandMessage message) {
 		ConcurrentHashMap<Integer, Channel> node2ChannelMap = NodeChannelManager.getNode2ChannelMap();
 		if (node2ChannelMap != null && !node2ChannelMap.isEmpty()) {

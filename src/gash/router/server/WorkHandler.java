@@ -23,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
 import gash.router.raft.leaderelection.MessageBuilder;
 import io.netty.channel.Channel;
@@ -70,9 +71,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			return;
 		}
 
-		if (debug)
+		/*if (debug)
 			PrintUtil.printWork(msg);
-
+*/
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.getStateOfLeader() == StateOfLeader.LEADERALIVE) {
@@ -89,6 +90,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
 								NodeChannelManager.currentLeaderAddress);
 				channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
+				
+				//Sent the newly discovered node all the data on this node.
+				DataReplicationManager.getInstance().replicateToNewNode(channel);
+				
+				
 			} else if (msg.hasLeader() && msg.getLeader().getAction() == LeaderQuery.THELEADERIS) {
 				NodeChannelManager.currentLeaderID = msg.getLeader().getLeaderId();
 				NodeChannelManager.currentLeaderAddress = msg.getLeader().getLeaderHost();
@@ -131,14 +137,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
 				WorkMessage wm = state.getEmon().createRoutingMsg();
 				channel.writeAndFlush(wm);
-				System.out.println("ADDRESS OF NODE TRYING TO CONNECT---------------------------------");
+				//TODO New node has been detected. Push all your data to it now.
 				SocketAddress remoteAddress = channel.remoteAddress();
 				InetSocketAddress addr = (InetSocketAddress) remoteAddress;
 
-				state.getEmon().createInboundIfNew(msg.getHeader().getNodeId(), addr.getHostName(), 9999);
-
-				System.out.println(addr.getHostName());
-
+				state.getEmon().createInboundIfNew(msg.getHeader().getNodeId(), addr.getHostName(), 5100);
+				state.getEmon().getInboundEdges().getNode(msg.getHeader().getNodeId()).setChannel(channel);
+				
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();

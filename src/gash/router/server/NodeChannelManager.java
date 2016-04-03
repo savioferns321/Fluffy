@@ -1,9 +1,11 @@
 package gash.router.server;
 
 import java.util.Collection;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ public class NodeChannelManager {
 
 	public static ConcurrentHashMap<Integer, Channel> node2ChannelMap = new ConcurrentHashMap<Integer, Channel>();
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
+	private static Queue<Integer> roundRobinQ = new LinkedBlockingQueue<Integer>(); 
 
 	public static int currentLeaderID;
 	public static String currentLeaderAddress;
@@ -57,12 +60,13 @@ public class NodeChannelManager {
 
 	// Returns next available channel for taking in read requests
 	public static Channel getNextReadChannel() {
-		// TODO Crude implementation. Need to update this.
-		if (!node2ChannelMap.isEmpty()) {
-			for (Integer i : node2ChannelMap.keySet()){
-				logger.info("Found channel ");
-				return node2ChannelMap.get(i);
+		if (!roundRobinQ.isEmpty()) {
+			Integer nodeId = roundRobinQ.remove();
+			if(node2ChannelMap.containsKey(nodeId)){
+				roundRobinQ.add(nodeId);
+				return node2ChannelMap.get(nodeId);
 			}
+			roundRobinQ.add(nodeId);	
 		}
 		logger.info("No channel found ");
 		return null;
@@ -91,8 +95,8 @@ public class NodeChannelManager {
 					EdgeList inboundEdges = EdgeMonitor.getInboundEdges();
 					EdgeList outboundEdges = EdgeMonitor.getOutboundEdges();
 					addToNode2ChannelMap(inboundEdges, outboundEdges);
-					// System.out.println("node2Channel Map : " +
-					// node2ChannelMap.toString());
+					System.out.println("node2Channel Map : " +
+					node2ChannelMap.toString());
 					// Make it efficient
 					Thread.sleep(NodeChannelManager.delay);
 				}
@@ -104,7 +108,7 @@ public class NodeChannelManager {
 
 		private void addToNode2ChannelMap(EdgeList inboundEdges, EdgeList outboundEdges) {
 			try {
-
+				
 				if (inboundEdges != null) {
 					ConcurrentHashMap<Integer, EdgeInfo> edgeListMap = inboundEdges.getEdgeListMap();
 					if (edgeListMap != null && !edgeListMap.isEmpty()) {
@@ -113,7 +117,11 @@ public class NodeChannelManager {
 							for (Integer nodeId : keySet2) {
 								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
 										&& edgeListMap.get(nodeId).getChannel()!= null) {
+									logger.info("Added node "+nodeId+" "+edgeListMap.get(nodeId).getHost()+" to channel map. ");
 									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+									if(!roundRobinQ.contains(nodeId)){
+										roundRobinQ.add(nodeId);
+									}
 								}
 							}
 					}
@@ -127,10 +135,14 @@ public class NodeChannelManager {
 								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
 										&& edgeListMap.get(nodeId).getChannel()!= null) {
 									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
+									if(!roundRobinQ.contains(nodeId)){
+										roundRobinQ.add(nodeId);
+									}
 								}
 							}
 					}
 				}
+				
 			} catch (Exception exception) {
 				logger.error("An Error has occured ", exception);
 			}
@@ -162,10 +174,6 @@ public class NodeChannelManager {
 	 * @return
 	 */
 	public static synchronized CommandMessageChannelCombo getClientChannelFromMap(String requestId) {
-
-		// TODO Problem : If the client has sent multiple requests for the same
-		// filename - what do we do?
-		// Solved - Generated a UID for every request and UID is the key
 
 		if (clientChannelMap.containsKey(requestId) && clientChannelMap.get(requestId) != null) {
 			return clientChannelMap.get(requestId);

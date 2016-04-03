@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
+
 import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.discovery.NodeDiscoveryManager;
 import gash.router.raft.leaderelection.MessageBuilder;
@@ -28,6 +30,7 @@ import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.ServerState;
 import gash.router.server.WorkInit;
+import gash.server.util.MessageGeneratorUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -37,7 +40,6 @@ import pipe.common.Common.Header;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
-import pipe.work.Work.WorkMessage.Worktype;
 import pipe.work.Work.WorkState;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
@@ -71,22 +73,36 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			System.out.println("No routing entries..possibly a new node");
 			try {
 				liveIps = NodeDiscoveryManager.checkHosts();
+				Channel discoveryChannel = null;
 
 				for (InetAddress oneIp : liveIps) {
-					System.out.println("Potential Server Node found of Network.. Trying to connect to:  "+oneIp.getHostAddress());
-					try{
-						
-						Channel newNodeChannel = connectToChannel(oneIp.getHostAddress(), 5100, this.state);
-						if(newNodeChannel.isOpen() && newNodeChannel!=null)
-						{
-							System.out.println("Channel connected to: "+ oneIp.getHostAddress());
-							WorkMessage wm = createNewNode();
-							newNodeChannel.writeAndFlush(wm);
+					//Ignore own IP address
+					if(!oneIp.getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())){
+						System.out.println("Potential Server Node found of Network.. Trying to connect to:  "+oneIp.getHostAddress());
+						try{
+							
+							Channel newNodeChannel = connectToChannel(oneIp.getHostAddress(), 5100, this.state);
+							if(discoveryChannel == null){
+								discoveryChannel = newNodeChannel;
+							}
+							if(newNodeChannel.isOpen() && newNodeChannel!=null)
+							{
+								System.out.println("Channel connected to: "+ oneIp.getHostAddress());
+								WorkMessage wm = createNewNode();
+								newNodeChannel.writeAndFlush(wm);
+							}
+						}
+						catch(Exception e){
+							System.out.println("Unable to connect to the potential client: "+oneIp.getHostAddress());
 						}
 					}
-					catch(Exception e){
-						System.out.println("Unable to connect to the potential client: "+oneIp.getHostAddress());
-					}
+					
+				}
+				
+				if(discoveryChannel != null){
+					//Send a discovery message to the first node that the new node finds
+					WorkMessage discoveryMessage = MessageBuilder.buildNewNodeLeaderStatusMessage();
+					discoveryChannel.writeAndFlush(discoveryMessage);
 				}
 				
 			} catch (Exception e) {
@@ -111,10 +127,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	public WorkMessage createRoutingMsg() {
-		WorkState.Builder sb = WorkState.newBuilder();
-		sb.setEnqueued(-1);
-		sb.setProcessed(-1);
-
+		
 		pipe.work.Work.RoutingConf.Builder rb = pipe.work.Work.RoutingConf.newBuilder();
 
 		ArrayList<String> ipList = new ArrayList<String>();
@@ -122,9 +135,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 		for (RoutingEntry destIp : state.getConf().getRouting()) {
 			ipList.add(destIp.getHost());
-		}
-		for (RoutingEntry destId : state.getConf().getRouting()) {
-			idList.add(destId.getHost());
+			idList.add(destIp.getId()+"");
 		}
 		rb.addAllNodeId(idList);
 		rb.addAllNodeIp(ipList);
@@ -135,10 +146,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
-		wb.setHeader(hb);
+		wb.setHeader(hb.build());
 		wb.setSecret(1234);
 		wb.setFlagRouting(true);
 		wb.setRoutingEntries(rb);
+		//TODO Is the leader really alive?
+		wb.setStateOfLeader(StateOfLeader.LEADERKNOWN);
 		return wb.build();
 	}
 
