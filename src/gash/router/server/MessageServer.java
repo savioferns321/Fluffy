@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf;
 import gash.router.raft.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.MessageBuilder;
 import gash.router.raft.leaderelection.NodeState;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.server.edges.EdgeMonitor;
@@ -73,11 +74,12 @@ public class MessageServer {
 	}
 
 	public void startServer() {
-		
+
 		QueueManager.initManager();
 		DataReplicationManager.initDataReplicationManager();
 		MessageGeneratorUtil.initGenerator();
 		MessageGeneratorUtil.setRoutingConf(conf);
+		MessageBuilder.setRoutingConf(conf);
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		logger.info("Work starting");
 
@@ -86,7 +88,7 @@ public class MessageServer {
 		cthread.start();
 
 		if (!conf.isInternalNode()) {
-			
+
 			StartCommandCommunication comm2 = new StartCommandCommunication(conf);
 			logger.info("Command starting");
 
@@ -101,9 +103,12 @@ public class MessageServer {
 		NodeChannelManager.initNodeChannelManager();
 
 		// Check for leader election to happen
-		while (!ElectionManagement.isReadyForElection());
-		ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf, nodeState);
-		ElectionManagement.startElection();
+		if (NodeChannelManager.amIPartOfNetwork) {
+			while (!ElectionManagement.isReadyForElection())
+				;
+			ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf, nodeState);
+			ElectionManagement.startElection();
+		}
 
 	}
 
@@ -145,8 +150,8 @@ public class MessageServer {
 	private boolean verifyConf(RoutingConf conf) {
 		return (conf != null);
 	}
-	
-	public static int getNodeId(){
+
+	public static int getNodeId() {
 		return nodeId;
 	}
 

@@ -25,11 +25,11 @@ public class NodeChannelManager {
 
 	public static ConcurrentHashMap<Integer, Channel> node2ChannelMap = new ConcurrentHashMap<Integer, Channel>();
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
-	private static Queue<Integer> roundRobinQ = new LinkedBlockingQueue<Integer>(); 
+	private static Queue<Integer> roundRobinQ = new LinkedBlockingQueue<Integer>();
 
 	public static int currentLeaderID;
 	public static String currentLeaderAddress;
-
+	public static boolean amIPartOfNetwork = true;
 	private static int delay = 3000;
 
 	public static NodeChannelManager getInstance() {
@@ -62,11 +62,11 @@ public class NodeChannelManager {
 	public static Channel getNextReadChannel() {
 		if (!roundRobinQ.isEmpty()) {
 			Integer nodeId = roundRobinQ.remove();
-			if(node2ChannelMap.containsKey(nodeId)){
+			if (node2ChannelMap.containsKey(nodeId)) {
 				roundRobinQ.add(nodeId);
 				return node2ChannelMap.get(nodeId);
 			}
-			roundRobinQ.add(nodeId);	
+			roundRobinQ.add(nodeId);
 		}
 		logger.info("No channel found ");
 		return null;
@@ -95,8 +95,7 @@ public class NodeChannelManager {
 					EdgeList inboundEdges = EdgeMonitor.getInboundEdges();
 					EdgeList outboundEdges = EdgeMonitor.getOutboundEdges();
 					addToNode2ChannelMap(inboundEdges, outboundEdges);
-					System.out.println("node2Channel Map : " +
-					node2ChannelMap.toString());
+					System.out.println("node2Channel Map : " + node2ChannelMap.toString());
 					// Make it efficient
 					Thread.sleep(NodeChannelManager.delay);
 				}
@@ -108,18 +107,20 @@ public class NodeChannelManager {
 
 		private void addToNode2ChannelMap(EdgeList inboundEdges, EdgeList outboundEdges) {
 			try {
-				
+
 				if (inboundEdges != null) {
 					ConcurrentHashMap<Integer, EdgeInfo> edgeListMap = inboundEdges.getEdgeListMap();
 					if (edgeListMap != null && !edgeListMap.isEmpty()) {
 						Set<Integer> keySet2 = edgeListMap.keySet();
 						if (keySet2 != null)
 							for (Integer nodeId : keySet2) {
-								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
-										&& edgeListMap.get(nodeId).getChannel()!= null) {
-									logger.info("Added node "+nodeId+" "+edgeListMap.get(nodeId).getHost()+" to channel map. ");
+								if (nodeId != null && !node2ChannelMap.containsKey(nodeId)
+										&& edgeListMap.containsKey(nodeId)
+										&& edgeListMap.get(nodeId).getChannel() != null) {
+									logger.info("Added node " + nodeId + " " + edgeListMap.get(nodeId).getHost()
+											+ " to channel map. ");
 									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
-									if(!roundRobinQ.contains(nodeId)){
+									if (!roundRobinQ.contains(nodeId)) {
 										roundRobinQ.add(nodeId);
 									}
 								}
@@ -132,17 +133,18 @@ public class NodeChannelManager {
 						Set<Integer> keySet2 = edgeListMap.keySet();
 						if (keySet2 != null)
 							for (Integer nodeId : keySet2) {
-								if (nodeId != null && !node2ChannelMap.containsKey(nodeId) && edgeListMap.containsKey(nodeId) 
-										&& edgeListMap.get(nodeId).getChannel()!= null) {
+								if (nodeId != null && !node2ChannelMap.containsKey(nodeId)
+										&& edgeListMap.containsKey(nodeId)
+										&& edgeListMap.get(nodeId).getChannel() != null) {
 									node2ChannelMap.put(nodeId, edgeListMap.get(nodeId).getChannel());
-									if(!roundRobinQ.contains(nodeId)){
+									if (!roundRobinQ.contains(nodeId)) {
 										roundRobinQ.add(nodeId);
 									}
 								}
 							}
 					}
 				}
-				
+
 			} catch (Exception exception) {
 				logger.error("An Error has occured ", exception);
 			}

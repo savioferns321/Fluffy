@@ -66,45 +66,49 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			for (RoutingEntry e : state.getConf().getRouting()) {
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
-		} 
-		
+		}
+
 		/// WHEN a new node enters it will have no routing entries.
-		if(outboundEdges.isEmpty() && inboundEdges.isEmpty()) {
+		if (outboundEdges.isEmpty() && inboundEdges.isEmpty()) {
+			NodeChannelManager.amIPartOfNetwork = false;
 			System.out.println("No routing entries..possibly a new node");
 			try {
 				liveIps = NodeDiscoveryManager.checkHosts();
 				Channel discoveryChannel = null;
 
 				for (InetAddress oneIp : liveIps) {
-					//Ignore own IP address
-					if(!oneIp.getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())){
-						System.out.println("Potential Server Node found of Network.. Trying to connect to:  "+oneIp.getHostAddress());
-						try{
-							
+					// Ignore own IP address
+					if (!oneIp.getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())) {
+						System.out.println("Potential Server Node found of Network.. Trying to connect to:  "
+								+ oneIp.getHostAddress());
+						try {
+
 							Channel newNodeChannel = connectToChannel(oneIp.getHostAddress(), 5100, this.state);
-							if(discoveryChannel == null){
-								discoveryChannel = newNodeChannel;
-							}
-							if(newNodeChannel.isOpen() && newNodeChannel!=null)
-							{
-								System.out.println("Channel connected to: "+ oneIp.getHostAddress());
+
+							if (newNodeChannel.isOpen() && newNodeChannel != null) {
+
+								System.out.println("Channel connected to: " + oneIp.getHostAddress());
 								WorkMessage wm = createNewNode();
 								newNodeChannel.writeAndFlush(wm);
+								if (discoveryChannel == null) {
+									discoveryChannel = newNodeChannel;
+								}
 							}
-						}
-						catch(Exception e){
-							System.out.println("Unable to connect to the potential client: "+oneIp.getHostAddress());
+						} catch (Exception e) {
+							System.out.println("Unable to connect to the potential client: " + oneIp.getHostAddress());
 						}
 					}
-					
+
 				}
-				
-				if(discoveryChannel != null){
-					//Send a discovery message to the first node that the new node finds
+
+				if (discoveryChannel != null) {
+					// Send a discovery message to the first node that the new
+					// node finds
 					WorkMessage discoveryMessage = MessageBuilder.buildNewNodeLeaderStatusMessage();
 					discoveryChannel.writeAndFlush(discoveryMessage);
+					logger.debug("Writing to a node to get the leader status");
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -127,7 +131,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	public WorkMessage createRoutingMsg() {
-		
+
 		pipe.work.Work.RoutingConf.Builder rb = pipe.work.Work.RoutingConf.newBuilder();
 
 		ArrayList<String> ipList = new ArrayList<String>();
@@ -135,7 +139,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 		for (RoutingEntry destIp : state.getConf().getRouting()) {
 			ipList.add(destIp.getHost());
-			idList.add(destIp.getId()+"");
+			idList.add(destIp.getId() + "");
 		}
 		rb.addAllNodeId(idList);
 		rb.addAllNodeIp(ipList);
@@ -150,7 +154,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		wb.setSecret(1234);
 		wb.setFlagRouting(true);
 		wb.setRoutingEntries(rb);
-		//TODO Is the leader really alive?
+		// TODO Is the leader really alive?
 		wb.setStateOfLeader(StateOfLeader.LEADERKNOWN);
 		return wb.build();
 	}
@@ -213,15 +217,18 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			try {
 				for (EdgeInfo ei : outboundEdges.map.values()) {
 					try {
-						//System.out.println("Inside For loop" + outboundEdges.map.toString());
+						// System.out.println("Inside For loop" +
+						// outboundEdges.map.toString());
 						if (ei.isActive() && ei.getChannel() != null) {
 							WorkMessage wm = createHB(ei);
 							ei.getChannel().writeAndFlush(wm);
-							//System.out.println("Connected to Channel with host :" + ei.getHost());
+							// System.out.println("Connected to Channel with
+							// host :" + ei.getHost());
 						} else if (ei.getChannel() == null) {
 							Channel channel = connectToChannel(ei.getHost(), ei.getPort(), this.state);
 							ei.setChannel(channel);
-							//System.out.println("Connected to Channel with host " + ei.getHost());
+							// System.out.println("Connected to Channel with
+							// host " + ei.getHost());
 							ei.setActive(true);
 							if (channel == null) {
 								logger.info("trying to connect to node " + ei.getRef());

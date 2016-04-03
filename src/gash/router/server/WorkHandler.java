@@ -71,16 +71,18 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			return;
 		}
 
-		/*if (debug)
-			PrintUtil.printWork(msg);
-*/
+		/*
+		 * if (debug) PrintUtil.printWork(msg);
+		 */
 		// TODO How can you implement this without if-else statements?
 		try {
 			if (msg.getStateOfLeader() == StateOfLeader.LEADERALIVE) {
-				//exec.shutdownNow();
-				//int currentTimeout = RandomTimeoutGenerator.randTimeout() * this.state.getConf().getNodeId();
-				//exec = Executors.newSingleThreadScheduledExecutor();
-				//exec.schedule(new ElectionTImer(), (long) currentTimeout, TimeUnit.MILLISECONDS);
+				// exec.shutdownNow();
+				// int currentTimeout = RandomTimeoutGenerator.randTimeout() *
+				// this.state.getConf().getNodeId();
+				// exec = Executors.newSingleThreadScheduledExecutor();
+				// exec.schedule(new ElectionTImer(), (long) currentTimeout,
+				// TimeUnit.MILLISECONDS);
 				// System.out.println("Leader is Alive ");
 				// Thread.sleep(1000);
 				// electionTimer.purge();
@@ -90,14 +92,14 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
 								NodeChannelManager.currentLeaderAddress);
 				channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
-				
-				//Sent the newly discovered node all the data on this node.
+
+				// Sent the newly discovered node all the data on this node.
 				DataReplicationManager.getInstance().replicateToNewNode(channel);
-				
-				
+
 			} else if (msg.hasLeader() && msg.getLeader().getAction() == LeaderQuery.THELEADERIS) {
 				NodeChannelManager.currentLeaderID = msg.getLeader().getLeaderId();
 				NodeChannelManager.currentLeaderAddress = msg.getLeader().getLeaderHost();
+				NodeChannelManager.amIPartOfNetwork = true;
 				logger.debug("The leader is " + NodeChannelManager.currentLeaderID);
 			}
 
@@ -129,7 +131,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				SocketAddress remoteAddress = channel.remoteAddress();
 				InetSocketAddress addr = (InetSocketAddress) remoteAddress;
 
-				state.getEmon().createOutboundIfNew(msg.getHeader().getNodeId(), addr.getHostName(), 9999);
+				state.getEmon().createOutboundIfNew(msg.getHeader().getNodeId(), addr.getHostName(), 5100);
 
 				System.out.println(addr.getHostName());
 
@@ -137,13 +139,14 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
 				WorkMessage wm = state.getEmon().createRoutingMsg();
 				channel.writeAndFlush(wm);
-				//TODO New node has been detected. Push all your data to it now.
+				// TODO New node has been detected. Push all your data to it
+				// now.
 				SocketAddress remoteAddress = channel.remoteAddress();
 				InetSocketAddress addr = (InetSocketAddress) remoteAddress;
 
 				state.getEmon().createInboundIfNew(msg.getHeader().getNodeId(), addr.getHostName(), 5100);
 				state.getEmon().getInboundEdges().getNode(msg.getHeader().getNodeId()).setChannel(channel);
-				
+
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();
