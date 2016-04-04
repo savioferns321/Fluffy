@@ -9,7 +9,6 @@ import com.google.protobuf.ByteString;
 
 import gash.router.container.RoutingConf;
 import gash.router.persistence.MessageDetails;
-import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
@@ -20,6 +19,7 @@ import pipe.monitor.Monitor.ClusterMonitor;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkMessage.Worktype;
+import pipe.work.Work.WorkState;
 import pipe.work.Work.WorkSteal;
 import routing.Pipe.CommandMessage;
 
@@ -206,17 +206,18 @@ public class MessageGeneratorUtil {
 		hb.setNodeId(MessageServer.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
-		Task.Builder tb = Task.newBuilder(message.getTask());
+		/*Task.Builder tb = Task.newBuilder(message.getTask());
 		tb.clearChunk();
 		tb.clearChunkNo();
-		tb.clearNoOfChunks();
-
+		tb.clearNoOfChunks();*/
+		
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb.build());
 		wb.setWorktype(Worktype.SLAVE_WRITTEN);
 		//TODO Set the secret
 		wb.setSecret(1234);
-		wb.setTask(tb.build());
+		//wb.setTask(tb.build());
+		
 		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
@@ -268,8 +269,10 @@ public class MessageGeneratorUtil {
 		//TODO Get the queue sizes.
 		cmb.setEnqueued(MessageServer.getNodeId(), QueueManager.getInstance().getInboundCommQSize()+
 				QueueManager.getInstance().getInboundWorkQSize());
-		cmb.setProcessed(MessageServer.getNodeId(), NodeState.getInstance().getProcessed());
-		cmb.setStolen(MessageServer.getNodeId(), NodeState.getInstance().getStolen());
+		//cmb.setProcessed(MessageServer.getNodeId(), NodeState.getInstance().getProcessed());
+		cmb.setProcessed(MessageServer.getNodeId(), 0);
+		//cmb.setStolen(MessageServer.getNodeId(), NodeState.getInstance().getStolen());
+		cmb.setStolen(MessageServer.getNodeId(), 0);
 		cmb.setTick(cmb.getTick()+1);
 
 		//Initialize the circle of nodes in the network.

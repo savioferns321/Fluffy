@@ -40,7 +40,7 @@ public class InboundWorker extends Thread {
 
 				if(currWork.hasSteal()){
 					logger.info("Handling a stolen msg ");
-					NodeState.getInstance().incrementStolen();
+					//NodeState.getInstance().incrementStolen();
 					int chunkCount = Dbhandler.getChuncks(t.getFilename());
 					for (int i = 1; i <= chunkCount; i++) {
 						//Get the file chunks
@@ -115,7 +115,7 @@ public class InboundWorker extends Thread {
 						break;
 					}
 				}
-				logger.info("Is my Inbound Work Queue empty? :" + manager.inboundWorkQ.isEmpty());
+				/*logger.info("Is my Inbound Work Queue empty? :" + manager.inboundWorkQ.isEmpty());
 				while(manager.inboundWorkQ.isEmpty())	//Node is free.. Ask other nodes for work
 				{
 					//select a node for checking if it has pending tasks and stealing them
@@ -130,7 +130,7 @@ public class InboundWorker extends Thread {
 						logger.info("Sending work steal request message");
 						Thread.sleep(5000);
 					}					
-				}
+				}*/
 			}
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage());

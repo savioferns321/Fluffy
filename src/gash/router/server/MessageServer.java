@@ -54,7 +54,6 @@ public class MessageServer {
 	private static int nodeId;
 
 	// State of the node (Leader/Non-leader, LeaderIP and LeaderID)
-	protected NodeState nodeState;
 
 	/**
 	 * initialize the server with a configuration of it's resources
@@ -67,7 +66,6 @@ public class MessageServer {
 
 	public MessageServer(RoutingConf conf) {
 		this.conf = conf;
-		this.nodeState = NodeState.init();
 	}
 
 	public void release() {
@@ -106,7 +104,7 @@ public class MessageServer {
 		if (NodeChannelManager.amIPartOfNetwork) {
 			while (!ElectionManagement.isReadyForElection())
 				;
-			ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf, nodeState);
+			ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf);
 			ElectionManagement.startElection();
 		}
 

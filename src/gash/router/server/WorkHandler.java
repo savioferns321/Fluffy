@@ -35,6 +35,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Task.TaskType;
 import pipe.election.Election.LeaderStatus.LeaderQuery;
+import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
@@ -77,6 +78,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			return;
 		}
 
+		System.out.println(msg.getAllFields());
 		/*
 		 * if (debug) PrintUtil.printWork(msg);
 		 */
@@ -115,23 +117,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				logger.info("The leader is " + NodeChannelManager.currentLeaderID);
 			}
 
-			if (msg.hasBeat()) {
-				Heartbeat hb = msg.getBeat();
-				WorkMessage message = msg;				
-				if(state.getConf().getNodeId() == NodeChannelManager.currentLeaderID){
-					//TODO This is an ACK received from the slave to the leader's heartbeat. Leader should handle 
-				}else{
-					//Received heartbeat from leader. Respond back with the same message.
-					synchronized (channel) {
-						ChannelFuture cf = channel.writeAndFlush(message);
-						while(!channel.isWritable()){
-							//Looping until channel is writable
-						}
-						if (cf.isDone() && !cf.isSuccess()) {
-							logger.info("Failed to write the message to the channel ");
-						}	
-					}	
-				}
+			if (msg.hasBeat() && msg.getStateOfLeader() != StateOfLeader.LEADERALIVE) {
+				
+				logger.info("heartbeat received from "+msg.getHeader().getNodeId());	
 
 			}else if(msg.hasSteal()){
 
@@ -142,9 +130,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 					QueueManager.getInstance().enqueueInboundWork(msg, channel);
 					// TODO Increment worksteal counter
 					logger.info("------A task was stolen from another node------");
-				
+
 					break;
-					
+
 				case STEAL_REQUEST:
 
 
@@ -168,13 +156,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 					}
 
-				
+
 					break;	
 
 				default:
 					break;
 				}
-				
+
 			} else if (msg.hasTask()) {
 
 				// Enqueue it to the inbound work queue
@@ -283,7 +271,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		Channel channel = ctx.channel();
 		handleMessage(msg, channel);
 
-		Thread.sleep(300);
+		//Thread.sleep(300);
 	}
 
 	@Override

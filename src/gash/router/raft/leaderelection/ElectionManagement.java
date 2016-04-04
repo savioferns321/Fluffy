@@ -23,18 +23,13 @@ public class ElectionManagement {
 	private static RaftStateMachine raftStateMachine;
 	private static Timer electionTimer;
 	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
-	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 2;
+	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 3;
 	private static int currentVoteCount = 1;
 
 	private static Logger logger;
-	private NodeState currentNodeState;
 
 	public ElectionManagement() {
 		logger = LoggerFactory.getLogger(getClass());
-	}
-
-	public ElectionManagement(NodeState nodeState) {
-		this.currentNodeState = nodeState;
 	}
 
 	public static ElectionManagement getInstance() {
@@ -44,13 +39,13 @@ public class ElectionManagement {
 		return instance.get();
 	}
 
-	public static ElectionManagement initElectionManagement(RoutingConf routingConf, NodeState nodeState) {
+	public static ElectionManagement initElectionManagement(RoutingConf routingConf) {
 		ElectionManagement.routingConf = routingConf;
 		ElectionManagement.raftStateMachine = new RaftStateMachine();
 		electionTimer = new Timer();
 
 		MessageBuilder.setRoutingConf(routingConf);
-		instance.compareAndSet(null, new ElectionManagement(nodeState));
+		instance.compareAndSet(null, new ElectionManagement());
 		return instance.get();
 	}
 
@@ -83,9 +78,9 @@ public class ElectionManagement {
 				}
 				System.out.println("Vote Casted in favour of : "
 						+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
-				//incomingChannel.writeAndFlush(electionResponseMessage);
-				while(!incomingChannel.isWritable()){
-					//Looping until channel is writable
+				// incomingChannel.writeAndFlush(electionResponseMessage);
+				while (!incomingChannel.isWritable()) {
+					// Looping until channel is writable
 				}
 				ChannelFuture cf = incomingChannel.writeAndFlush(electionResponseMessage);
 				if (cf.isDone() && !cf.isSuccess()) {
@@ -121,15 +116,8 @@ public class ElectionManagement {
 
 		if (electionWorkMessage.getRaftMessage().getAction() == ElectionAction.LEADER) {
 			try {
-				ElectionManagement electionManagement = instance.get();
-				NodeState nodeState = new NodeState();
-				nodeState.setLeaderId(electionWorkMessage.getRaftMessage().getLeaderId());
-				nodeState.setLeaderHostId(electionWorkMessage.getRaftMessage().getLeaderHost());
-				nodeState.setNodeState(State.NonLeader);
 
-				electionManagement.setCurrentNodeState(nodeState);
-				instance.compareAndSet(null, electionManagement);
-				System.out.println("Current Leader ID : " + instance.get().getCurrentNodeState().getLeaderId());
+				System.out.println("Current Leader ID : " + electionWorkMessage.getRaftMessage().getLeaderId());
 				// Saving current leader id in NodeChannelManager to use it
 				// across the node
 				NodeChannelManager.currentLeaderID = electionWorkMessage.getRaftMessage().getLeaderId();
@@ -145,11 +133,11 @@ public class ElectionManagement {
 		// TODO put logic to count the number of votes received so far and
 		// decide the leader
 		if (electionWorkMessage.getRaftMessage().getRequestVote().getVoteGranted()) {
-			/*currentVoteCount++;
-			if (currentVoteCount > ((NodeChannelManager.getNode2ChannelMap().size() / 2) + 1))
-				return true;
-			else
-				return false;*/
+			/*
+			 * currentVoteCount++; if (currentVoteCount >
+			 * ((NodeChannelManager.getNode2ChannelMap().size() / 2) + 1))
+			 * return true; else return false;
+			 */
 			return true;
 		}
 		return false;
@@ -195,14 +183,6 @@ public class ElectionManagement {
 			}
 		}
 
-	}
-
-	public NodeState getCurrentNodeState() {
-		return currentNodeState;
-	}
-
-	public void setCurrentNodeState(NodeState currentNodeState) {
-		this.currentNodeState = currentNodeState;
 	}
 
 }
