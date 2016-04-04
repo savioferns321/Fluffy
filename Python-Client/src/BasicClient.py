@@ -1,15 +1,17 @@
 import socket
 import common_pb2
+import pipe_pb2
 import pbd
-from common.MessageBuilder import *
 from protobuf_to_dict import protobuf_to_dict
 from asyncore import read
+import struct
+import time
 
 class BasicClient:
     def __init__(self,host,port):
         self.host = host
         self.port = port
-        self.sd = socket.socket()
+        self.sd  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     def setName(self,name):
         self.name = name
@@ -44,57 +46,107 @@ class BasicClient:
         self.sd.send(msg)
         
     def getFile(self,name):
-        req = common_pb2.Task()
-        req.tasktype = common_pb2.Task.TaskType.READ
-        req.sender = "127.0.0.1"
-        req.filename = name
-        
-        request = req.SerializeToString()
+        cm = pipe_pb2.CommandMessage();
+        cm.header.node_id = 999;
+        cm.header.time = 11234;
+        cm.task.task_type = common_pb2.Task.TaskType.Value("READ")
+        cm.task.sender = "127.0.0.1"
+        cm.task.filename = name
+        cm.message = name
+        request = cm.SerializeToString()
         return request
     
-    def chunckFile(self,file):
-        fileChunck = []
+    def chunkFile(self,file):
+        fileChunk = []
         with open(file, "rb") as fileContent:
-            data = ifile.read(1024*1024)
+            data = fileContent.read(1024*1024)
             while data:
-                fileChunck.append(data)
-                data = ifile.read(1024*1024)
-        return fileChunck
+                fileChunk.append(data)
+                data = fileContent.read(1024*1024) 
+        return fileChunk
         
-            
+    def genPing(self):
+        cm = pipe_pb2.CommandMessage();
+        cm.header.node_id = 999;
+        cm.header.time = 11234;
+        cm.ping = True;
+        msg = cm.SerializeToString();
+        return msg;
     
-    def sendFile(self,filename,filecontent, noofchunck,chunckid):
-        req = common_pb2.Task()
-        req.tasktype = common_pb2.Task.TaskType.WRITE
-        req.sender = "127.0.0.1"
-        req.filename = filename
-        req.fileContent = filecontent
-        req.chunck_no = chunckid
-        req.no_of_chucnk = noofchunck
-        request = req.SerializeToString()
-        return request
+    def genChunkedMsg(self,filename,filecontent, noofchunks,chunkid):
+
+        cm = pipe_pb2.CommandMessage();
+        cm.header.node_id = 999;
+        cm.header.time = 11234;
+
+        cm.task.task_type = common_pb2.Task.TaskType.Value("WRITE")
+        cm.task.sender = "127.0.0.1"
+        cm.task.filename = filename
+        cm.task.chunk_no = chunkid
+        cm.task.no_of_chunks = noofchunks
+        cm.fileContent = filecontent;     
+        msg = cm.SerializeToString();
+        return msg
     
     def sendData(self,data,host,port):
-        s = socket.socket()
-        s.connect((host, port))
-        msg_len = struct.pack('>L', len(msg_out))
-        s.sendall(msg_len + msg_out)
-        len_buf = receiveMsg(s, 4)
-        msg_in_len = struct.unpack('>L', len_buf)[0]
-        msg_in = receiveMsg(s, msg_in_len)
-        r = comm_pb2.Request()
+
+        msg_len = struct.pack('>L', len(data))
+
+        self.sd.sendall(msg_len + data)
+
+        len_buf = self.receiveMsg(self.sd, 4)
+
+        msg_in = self.receiveMsg(self.sd, len_buf)
+
+        r =  pipe_pb2.CommandMessage();
+
         r.ParseFromString(msg_in)
-        s.close
+
+        self.sd.close
+
         return r
+        
 
 
-    def receiveMsg(socket, n):
-        buf = ''
-        while n > 0:
-            data = socket.recv(n)
-            if data == '':
-                raise RuntimeError('data not received!')
-            buf += data
-            n -= len(data)
-        return buf
+    def receiveMsg(self,socket, waittime):
+
+        socket.setblocking(0)
+
+        finaldata = []
+
+        data = ''
+
+        start_time = time.time()
+
+        while 1:
+
+            if data and time.time()-start_time > waittime:
+
+                break
+
+            elif time.time()-start_time > waittime*2:
+
+                break
+
+        try:
+
+            data = socket.recv(8192)
+
+            if data:
+
+                finaldata.append(data)
+
+                begin = time.time()
+
+            else:
+
+                time.sleep(0.1)
+
+        except:
+
+            pass
+
+        print(finaldata)
+
+        return ''.join(finaldata)
         

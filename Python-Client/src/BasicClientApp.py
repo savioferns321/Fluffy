@@ -8,23 +8,24 @@ class BasicClientApp:
         while name==None:
             print("Enter your name in order to join: ");
             name = sys.stdin.readline()
-            if name!=None:
+            if name==None:
                 break
             print("Enter the IP of Server with which you want to connect: ");
-            host = sys.stdin.readline()
+            #host = raw_input();
             print("Enter the port of Server: ");
-            port = int(sys.stdin.readline())
+            #port = int(raw_input());
             
-            
+        port = 5101;
+        host = "192.168.0.2"   
         bc =BasicClient(host,port)
         bc.startSession()
         bc.setName(name)
-        bc.join(name)
+        #bc.join(name)
 
         print("\n--------****Fluffy Client****-------------" + name + "\n")
         print("Please Select one of following option by entering the respective number: \n");
         print("-----------------------------------------------\n");
-        print("1.) Upload - Upload a New File \n");
+        print("1.) Upload - Upload a New File \n"); 
         print("2.) Download - To Download a particular File\n");
         print("3.) help - list the options\n");
         print("4.) exit - end session\n");
@@ -32,37 +33,57 @@ class BasicClientApp:
 
         forever = True;
         while (forever):
-                choice = sys.stdin.readline()
-
-                print("")
-                print(choice.lower())
+                #print("Enter your choice");
+                #choice = int(raw_input());
+                choice = 2;
                 if (choice == None):
                     continue;
-                elif (choice == "4" ):
+                elif (choice == 4 ):
                     print("Bye from Fluffy client!!");
                     bc.stopSession();
                     forever = False;
-                elif (choice == "1"):
+                elif (choice == 1):
                     print("Enter the name of your file: ")
-                    filename = sys.stdin.readline()
+                    #filename = raw_input();
+                    print("SEND");
+                    #bc.sendData(bc.genPing(),"127.0.0.1",4186);
+                    filename = "intro.pdf"
                     print("Enter qualified pathname of file to be uploded: ");
-                    path = sys.stdin.readline()
-                    chuncks = bc.chunckFile(path)
-                    noofchuncks = len(chuncks)
+                    #path = raw_input();
+                    path = "introductions3.pdf";
+                    chunks = bc.chunkFile(path)
+                    noofchunks = len(chunks)
+
                     chunkid = 1;
-                    for chunck in chuncks:
-                        req = sendFile(filename,chunck,noofchuncks,chunckid)
+                    for chunk in chunks:
+                        req = bc.genChunkedMsg(filename,chunk,noofchunks,chunkid);
                         chunkid += 1 
-                        result = sendData(req,host,port)
-                        print result.__str__()
+                        result = bc.sendData(req,host,port)
+                        
                     
-                elif (choice == "2" ):
-                    print("Enter the filename you want to download: ")
-                    name = sys.stdin.readline()
+                elif (choice == 2 ):
+                    #print("Enter the filename you want to download: ")
+                    #name = sys.stdin.readline()
+                    name = "introductions3.pdf"
                     req = bc.getFile(name)
-                    result = sendData(req,host,port)
+                    result = bc.sendData(req,host,port)
+                    print result
+
+                    if(result.task.filename == name):
+
+                        noofchuncks = result.task.noofchuncks
+
+                        print noofchuncks
+
+                    while noofchuncks != 0:
+
+                        if (result.task.filename == name):
+
+                            with open(path/name, "w") as outfile:
+
+                                outfile.write(result.task.fileContent)
                     
-                elif (choice == "3"):
+                elif (choice == 3):
                     print("");
                     print("-----------------------------------------------\n");
                     print("1.) Upload - Upload a New File \n");
@@ -71,7 +92,7 @@ class BasicClientApp:
                     print("4.) exit - end session\n");
                     print("\n");
                 else:
-                    bc.sendMessage(choice);
+                    print("Wrong Selection");
         print("\nGoodbye\n");
         
         
