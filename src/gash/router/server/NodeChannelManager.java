@@ -109,10 +109,10 @@ public class NodeChannelManager {
 		Collection<Channel> allChannel = node2ChannelMap.values();
 		for (Channel channel : allChannel) {
 			System.out.println("Sending message to Channel " + channel.toString());
-			//channel.writeAndFlush(message);
+			while(!channel.isWritable()){
+				//Looping until channel is writable
+			}			
 			ChannelFuture cf = channel.writeAndFlush(message);
-			//cf.get();
-			cf.awaitUninterruptibly();
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.info("Failed to write the message to the channel ");
 			}

@@ -82,15 +82,21 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					Channel nextNodeChannel = NodeChannelManager.getNode2ChannelMap()
 							.get(cmdMsg.getNextNodeIdsList().remove(0));
 					ChannelFuture cf = null;
+					
 					if(nextNodeChannel == null){
 						//No node in the network to read from.
 						logger.info("No other nodes in the network to retrieve for monitoring ");
+						while(!channel.isWritable()){
+							//Looping until channel is writable
+						}
 						cf = channel.writeAndFlush(cmdMsg);
 					}else{
 						logger.info("Found nodes in the network to retrieve for monitoring ");
+						while(!nextNodeChannel.isWritable()){
+							//Looping until channel is writable
+						}
 						cf = nextNodeChannel.writeAndFlush(cmdMsg);
 					}
-					cf.awaitUninterruptibly();
 					if (cf.isDone() && !cf.isSuccess()) {
 						logger.info("Failed to write the monitor message to the channel ");
 					}
@@ -100,8 +106,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 						//case 3 : Message returned back to server. Send this message back to client.
 						//Read the request ID from the message(set in the oneof message field) and get the client channel.
 						Channel clientChannel = NodeChannelManager.getClientChannelFromMap(msg.getMessage()).getChannel();
+						while(!clientChannel.isWritable()){
+							//Looping until channel is writable
+						}
 						ChannelFuture cf = clientChannel.writeAndFlush(clientChannel);
-						cf.awaitUninterruptibly();
 						if (cf.isDone() && !cf.isSuccess()) {
 							logger.info("Failed to write the monitor message to the channel ");
 						}
@@ -112,9 +120,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 						CommandMessage cmdMsg = MessageGeneratorUtil.getInstance().initializeMonitorMsg(msg,false, null);
 						Channel nextNodeChannel = NodeChannelManager.getNode2ChannelMap()
 								.get(cmdMsg.getNextNodeIdsList().remove(0));
-
+						while(!nextNodeChannel.isWritable()){
+							//Looping until channel is writable
+						}
 						cf = nextNodeChannel.writeAndFlush(cmdMsg);
-						cf.awaitUninterruptibly();
 						if (cf.isDone() && !cf.isSuccess()) {
 							logger.info("Failed to write the monitor message to the channel ");
 						}
@@ -150,10 +159,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				eb.setMessage(e.getMessage());
 				CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
 				rb.setErr(eb);
-				//channel.writeAndFlush(rb.build());
+				while(!channel.isWritable()){
+					//Looping until channel is writable
+				}
 				ChannelFuture cf = channel.writeAndFlush(rb.build());
-				cf.awaitUninterruptibly();
-				//cf.get();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("Failed to write the message to the channel ");
 				}

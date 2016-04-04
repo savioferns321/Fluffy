@@ -65,8 +65,10 @@ public class DataReplicationManager {
 				try {
 					WorkMessage workMessage = MessageGeneratorUtil.getInstance().generateNewNodeReplicationMsg(details, InetAddress.getLocalHost().getHostAddress());
 					//channel.writeAndFlush(workMessage);
+					while(!channel.isWritable()){
+						//Looping until channel is writable
+					}
 					ChannelFuture cf = channel.writeAndFlush(workMessage);
-					cf.awaitUninterruptibly();
 					if (cf.isDone() && !cf.isSuccess()) {
 						logger.error("Failed to send replication message to server");
 					}

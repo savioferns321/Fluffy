@@ -33,14 +33,15 @@ public class OutboundWorker extends Thread{
 				
 				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
 					boolean rtn = false;
-					if (msg.getChannel().isWritable()) {
+						while(!msg.getChannel().isWritable()){
+							//Looping until channel is writable
+						}
 						ChannelFuture cf = msg.getChannel().writeAndFlush(msg.getWorkMessage());
-						cf.awaitUninterruptibly();
 						rtn = cf.isSuccess();
 						logger.info("Wrote msg to the channel ? "+rtn);
 						if (!rtn)
 							manager.returnOutboundWork(msg);
-					}
+					
 
 				} else {
 					logger.info("channel to node " + msg.getWorkMessage().getHeader().getDestination() + " is not writable");

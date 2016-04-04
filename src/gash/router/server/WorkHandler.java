@@ -97,8 +97,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				WorkMessage buildNewNodeLeaderStatusResponseMessage = MessageBuilder
 						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
 								NodeChannelManager.currentLeaderAddress);
+				while(!channel.isWritable()){
+					//Looping until channel is writable
+				}
 				ChannelFuture cf = channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
-				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("Failed to write the message to the channel ");
 				}				
@@ -122,7 +124,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 					//Received heartbeat from leader. Respond back with the same message.
 					synchronized (channel) {
 						ChannelFuture cf = channel.writeAndFlush(message);
-						cf.awaitUninterruptibly();
+						while(!channel.isWritable()){
+							//Looping until channel is writable
+						}
 						if (cf.isDone() && !cf.isSuccess()) {
 							logger.info("Failed to write the message to the channel ");
 						}	
@@ -192,8 +196,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			} else if (msg.hasNewNode()) {
 				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
 				WorkMessage wm = state.getEmon().createRoutingMsg();
+				while(!channel.isWritable()){
+					//Looping until channel is writable
+				}
 				ChannelFuture cf = channel.writeAndFlush(wm);
-				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("Failed to write the message to the channel ");
 				}
@@ -239,8 +245,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			eb.setMessage(e.getMessage());
 			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
 			rb.setErr(eb);
+			while(!channel.isWritable()){
+				//Looping until channel is writable
+			}
 			ChannelFuture cf = channel.writeAndFlush(rb.build());
-			cf.awaitUninterruptibly();
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.info("Failed to write the message to the channel ");
 			}

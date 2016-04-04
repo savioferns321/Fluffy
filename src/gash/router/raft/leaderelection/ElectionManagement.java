@@ -84,8 +84,10 @@ public class ElectionManagement {
 				System.out.println("Vote Casted in favour of : "
 						+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
 				//incomingChannel.writeAndFlush(electionResponseMessage);
+				while(!incomingChannel.isWritable()){
+					//Looping until channel is writable
+				}
 				ChannelFuture cf = incomingChannel.writeAndFlush(electionResponseMessage);
-				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.error("Failed to send replication message to server");
 				}

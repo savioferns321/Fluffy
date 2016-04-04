@@ -38,7 +38,6 @@ public class OutboundCommander extends Thread{
 					boolean rtn = false;
 					if (msg.getChannel().isWritable()) {
 						ChannelFuture cf = msg.getChannel().writeAndFlush(msg.getCommandMessage());
-						cf.awaitUninterruptibly();
 						rtn = cf.isSuccess();
 						if (!rtn)
 							manager.returnOutboundCommand(msg);

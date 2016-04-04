@@ -63,11 +63,15 @@ public class ReadHandler {
 		public void run() {
 			if (this.nodeChannel.isOpen() && this.nodeChannel.isActive()) {
 				//this.nodeChannel.writeAndFlush(workmessage);
+				while(!this.nodeChannel.isWritable()){
+					//Looping until channel is writable
+				}
 				ChannelFuture cf = this.nodeChannel.writeAndFlush(workmessage);
-				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.error("Failed to send replication message to server");
 				}
+				
+				
 			} else {
 				logger.error("The nodeChannel to " + nodeChannel.localAddress() + " is not active");
 			}
