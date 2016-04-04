@@ -139,6 +139,22 @@ public class QueueManager {
 	public void returnInboundWork(WorkMessageChannelCombo msg) throws InterruptedException {
 		inboundWorkQ.putFirst(msg);
 	}
+	
+	public int getInboundCommQSize(){
+		return inboundCommQ.size();
+	}
+	
+	public int getOutboundCommQSize(){
+		return outboundCommQ.size();
+	}
+	
+	public int getInboundWorkQSize(){
+		return inboundWorkQ.size();
+	}
+	
+	public int getOutboundWorkQSize(){
+		return outboundWorkQ.size();
+	}
 
 	/*
 	 * End of Work Message methods

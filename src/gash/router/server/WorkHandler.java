@@ -15,6 +15,7 @@
  */
 package gash.router.server;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
@@ -26,15 +27,20 @@ import org.slf4j.LoggerFactory;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
 import gash.router.raft.leaderelection.MessageBuilder;
+import gash.router.server.QueueManager.WorkMessageChannelCombo;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
+import pipe.common.Common.Task.TaskType;
 import pipe.election.Election.LeaderStatus.LeaderQuery;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkState;
+import pipe.work.Work.WorkSteal;
+import pipe.work.Work.WorkSteal.StealType;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
@@ -91,7 +97,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				WorkMessage buildNewNodeLeaderStatusResponseMessage = MessageBuilder
 						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
 								NodeChannelManager.currentLeaderAddress);
-				channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
+				ChannelFuture cf = channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
+				cf.awaitUninterruptibly();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.info("Failed to write the message to the channel ");
+				}				
 
 				// Sent the newly discovered node all the data on this node.
 				DataReplicationManager.getInstance().replicateToNewNode(channel);
@@ -100,23 +110,67 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				NodeChannelManager.currentLeaderID = msg.getLeader().getLeaderId();
 				NodeChannelManager.currentLeaderAddress = msg.getLeader().getLeaderHost();
 				NodeChannelManager.amIPartOfNetwork = true;
-				logger.debug("The leader is " + NodeChannelManager.currentLeaderID);
+				logger.info("The leader is " + NodeChannelManager.currentLeaderID);
 			}
 
 			if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				// logger.info("heartbeat from " + msg.getHeader().getNodeId());
-
-				// TODO Generate Heartbeat response. Currently returns null.
-				// Write
-				// this response to the channel synchronously.
-				// WorkMessage message =
-				// MessageGeneratorUtil.getInstance().generateHeartbeat();
-				WorkMessage message = msg;
-				synchronized (channel) {
-					channel.writeAndFlush(message);
+				WorkMessage message = msg;				
+				if(state.getConf().getNodeId() == NodeChannelManager.currentLeaderID){
+					//TODO This is an ACK received from the slave to the leader's heartbeat. Leader should handle 
+				}else{
+					//Received heartbeat from leader. Respond back with the same message.
+					synchronized (channel) {
+						ChannelFuture cf = channel.writeAndFlush(message);
+						cf.awaitUninterruptibly();
+						if (cf.isDone() && !cf.isSuccess()) {
+							logger.info("Failed to write the message to the channel ");
+						}	
+					}	
 				}
 
+			}else if(msg.hasSteal()){
+
+				switch (msg.getSteal().getStealtype()) {
+				case STEAL_RESPONSE:
+
+					logger.info("------Stealing work from node:------ "+msg.getHeader().getNodeId());
+					QueueManager.getInstance().enqueueInboundWork(msg, channel);
+					// TODO Increment worksteal counter
+					logger.info("------A task was stolen from another node------");
+				
+					break;
+					
+				case STEAL_REQUEST:
+
+
+					WorkMessageChannelCombo msgOnQueue = QueueManager.getInstance().inboundWorkQ.peek();
+
+					if(msgOnQueue!= null && msgOnQueue.getWorkMessage().getTask().getTaskType()== TaskType.READ ){
+
+						logger.info("------Pending Read Request found in Queue, Sending to another node------");
+
+						WorkMessage wmProto = QueueManager.getInstance().dequeueInboundWork().getWorkMessage();
+
+						WorkMessage.Builder wm = WorkMessage.newBuilder(wmProto);
+
+						WorkSteal.Builder stealMessage = WorkSteal.newBuilder();
+
+						stealMessage.setStealtype(StealType.STEAL_RESPONSE);
+
+						wm.setSteal(stealMessage);
+
+						QueueManager.getInstance().enqueueOutboundWork(wm.build(), channel);
+
+					}
+
+				
+					break;	
+
+				default:
+					break;
+				}
+				
 			} else if (msg.hasTask()) {
 
 				// Enqueue it to the inbound work queue
@@ -138,7 +192,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			} else if (msg.hasNewNode()) {
 				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
 				WorkMessage wm = state.getEmon().createRoutingMsg();
-				channel.writeAndFlush(wm);
+				ChannelFuture cf = channel.writeAndFlush(wm);
+				cf.awaitUninterruptibly();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.info("Failed to write the message to the channel ");
+				}
 				// TODO New node has been detected. Push all your data to it
 				// now.
 				SocketAddress remoteAddress = channel.remoteAddress();
@@ -169,6 +227,8 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			}
 		} catch (NullPointerException e) {
 			System.out.println("Null pointer has occured");
+			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		catch (Exception e) {
@@ -179,7 +239,11 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			eb.setMessage(e.getMessage());
 			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
 			rb.setErr(eb);
-			channel.writeAndFlush(rb.build());
+			ChannelFuture cf = channel.writeAndFlush(rb.build());
+			cf.awaitUninterruptibly();
+			if (cf.isDone() && !cf.isSuccess()) {
+				logger.info("Failed to write the message to the channel ");
+			}
 		}
 
 		System.out.flush();
@@ -218,6 +282,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("Unexpected exception from downstream.", cause);
 		ctx.close();
+	}
+
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception{
+		logger.error("Node CHANNEL WAS DESTROYED: "+ctx.channel().remoteAddress());
+		InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+		InetAddress inetAddress = socketAddress.getAddress();
+		logger.error(inetAddress.getHostAddress());
+		state.getEmon().getOutboundEdges().removeNodeByIp(inetAddress.getHostAddress());
 	}
 
 }

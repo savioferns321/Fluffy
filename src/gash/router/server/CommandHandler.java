@@ -19,10 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.container.RoutingConf;
+import gash.router.server.QueueManager.CommandMessageChannelCombo;
+import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
+import pipe.monitor.Monitor.ClusterMonitor;
 import routing.Pipe.CommandMessage;
 
 /**
@@ -62,6 +66,64 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		try {
 			// TODO How can you implement this without if-else statements?
+			if(msg.hasMonitorMsg()){
+				//This is sent from the monitor. The monitor message needs to be populated.
+				//TODO Determine is this is sent from Client-Server, Server-Server, or Server-Client
+				ClusterMonitor clusterMsg = msg.getMonitorMsg();
+				if(clusterMsg.getClusterId() == -1){
+
+					/*case 1 : Client-Server(cluster-Id = -1).Populate the nextNodes list and its own load in the cluster
+					msg. Send it to the next node in the list.*/
+					//Store the client channel to be retrieved later.
+					String requestID = NodeChannelManager.addClientToMap
+							(QueueManager.getInstance().new CommandMessageChannelCombo(channel, msg));
+					CommandMessage cmdMsg = MessageGeneratorUtil.getInstance().initializeMonitorMsg(msg,true, requestID);
+
+					Channel nextNodeChannel = NodeChannelManager.getNode2ChannelMap()
+							.get(cmdMsg.getNextNodeIdsList().remove(0));
+					ChannelFuture cf = null;
+					if(nextNodeChannel == null){
+						//No node in the network to read from.
+						logger.info("No other nodes in the network to retrieve for monitoring ");
+						cf = channel.writeAndFlush(cmdMsg);
+					}else{
+						logger.info("Found nodes in the network to retrieve for monitoring ");
+						cf = nextNodeChannel.writeAndFlush(cmdMsg);
+					}
+					cf.awaitUninterruptibly();
+					if (cf.isDone() && !cf.isSuccess()) {
+						logger.info("Failed to write the monitor message to the channel ");
+					}
+				}else{
+					switch (msg.getNextNodeIdsCount()) {
+					case 0:
+						//case 3 : Message returned back to server. Send this message back to client.
+						//Read the request ID from the message(set in the oneof message field) and get the client channel.
+						Channel clientChannel = NodeChannelManager.getClientChannelFromMap(msg.getMessage()).getChannel();
+						ChannelFuture cf = clientChannel.writeAndFlush(clientChannel);
+						cf.awaitUninterruptibly();
+						if (cf.isDone() && !cf.isSuccess()) {
+							logger.info("Failed to write the monitor message to the channel ");
+						}
+						break;
+
+					default:
+						//case 2 : Message from another server. Populate with its own load. Needs to be forwarded to the next server.
+						CommandMessage cmdMsg = MessageGeneratorUtil.getInstance().initializeMonitorMsg(msg,false, null);
+						Channel nextNodeChannel = NodeChannelManager.getNode2ChannelMap()
+								.get(cmdMsg.getNextNodeIdsList().remove(0));
+
+						cf = nextNodeChannel.writeAndFlush(cmdMsg);
+						cf.awaitUninterruptibly();
+						if (cf.isDone() && !cf.isSuccess()) {
+							logger.info("Failed to write the monitor message to the channel ");
+						}
+						break;
+					}
+				}
+			}
+
+
 			if(msg.hasTask()){
 
 				/**
@@ -72,11 +134,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				System.out.flush();
 				QueueManager.getInstance().enqueueInboundCommmand(msg, channel);
 			}else			
-			if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-			} else if (msg.hasMessage()) {
-				logger.info(msg.getMessage());
-			}  
+				if (msg.hasPing()) {
+					logger.info("ping from " + msg.getHeader().getNodeId());
+				} else if (msg.hasMessage()) {
+					logger.info(msg.getMessage());
+				}  
 
 		} catch (Exception e) {
 			// TODO add logging
@@ -88,7 +150,13 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				eb.setMessage(e.getMessage());
 				CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
 				rb.setErr(eb);
-				channel.writeAndFlush(rb.build());
+				//channel.writeAndFlush(rb.build());
+				ChannelFuture cf = channel.writeAndFlush(rb.build());
+				cf.awaitUninterruptibly();
+				//cf.get();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.info("Failed to write the message to the channel ");
+				}
 			}catch (Exception e2) {
 				e.printStackTrace();
 			}

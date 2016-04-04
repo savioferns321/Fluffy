@@ -29,6 +29,16 @@ message RoutingConf {
   repeated string nodeId = 2;
 }
 
+
+
+message WorkSteal {
+enum StealType {
+     	STEAL_REQUEST = 1;
+	STEAL_RESPONSE = 2;
+    }
+required StealType stealtype = 1;
+
+}
 // These are messages to keep the network running (not to perform work)
 message WorkMessage {
    required Header header = 1;
@@ -36,13 +46,15 @@ message WorkMessage {
    optional RoutingConf routingEntries = 11;
    optional bool isProcessed = 13;
    optional string requestId = 14;
-   
+   optional WorkSteal steal = 18;
    enum Worktype {
       LEADER_WRITE = 1;
       SLAVE_WRITTEN = 2;
       LEADER_READ = 3;
       SLAVE_READ_DONE = 4;
    }
+
+
    
    optional Worktype worktype = 15;
    required StateOfLeader stateOfLeader = 16;

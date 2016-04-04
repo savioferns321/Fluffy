@@ -1,12 +1,9 @@
 package gash.router.server;
 
 import java.rmi.UnexpectedException;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.protobuf.ByteString;
 
 import gash.router.persistence.DataReplicationManager;
 import gash.router.persistence.Dbhandler;
@@ -16,7 +13,6 @@ import io.netty.channel.Channel;
 import pipe.common.Common.Task;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
-import sun.security.pkcs11.Secmod.DbMode;
 
 public class InboundCommander extends Thread{
 
@@ -43,7 +39,7 @@ public class InboundCommander extends Thread{
 				Task currTask = currCombo.getCommandMessage().getTask();
 				switch (currTask.getTaskType()) {
 				case WRITE:
-					//TODO Write it to this(master) node. Send ACK to the client and asynchronously start replication on the remaining servers.
+					//Write it to this(master) node. Send ACK to the client and asynchronously start replication on the remaining servers.
 
 					/*Thread.sleep(10000);
 					 logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename());
@@ -55,14 +51,14 @@ public class InboundCommander extends Thread{
 					try {
 						
 						//If file size has only 1 chunk, write to in memory DB, else write to the standard DB.
-						if(currTask.getNoOfChunks() == 1){
+						/*if(currTask.getNoOfChunks() == 1){
 							//TODO Write to in memory DB
 							//Dbhandler.addFile(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray());
-						}else{
+						}else{*/
 							//TODO Write to standard DB
 							Dbhandler.addFile(currTask.getFilename(), currMsg.getTask().getChunk().toByteArray(), currTask.getNoOfChunks(), currTask.getChunkNo());
 							isSuccess = true;
-						}
+						//}
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -70,7 +66,6 @@ public class InboundCommander extends Thread{
 					}
 
 					//Starting asynchronous replication
-					//TODO is replication working properly?
 					DataReplicationManager.getInstance().replicate(currMsg);
 					
 					//Send ACK to the client
@@ -81,7 +76,6 @@ public class InboundCommander extends Thread{
 					break;
 
 				case READ:
-					//TODO Forward it to the a slave node
 					/*
 					 * This is a command message, so this is directly from a client and this node is a leader.
 					 * So find a node who can process this request.
@@ -89,22 +83,24 @@ public class InboundCommander extends Thread{
 					 * Also, store the client channel so that we can send the read file to him directly.
 					 */
 					
-					//TODO Get the next node to delegate the request
 					Channel nextChannel= NodeChannelManager.getNextReadChannel();
 					
 					//Get the no. of chunks in the file FROM ITS OWN DB, although the file is to be read from another node.
-					int chunkCount = Dbhandler.getChuncks(currMsg.getTask().getFilename());
-					//Setting the chunk count to be decremented each time this file's chunk is sent back to the client.
-					currCombo.setChunkCount(chunkCount);
+					int chunkCount = Dbhandler.getChuncks(currMsg.getTask().getFilename());	
+					if(chunkCount != 0){
+						//Setting the chunk count to be decremented each time this file's chunk is sent back to the client.
+						currCombo.setChunkCount(chunkCount);
+						
+						//Store the client channel so it can be used later to reply back to the client.
+						String requestId = NodeChannelManager.addClientToMap(currCombo);
+						
+						//Generate proper work message to send to next client.
+						WorkMessage message = MessageGeneratorUtil.getInstance().generateDelegationMessage(currMsg, requestId);
+						
+						//Enqueue the generated message to the outbound work queue
+						manager.enqueueOutboundWork(message, nextChannel);
+					}
 					
-					//Store the client channel so it can be used later to reply back to the client.
-					String requestId = NodeChannelManager.addClientToMap(currCombo);
-					
-					//Generate proper work message to send to next client.
-					WorkMessage message = MessageGeneratorUtil.getInstance().generateDelegationMessage(currMsg, requestId);
-					
-					//Enqueue the generated message to the outbound work queue
-					manager.enqueueOutboundWork(message, nextChannel);
 					
 					/*Thread.sleep(10000);
 					logger.info("Finished processing task "+currCombo.getCommandMessage().getTask().getFilename());*/
@@ -113,7 +109,7 @@ public class InboundCommander extends Thread{
 				default:
 					break;
 				}
-
+				
 			} catch (InterruptedException e) {
 				logger.error(e.getMessage());				
 				e.printStackTrace();

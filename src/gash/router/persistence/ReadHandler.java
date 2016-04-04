@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.server.NodeChannelManager;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import pipe.work.Work.WorkMessage;
 
 public class ReadHandler {
@@ -61,7 +62,12 @@ public class ReadHandler {
 		@Override
 		public void run() {
 			if (this.nodeChannel.isOpen() && this.nodeChannel.isActive()) {
-				this.nodeChannel.writeAndFlush(workmessage);
+				//this.nodeChannel.writeAndFlush(workmessage);
+				ChannelFuture cf = this.nodeChannel.writeAndFlush(workmessage);
+				cf.awaitUninterruptibly();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.error("Failed to send replication message to server");
+				}
 			} else {
 				logger.error("The nodeChannel to " + nodeChannel.localAddress() + " is not active");
 			}

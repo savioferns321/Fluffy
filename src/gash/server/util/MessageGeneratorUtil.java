@@ -9,15 +9,18 @@ import com.google.protobuf.ByteString;
 
 import gash.router.container.RoutingConf;
 import gash.router.persistence.MessageDetails;
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
-import gash.router.server.edges.EdgeMonitor;
+import gash.router.server.QueueManager;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;
+import pipe.monitor.Monitor.ClusterMonitor;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkMessage.Worktype;
+import pipe.work.Work.WorkSteal;
 import routing.Pipe.CommandMessage;
 
 public class MessageGeneratorUtil {
@@ -112,6 +115,29 @@ public class MessageGeneratorUtil {
 
 		return wb.build();
 	}
+	
+	
+	public WorkMessage generateStealMessage(){
+
+		Header.Builder hb = Header.newBuilder();
+		//TODO Get node ID
+		hb.setNodeId(MessageServer.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+		
+		WorkSteal.Builder stealMessage = WorkSteal.newBuilder();
+		stealMessage.setStealtype(pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST);
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb.build());
+		wb.setIsProcessed(false);
+		//TODO Set the secret
+		wb.setSecret(1234);
+		addLeaderFieldToWorkMessage(wb);
+		wb.setSteal(stealMessage);
+		
+		return wb.build();
+	}
+	
 
 	/**
 	 * This message is sent from the slave to the leader when leader has requested a READ. A msg is generated for each file chunk.
@@ -222,6 +248,52 @@ public class MessageGeneratorUtil {
 		return wb.build();
 	}
 
+	/**
+	 * Generates a message from the 1st node that the Monitor connects to. This method 
+	 * creates a list of all the nodes in the network ending at the creator's own node ID.
+	 * The idea is that when this message is passed around the nodes, each node will add
+	 * his current status to the monitor message contained in the command message and will
+	 * pass the message to the next node in the nodes list.
+	 * @param message
+	 * @return
+	 */
+	public CommandMessage initializeMonitorMsg(CommandMessage message, boolean isFirstNode, String requestID){
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(MessageServer.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+		ClusterMonitor.Builder cmb = ClusterMonitor.newBuilder(message.getMonitorMsg());
+		
+		cmb.setProcessId(MessageServer.getNodeId(),MessageServer.getNodeId());
+		//TODO Get the queue sizes.
+		cmb.setEnqueued(MessageServer.getNodeId(), QueueManager.getInstance().getInboundCommQSize()+
+				QueueManager.getInstance().getInboundWorkQSize());
+		cmb.setProcessed(MessageServer.getNodeId(), NodeState.getInstance().getProcessed());
+		cmb.setStolen(MessageServer.getNodeId(), NodeState.getInstance().getStolen());
+		cmb.setTick(cmb.getTick()+1);
+
+		//Initialize the circle of nodes in the network.
+		CommandMessage.Builder cb = CommandMessage.newBuilder(message);
+		cb.setMonitorMsg(cmb.build());
+		cb.setHeader(hb.build());
+
+		if(isFirstNode){
+			//TODO Get the cluster ID from the routing conf.
+			cmb.setClusterId(1);
+			cmb.setNumNodes(NodeChannelManager.getNode2ChannelMap().size()+1);
+			//Build the nextNodeIds field. Populate it with the IDs of all the nodes in the network.
+			for(Integer nodeID : NodeChannelManager.getNode2ChannelMap().keySet()){
+				cb.getNextNodeIdsList().add(nodeID);
+			}
+			//Add the current node ID to the list.
+			cb.getNextNodeIdsList().add(MessageServer.getNodeId());
+			//Set the request ID
+			cb.setMessage(requestID);
+
+		}
+		return cb.build();
+
+	}
 
 	/**
 	 * Generates a Heartbeat msg sent from leader to slave.

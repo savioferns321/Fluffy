@@ -17,6 +17,7 @@ package gash.router.server.edges;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import gash.router.server.NodeChannelManager;
 import io.netty.channel.Channel;
 
 public class EdgeList {
@@ -79,6 +80,15 @@ public class EdgeList {
 
 	public void removeNode(int ref) {
 		map.remove(ref);
+	}
+	
+	public void removeNodeByIp(String ip){
+		for (Integer curr : map.keySet()) {
+			if(map.get(curr).getHost().equals(ip)){
+				map.get(curr).setChannel(null);
+				NodeChannelManager.node2ChannelMap.remove(curr);
+			}
+		}
 	}
 
 	public void clear() {

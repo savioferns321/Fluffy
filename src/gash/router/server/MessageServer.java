@@ -67,7 +67,7 @@ public class MessageServer {
 
 	public MessageServer(RoutingConf conf) {
 		this.conf = conf;
-		this.nodeState = NodeState.getInstance();
+		this.nodeState = NodeState.init();
 	}
 
 	public void release() {

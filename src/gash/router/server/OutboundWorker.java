@@ -3,6 +3,7 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.QueueManager.WorkMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
@@ -26,11 +27,10 @@ public class OutboundWorker extends Thread{
 			try {
 				// block until a message is enqueued
 				WorkMessageChannelCombo msg = manager.dequeueOutboundWork();
-
+				NodeState.getInstance().incrementProcessed();
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getWorkMessage().getHeader().getDestination());
 				
-
 				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
 					boolean rtn = false;
 					if (msg.getChannel().isWritable()) {

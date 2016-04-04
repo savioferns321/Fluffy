@@ -3,6 +3,7 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.QueueManager.CommandMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
@@ -25,7 +26,11 @@ public class OutboundCommander extends Thread{
 			try {
 				// block until a message is enqueued
 				CommandMessageChannelCombo msg = this.manager.dequeueOutboundCommmand();
-
+				/**
+				 * Incrementing the no. of processed tasks
+				 */
+				NodeState.getInstance().incrementProcessed();
+				
 				if (logger.isDebugEnabled())
 					logger.debug("Outbound management message routing to node " + msg.getCommandMessage().getHeader().getDestination());
 
@@ -33,7 +38,6 @@ public class OutboundCommander extends Thread{
 					boolean rtn = false;
 					if (msg.getChannel().isWritable()) {
 						ChannelFuture cf = msg.getChannel().writeAndFlush(msg.getCommandMessage());
-
 						cf.awaitUninterruptibly();
 						rtn = cf.isSuccess();
 						if (!rtn)

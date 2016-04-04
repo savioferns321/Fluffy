@@ -5,9 +5,13 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gash.router.container.RoutingConf;
 import gash.router.server.NodeChannelManager;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import pipe.election.Election.RaftMessage.ElectionAction;
 import pipe.work.Work.WorkMessage;
 
@@ -21,10 +25,12 @@ public class ElectionManagement {
 	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
 	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 2;
 	private static int currentVoteCount = 1;
+
+	private static Logger logger;
 	private NodeState currentNodeState;
 
 	public ElectionManagement() {
-
+		logger = LoggerFactory.getLogger(getClass());
 	}
 
 	public ElectionManagement(NodeState nodeState) {
@@ -77,7 +83,12 @@ public class ElectionManagement {
 				}
 				System.out.println("Vote Casted in favour of : "
 						+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
-				incomingChannel.writeAndFlush(electionResponseMessage);
+				//incomingChannel.writeAndFlush(electionResponseMessage);
+				ChannelFuture cf = incomingChannel.writeAndFlush(electionResponseMessage);
+				cf.awaitUninterruptibly();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.error("Failed to send replication message to server");
+				}
 			}
 		}
 

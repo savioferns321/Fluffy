@@ -141,8 +141,8 @@ public class DemoApp implements CommListener {
 
 			// do stuff w/ the connection
 			//da.ping(2);
-			da.sendReadTasks();
-			//da.splitFile(new File("intro.pdf"));
+			//da.sendReadTasks();
+			da.splitFile(new File("introductions3.pdf"));
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

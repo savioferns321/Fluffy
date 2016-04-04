@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
 import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
@@ -62,7 +64,12 @@ public class DataReplicationManager {
 			for(MessageDetails details : fileMap.get(filename)){
 				try {
 					WorkMessage workMessage = MessageGeneratorUtil.getInstance().generateNewNodeReplicationMsg(details, InetAddress.getLocalHost().getHostAddress());
-					channel.writeAndFlush(workMessage);
+					//channel.writeAndFlush(workMessage);
+					ChannelFuture cf = channel.writeAndFlush(workMessage);
+					cf.awaitUninterruptibly();
+					if (cf.isDone() && !cf.isSuccess()) {
+						logger.error("Failed to send replication message to server");
+					}
 				} catch (UnknownHostException e) {
 					logger.error(e.getMessage());
 				}

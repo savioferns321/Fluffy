@@ -33,6 +33,7 @@ import gash.router.server.WorkInit;
 import gash.server.util.MessageGeneratorUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -89,8 +90,13 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 								System.out.println("Channel connected to: " + oneIp.getHostAddress());
 								WorkMessage wm = createNewNode();
-								newNodeChannel.writeAndFlush(wm);
+								ChannelFuture cf = newNodeChannel.writeAndFlush(wm);
+								cf.awaitUninterruptibly();
+								if (cf.isDone() && !cf.isSuccess()) {
+									logger.info("Failed to write the message to the channel ");
+								}
 								if (discoveryChannel == null) {
+									logger.info("Setting discovery channel for : "+oneIp.getHostAddress());
 									discoveryChannel = newNodeChannel;
 								}
 							}
@@ -105,7 +111,11 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					// Send a discovery message to the first node that the new
 					// node finds
 					WorkMessage discoveryMessage = MessageBuilder.buildNewNodeLeaderStatusMessage();
-					discoveryChannel.writeAndFlush(discoveryMessage);
+					ChannelFuture cf = discoveryChannel.writeAndFlush(discoveryMessage);
+					cf.awaitUninterruptibly();
+					if (cf.isDone() && !cf.isSuccess()) {
+						logger.info("Failed to write the message to the channel ");
+					}
 					logger.debug("Writing to a node to get the leader status");
 				}
 
@@ -220,8 +230,15 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						// System.out.println("Inside For loop" +
 						// outboundEdges.map.toString());
 						if (ei.isActive() && ei.getChannel() != null) {
-							WorkMessage wm = createHB(ei);
-							ei.getChannel().writeAndFlush(wm);
+							if (NodeChannelManager.currentLeaderID == this.state.getConf().getNodeId()) {
+								WorkMessage wm = createHB(ei);
+								ChannelFuture cf = ei.getChannel().writeAndFlush(wm);
+								cf.awaitUninterruptibly();
+								if (cf.isDone() && !cf.isSuccess()) {
+									logger.info("Failed to write the message to the channel ");
+								}
+								logger.debug("Forming and sending out WorkMessage");
+							}
 							// System.out.println("Connected to Channel with
 							// host :" + ei.getHost());
 						} else if (ei.getChannel() == null) {

@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.types.Binary;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -19,34 +20,34 @@ public class Dbhandler {
 	}*/
 
 	public static void main(String[] args){
-		System.out.println(getFilewithChunckId("HoliVideo.mov",2));
+		//System.out.println(getFilewithChunckId("HoliVideo.mov",2));
+		Map<String,ArrayList<MessageDetails>> map = getAllFilesForReplication();
+		for(String filename : map.keySet()){
+			System.out.print(filename);
+			System.out.println(" --> "+map.get(filename).size());
+			for(MessageDetails details : map.get(filename)){
+				System.out.print(filename+"  ");
+				System.out.println("\t"+details.getChunckId() );
+			}
+		}
 	}
 
 	//Getting all files for replication
 	public static synchronized Map<String,ArrayList<MessageDetails>> getAllFilesForReplication(){
 		Map<String,ArrayList<MessageDetails>> messageMap = new HashMap<String,ArrayList<MessageDetails>>();
-		ArrayList<MessageDetails> data = new ArrayList<MessageDetails>();
-		Binary bData= null;
-		byte[] byteData = {};
-		int numchuncks = 0;
-		int chunckid =0;
-		String filename = "";
+		
 		MongoClient client = getConnection();
 		MongoDatabase db = client.getDatabase("Fluffy");
-		MongoCollection<Document> collection = db.getCollection("Fluffy");
-		FindIterable<Document> doc = collection.find();
-		for(Document docs: doc){
-			bData = (Binary) docs.get("bytes");
-			byteData = bData.getData();
-			numchuncks = (Integer) docs.get("noOfChuncks");
-			chunckid = (Integer) docs.get("chunckId");
-			filename = docs.getString("fileName");
-			MessageDetails msgdata = new MessageDetails(filename, byteData,numchuncks,chunckid);
-			data.add(msgdata);
-			messageMap.put(filename, data);
-			data.clear();
-
+		DistinctIterable<String> distintColl = db.getCollection("Fluffy").distinct("fileName", String.class);
+		for(String file : distintColl){
+			int n = getChuncks(file);
+			ArrayList<MessageDetails> msgDetails = new ArrayList<MessageDetails>();
+			for (int i = 1; i <= n; i++) {
+				msgDetails.add(getFilewithChunckId(file, i));
+			}
+			messageMap.put(file, msgDetails);
 		}
+		
 		client.close();
 		return messageMap;
 	}
@@ -124,7 +125,7 @@ public class Dbhandler {
 		MongoCollection<Document> collection = db.getCollection("Fluffy");
 		FindIterable<Document> doc = collection.find(new Document("fileName", fileName));
 		for(Document docs: doc){
-			numchuncks = (Integer) docs.get("noOfChuncks");
+			numchuncks++;
 		}
 		client.close();
 		return numchuncks;
@@ -187,10 +188,10 @@ public class Dbhandler {
 
 		}
 		client.close();
-		System.out.println(msgdata.getChunckId());
+		/*System.out.println(msgdata.getChunckId());
 		System.out.println(msgdata.getNoOfChuncks());
 		System.out.println(msgdata.getFileName());
-		System.out.println(msgdata.getByteData());
+		System.out.println(msgdata.getByteData());*/
 		return msgdata;
 	}
 

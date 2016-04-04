@@ -12,12 +12,23 @@ public class NodeState {
 	private static State nodeState;
 	private static int leaderId;
 	private static String leaderHostId;
+	
+	/**
+	 * Added fields for maintaining the no. of processed tasks.
+	 * @author savio
+	 */
+	private int processed =0;
+	private int stolen = 0;
 
 	protected static AtomicReference<NodeState> instance = new AtomicReference<NodeState>();
 
-	public static NodeState getInstance() {
+	public static NodeState init(){
 		nodeState = State.NonLeader;
 		instance.compareAndSet(null, new NodeState());
+		return instance.get();
+	}
+	
+	public static NodeState getInstance() {
 		return instance.get();
 	}
 
@@ -55,5 +66,19 @@ public class NodeState {
 	public void setLeaderHostId(String leaderHostId) {
 		NodeState.leaderHostId = leaderHostId;
 	}
-
+	
+	public int getProcessed() {
+		return processed;
+	}
+	
+	public void incrementProcessed(){
+		processed++;
+	}
+	
+	public int getStolen() {
+		return stolen;
+	}
+	public void incrementStolen(){
+		stolen++;
+	}
 }

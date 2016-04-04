@@ -1721,6 +1721,502 @@ public final class Work {
     // @@protoc_insertion_point(class_scope:RoutingConf)
   }
 
+  public interface WorkStealOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:WorkSteal)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required .WorkSteal.StealType stealtype = 1;</code>
+     */
+    boolean hasStealtype();
+    /**
+     * <code>required .WorkSteal.StealType stealtype = 1;</code>
+     */
+    pipe.work.Work.WorkSteal.StealType getStealtype();
+  }
+  /**
+   * Protobuf type {@code WorkSteal}
+   */
+  public static final class WorkSteal extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:WorkSteal)
+      WorkStealOrBuilder {
+    // Use WorkSteal.newBuilder() to construct.
+    private WorkSteal(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private WorkSteal(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final WorkSteal defaultInstance;
+    public static WorkSteal getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public WorkSteal getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkSteal(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              int rawValue = input.readEnum();
+              pipe.work.Work.WorkSteal.StealType value = pipe.work.Work.WorkSteal.StealType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000001;
+                stealtype_ = value;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return pipe.work.Work.internal_static_WorkSteal_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return pipe.work.Work.internal_static_WorkSteal_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              pipe.work.Work.WorkSteal.class, pipe.work.Work.WorkSteal.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<WorkSteal> PARSER =
+        new com.google.protobuf.AbstractParser<WorkSteal>() {
+      public WorkSteal parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkSteal(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkSteal> getParserForType() {
+      return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code WorkSteal.StealType}
+     */
+    public enum StealType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>STEAL_REQUEST = 1;</code>
+       */
+      STEAL_REQUEST(0, 1),
+      /**
+       * <code>STEAL_RESPONSE = 2;</code>
+       */
+      STEAL_RESPONSE(1, 2),
+      ;
+
+      /**
+       * <code>STEAL_REQUEST = 1;</code>
+       */
+      public static final int STEAL_REQUEST_VALUE = 1;
+      /**
+       * <code>STEAL_RESPONSE = 2;</code>
+       */
+      public static final int STEAL_RESPONSE_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static StealType valueOf(int value) {
+        switch (value) {
+          case 1: return STEAL_REQUEST;
+          case 2: return STEAL_RESPONSE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<StealType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<StealType>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<StealType>() {
+              public StealType findValueByNumber(int number) {
+                return StealType.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return pipe.work.Work.WorkSteal.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final StealType[] VALUES = values();
+
+      public static StealType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private StealType(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:WorkSteal.StealType)
+    }
+
+    private int bitField0_;
+    public static final int STEALTYPE_FIELD_NUMBER = 1;
+    private pipe.work.Work.WorkSteal.StealType stealtype_;
+    /**
+     * <code>required .WorkSteal.StealType stealtype = 1;</code>
+     */
+    public boolean hasStealtype() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required .WorkSteal.StealType stealtype = 1;</code>
+     */
+    public pipe.work.Work.WorkSteal.StealType getStealtype() {
+      return stealtype_;
+    }
+
+    private void initFields() {
+      stealtype_ = pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasStealtype()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeEnum(1, stealtype_.getNumber());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, stealtype_.getNumber());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static pipe.work.Work.WorkSteal parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.WorkSteal parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static pipe.work.Work.WorkSteal parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static pipe.work.Work.WorkSteal parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(pipe.work.Work.WorkSteal prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code WorkSteal}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:WorkSteal)
+        pipe.work.Work.WorkStealOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return pipe.work.Work.internal_static_WorkSteal_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return pipe.work.Work.internal_static_WorkSteal_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                pipe.work.Work.WorkSteal.class, pipe.work.Work.WorkSteal.Builder.class);
+      }
+
+      // Construct using pipe.work.Work.WorkSteal.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        stealtype_ = pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return pipe.work.Work.internal_static_WorkSteal_descriptor;
+      }
+
+      public pipe.work.Work.WorkSteal getDefaultInstanceForType() {
+        return pipe.work.Work.WorkSteal.getDefaultInstance();
+      }
+
+      public pipe.work.Work.WorkSteal build() {
+        pipe.work.Work.WorkSteal result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public pipe.work.Work.WorkSteal buildPartial() {
+        pipe.work.Work.WorkSteal result = new pipe.work.Work.WorkSteal(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.stealtype_ = stealtype_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof pipe.work.Work.WorkSteal) {
+          return mergeFrom((pipe.work.Work.WorkSteal)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(pipe.work.Work.WorkSteal other) {
+        if (other == pipe.work.Work.WorkSteal.getDefaultInstance()) return this;
+        if (other.hasStealtype()) {
+          setStealtype(other.getStealtype());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasStealtype()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        pipe.work.Work.WorkSteal parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (pipe.work.Work.WorkSteal) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private pipe.work.Work.WorkSteal.StealType stealtype_ = pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST;
+      /**
+       * <code>required .WorkSteal.StealType stealtype = 1;</code>
+       */
+      public boolean hasStealtype() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required .WorkSteal.StealType stealtype = 1;</code>
+       */
+      public pipe.work.Work.WorkSteal.StealType getStealtype() {
+        return stealtype_;
+      }
+      /**
+       * <code>required .WorkSteal.StealType stealtype = 1;</code>
+       */
+      public Builder setStealtype(pipe.work.Work.WorkSteal.StealType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        stealtype_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required .WorkSteal.StealType stealtype = 1;</code>
+       */
+      public Builder clearStealtype() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        stealtype_ = pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:WorkSteal)
+    }
+
+    static {
+      defaultInstance = new WorkSteal(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:WorkSteal)
+  }
+
   public interface WorkMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:WorkMessage)
       com.google.protobuf.MessageOrBuilder {
@@ -1782,6 +2278,19 @@ public final class Work {
      */
     com.google.protobuf.ByteString
         getRequestIdBytes();
+
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    boolean hasSteal();
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    pipe.work.Work.WorkSteal getSteal();
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    pipe.work.Work.WorkStealOrBuilder getStealOrBuilder();
 
     /**
      * <code>optional .WorkMessage.Worktype worktype = 15;</code>
@@ -2122,7 +2631,7 @@ public final class Work {
               if (value == null) {
                 unknownFields.mergeVarintField(15, rawValue);
               } else {
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000040;
                 worktype_ = value;
               }
               break;
@@ -2133,7 +2642,7 @@ public final class Work {
               if (value == null) {
                 unknownFields.mergeVarintField(16, rawValue);
               } else {
-                bitField0_ |= 0x00000040;
+                bitField0_ |= 0x00000080;
                 stateOfLeader_ = value;
               }
               break;
@@ -2149,6 +2658,19 @@ public final class Work {
                 payload_ = subBuilder.buildPartial();
               }
               payloadCase_ = 17;
+              break;
+            }
+            case 146: {
+              pipe.work.Work.WorkSteal.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = steal_.toBuilder();
+              }
+              steal_ = input.readMessage(pipe.work.Work.WorkSteal.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(steal_);
+                steal_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
               break;
             }
           }
@@ -2550,13 +3072,34 @@ public final class Work {
       }
     }
 
+    public static final int STEAL_FIELD_NUMBER = 18;
+    private pipe.work.Work.WorkSteal steal_;
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    public boolean hasSteal() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    public pipe.work.Work.WorkSteal getSteal() {
+      return steal_;
+    }
+    /**
+     * <code>optional .WorkSteal steal = 18;</code>
+     */
+    public pipe.work.Work.WorkStealOrBuilder getStealOrBuilder() {
+      return steal_;
+    }
+
     public static final int WORKTYPE_FIELD_NUMBER = 15;
     private pipe.work.Work.WorkMessage.Worktype worktype_;
     /**
      * <code>optional .WorkMessage.Worktype worktype = 15;</code>
      */
     public boolean hasWorktype() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional .WorkMessage.Worktype worktype = 15;</code>
@@ -2571,7 +3114,7 @@ public final class Work {
      * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
      */
     public boolean hasStateOfLeader() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
      * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
@@ -2825,6 +3368,7 @@ public final class Work {
       routingEntries_ = pipe.work.Work.RoutingConf.getDefaultInstance();
       isProcessed_ = false;
       requestId_ = "";
+      steal_ = pipe.work.Work.WorkSteal.getDefaultInstance();
       worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
       stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
     }
@@ -2849,6 +3393,12 @@ public final class Work {
       if (!getHeader().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
+      }
+      if (hasSteal()) {
+        if (!getSteal().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       if (hasErr()) {
         if (!getErr().isInitialized()) {
@@ -2935,14 +3485,17 @@ public final class Work {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBytes(14, getRequestIdBytes());
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeEnum(15, worktype_.getNumber());
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeEnum(16, stateOfLeader_.getNumber());
       }
       if (payloadCase_ == 17) {
         output.writeMessage(17, (pipe.election.Election.RaftMessage) payload_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeMessage(18, steal_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3008,17 +3561,21 @@ public final class Work {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(14, getRequestIdBytes());
       }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(15, worktype_.getNumber());
       }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(16, stateOfLeader_.getNumber());
       }
       if (payloadCase_ == 17) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, (pipe.election.Election.RaftMessage) payload_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, steal_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3135,6 +3692,7 @@ public final class Work {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getHeaderFieldBuilder();
           getRoutingEntriesFieldBuilder();
+          getStealFieldBuilder();
         }
       }
       private static Builder create() {
@@ -3161,10 +3719,16 @@ public final class Work {
         bitField0_ = (bitField0_ & ~0x00000008);
         requestId_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
+        if (stealBuilder_ == null) {
+          steal_ = pipe.work.Work.WorkSteal.getDefaultInstance();
+        } else {
+          stealBuilder_.clear();
+        }
         bitField0_ = (bitField0_ & ~0x00000020);
-        stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
+        worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
         bitField0_ = (bitField0_ & ~0x00000040);
+        stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
+        bitField0_ = (bitField0_ & ~0x00000080);
         payloadCase_ = 0;
         payload_ = null;
         return this;
@@ -3226,9 +3790,17 @@ public final class Work {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.worktype_ = worktype_;
+        if (stealBuilder_ == null) {
+          result.steal_ = steal_;
+        } else {
+          result.steal_ = stealBuilder_.build();
+        }
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
+        }
+        result.worktype_ = worktype_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         result.stateOfLeader_ = stateOfLeader_;
         if (payloadCase_ == 3) {
@@ -3316,6 +3888,9 @@ public final class Work {
           requestId_ = other.requestId_;
           onChanged();
         }
+        if (other.hasSteal()) {
+          mergeSteal(other.getSteal());
+        }
         if (other.hasWorktype()) {
           setWorktype(other.getWorktype());
         }
@@ -3383,6 +3958,12 @@ public final class Work {
         if (!getHeader().isInitialized()) {
           
           return false;
+        }
+        if (hasSteal()) {
+          if (!getSteal().isInitialized()) {
+            
+            return false;
+          }
         }
         if (hasErr()) {
           if (!getErr().isInitialized()) {
@@ -3829,12 +4410,128 @@ public final class Work {
         return this;
       }
 
+      private pipe.work.Work.WorkSteal steal_ = pipe.work.Work.WorkSteal.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.WorkSteal, pipe.work.Work.WorkSteal.Builder, pipe.work.Work.WorkStealOrBuilder> stealBuilder_;
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public boolean hasSteal() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public pipe.work.Work.WorkSteal getSteal() {
+        if (stealBuilder_ == null) {
+          return steal_;
+        } else {
+          return stealBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public Builder setSteal(pipe.work.Work.WorkSteal value) {
+        if (stealBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          steal_ = value;
+          onChanged();
+        } else {
+          stealBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000020;
+        return this;
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public Builder setSteal(
+          pipe.work.Work.WorkSteal.Builder builderForValue) {
+        if (stealBuilder_ == null) {
+          steal_ = builderForValue.build();
+          onChanged();
+        } else {
+          stealBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000020;
+        return this;
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public Builder mergeSteal(pipe.work.Work.WorkSteal value) {
+        if (stealBuilder_ == null) {
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
+              steal_ != pipe.work.Work.WorkSteal.getDefaultInstance()) {
+            steal_ =
+              pipe.work.Work.WorkSteal.newBuilder(steal_).mergeFrom(value).buildPartial();
+          } else {
+            steal_ = value;
+          }
+          onChanged();
+        } else {
+          stealBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000020;
+        return this;
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public Builder clearSteal() {
+        if (stealBuilder_ == null) {
+          steal_ = pipe.work.Work.WorkSteal.getDefaultInstance();
+          onChanged();
+        } else {
+          stealBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000020);
+        return this;
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public pipe.work.Work.WorkSteal.Builder getStealBuilder() {
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return getStealFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      public pipe.work.Work.WorkStealOrBuilder getStealOrBuilder() {
+        if (stealBuilder_ != null) {
+          return stealBuilder_.getMessageOrBuilder();
+        } else {
+          return steal_;
+        }
+      }
+      /**
+       * <code>optional .WorkSteal steal = 18;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.work.Work.WorkSteal, pipe.work.Work.WorkSteal.Builder, pipe.work.Work.WorkStealOrBuilder> 
+          getStealFieldBuilder() {
+        if (stealBuilder_ == null) {
+          stealBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.work.Work.WorkSteal, pipe.work.Work.WorkSteal.Builder, pipe.work.Work.WorkStealOrBuilder>(
+                  getSteal(),
+                  getParentForChildren(),
+                  isClean());
+          steal_ = null;
+        }
+        return stealBuilder_;
+      }
+
       private pipe.work.Work.WorkMessage.Worktype worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
       /**
        * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public boolean hasWorktype() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional .WorkMessage.Worktype worktype = 15;</code>
@@ -3849,7 +4546,7 @@ public final class Work {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         worktype_ = value;
         onChanged();
         return this;
@@ -3858,7 +4555,7 @@ public final class Work {
        * <code>optional .WorkMessage.Worktype worktype = 15;</code>
        */
       public Builder clearWorktype() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
         onChanged();
         return this;
@@ -3869,7 +4566,7 @@ public final class Work {
        * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
        */
       public boolean hasStateOfLeader() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
@@ -3884,7 +4581,7 @@ public final class Work {
         if (value == null) {
           throw new NullPointerException();
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         stateOfLeader_ = value;
         onChanged();
         return this;
@@ -3893,7 +4590,7 @@ public final class Work {
        * <code>required .WorkMessage.StateOfLeader stateOfLeader = 16;</code>
        */
       public Builder clearStateOfLeader() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
         onChanged();
         return this;
@@ -4932,6 +5629,11 @@ public final class Work {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_RoutingConf_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_WorkSteal_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_WorkSteal_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_WorkMessage_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -4949,23 +5651,27 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\"-\n\013RoutingConf\022\016\n\006nodeIp\030\001 " +
-      "\003(\t\022\016\n\006nodeId\030\002 \003(\t\"\201\005\n\013WorkMessage\022\027\n\006h" +
-      "eader\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022$\n\016" +
-      "routingEntries\030\013 \001(\0132\014.RoutingConf\022\023\n\013is" +
-      "Processed\030\r \001(\010\022\021\n\trequestId\030\016 \001(\t\022\'\n\010wo" +
-      "rktype\030\017 \001(\0162\025.WorkMessage.Worktype\0221\n\rs" +
-      "tateOfLeader\030\020 \002(\0162\032.WorkMessage.StateOf",
-      "Leader\022\027\n\003err\030\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030" +
-      "\004 \001(\010H\000\022\032\n\004beat\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004t" +
-      "ask\030\006 \001(\0132\005.TaskH\000\022\033\n\005state\030\007 \001(\0132\n.Work" +
-      "StateH\000\022\037\n\006leader\030\010 \001(\0132\r.LeaderStatusH\000" +
-      "\022\021\n\007newNode\030\t \001(\010H\000\022\025\n\013flagRouting\030\n \001(\010" +
-      "H\000\022#\n\013raftMessage\030\021 \001(\0132\014.RaftMessageH\000\"" +
-      "U\n\010Worktype\022\020\n\014LEADER_WRITE\020\001\022\021\n\rSLAVE_W" +
-      "RITTEN\020\002\022\017\n\013LEADER_READ\020\003\022\023\n\017SLAVE_READ_" +
-      "DONE\020\004\"T\n\rStateOfLeader\022\017\n\013LEADERALIVE\020\001" +
-      "\022\016\n\nLEADERDEAD\020\002\022\021\n\rLEADERUNKNOWN\020\003\022\017\n\013L",
-      "EADERKNOWN\020\004B\t\n\007payloadB\r\n\tpipe.workH\001"
+      "\003(\t\022\016\n\006nodeId\030\002 \003(\t\"h\n\tWorkSteal\022\'\n\tstea" +
+      "ltype\030\001 \002(\0162\024.WorkSteal.StealType\"2\n\tSte" +
+      "alType\022\021\n\rSTEAL_REQUEST\020\001\022\022\n\016STEAL_RESPO" +
+      "NSE\020\002\"\234\005\n\013WorkMessage\022\027\n\006header\030\001 \002(\0132\007." +
+      "Header\022\016\n\006secret\030\002 \002(\003\022$\n\016routingEntries" +
+      "\030\013 \001(\0132\014.RoutingConf\022\023\n\013isProcessed\030\r \001(",
+      "\010\022\021\n\trequestId\030\016 \001(\t\022\031\n\005steal\030\022 \001(\0132\n.Wo" +
+      "rkSteal\022\'\n\010worktype\030\017 \001(\0162\025.WorkMessage." +
+      "Worktype\0221\n\rstateOfLeader\030\020 \002(\0162\032.WorkMe" +
+      "ssage.StateOfLeader\022\027\n\003err\030\003 \001(\0132\010.Failu" +
+      "reH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004beat\030\005 \001(\0132\n.Hea" +
+      "rtbeatH\000\022\025\n\004task\030\006 \001(\0132\005.TaskH\000\022\033\n\005state" +
+      "\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006leader\030\010 \001(\0132\r.L" +
+      "eaderStatusH\000\022\021\n\007newNode\030\t \001(\010H\000\022\025\n\013flag" +
+      "Routing\030\n \001(\010H\000\022#\n\013raftMessage\030\021 \001(\0132\014.R" +
+      "aftMessageH\000\"U\n\010Worktype\022\020\n\014LEADER_WRITE",
+      "\020\001\022\021\n\rSLAVE_WRITTEN\020\002\022\017\n\013LEADER_READ\020\003\022\023" +
+      "\n\017SLAVE_READ_DONE\020\004\"T\n\rStateOfLeader\022\017\n\013" +
+      "LEADERALIVE\020\001\022\016\n\nLEADERDEAD\020\002\022\021\n\rLEADERU" +
+      "NKNOWN\020\003\022\017\n\013LEADERKNOWN\020\004B\t\n\007payloadB\r\n\t" +
+      "pipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4999,12 +5705,18 @@ public final class Work {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_RoutingConf_descriptor,
         new java.lang.String[] { "NodeIp", "NodeId", });
-    internal_static_WorkMessage_descriptor =
+    internal_static_WorkSteal_descriptor =
       getDescriptor().getMessageTypes().get(3);
+    internal_static_WorkSteal_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_WorkSteal_descriptor,
+        new java.lang.String[] { "Stealtype", });
+    internal_static_WorkMessage_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Worktype", "StateOfLeader", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "RaftMessage", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Steal", "Worktype", "StateOfLeader", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "RaftMessage", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
   }
