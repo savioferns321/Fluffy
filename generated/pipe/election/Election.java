@@ -973,6 +973,15 @@ public final class Election {
      * <code>optional int32 leader_id = 4;</code>
      */
     int getLeaderId();
+
+    /**
+     * <code>required int32 term = 5;</code>
+     */
+    boolean hasTerm();
+    /**
+     * <code>required int32 term = 5;</code>
+     */
+    int getTerm();
   }
   /**
    * Protobuf type {@code RaftMessage}
@@ -1059,6 +1068,11 @@ public final class Election {
             case 32: {
               bitField0_ |= 0x00000008;
               leaderId_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              term_ = input.readInt32();
               break;
             }
           }
@@ -1285,11 +1299,27 @@ public final class Election {
       return leaderId_;
     }
 
+    public static final int TERM_FIELD_NUMBER = 5;
+    private int term_;
+    /**
+     * <code>required int32 term = 5;</code>
+     */
+    public boolean hasTerm() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required int32 term = 5;</code>
+     */
+    public int getTerm() {
+      return term_;
+    }
+
     private void initFields() {
       action_ = pipe.election.Election.RaftMessage.ElectionAction.REQUESTVOTE;
       requestVote_ = pipe.election.Election.VoteRequestMsg.getDefaultInstance();
       leaderHost_ = "";
       leaderId_ = 0;
+      term_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1298,6 +1328,10 @@ public final class Election {
       if (isInitialized == 0) return false;
 
       if (!hasAction()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasTerm()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1319,6 +1353,9 @@ public final class Election {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, leaderId_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(5, term_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1344,6 +1381,10 @@ public final class Election {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, leaderId_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, term_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1475,6 +1516,8 @@ public final class Election {
         bitField0_ = (bitField0_ & ~0x00000004);
         leaderId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        term_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -1523,6 +1566,10 @@ public final class Election {
           to_bitField0_ |= 0x00000008;
         }
         result.leaderId_ = leaderId_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.term_ = term_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1553,12 +1600,19 @@ public final class Election {
         if (other.hasLeaderId()) {
           setLeaderId(other.getLeaderId());
         }
+        if (other.hasTerm()) {
+          setTerm(other.getTerm());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
         if (!hasAction()) {
+          
+          return false;
+        }
+        if (!hasTerm()) {
           
           return false;
         }
@@ -1839,6 +1893,38 @@ public final class Election {
       public Builder clearLeaderId() {
         bitField0_ = (bitField0_ & ~0x00000008);
         leaderId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int term_ ;
+      /**
+       * <code>required int32 term = 5;</code>
+       */
+      public boolean hasTerm() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>required int32 term = 5;</code>
+       */
+      public int getTerm() {
+        return term_;
+      }
+      /**
+       * <code>required int32 term = 5;</code>
+       */
+      public Builder setTerm(int value) {
+        bitField0_ |= 0x00000010;
+        term_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 term = 5;</code>
+       */
+      public Builder clearTerm() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        term_ = 0;
         onChanged();
         return this;
       }
@@ -2445,15 +2531,15 @@ public final class Election {
       "\n\013leader_host\030\003 \001(\t\022\021\n\tleader_id\030\004 \001(\005\"A" +
       "\n\013LeaderState\022\021\n\rLEADERUNKNOWN\020\001\022\017\n\013LEAD" +
       "ERALIVE\020\002\022\016\n\nLEADERDEAD\020\003\"2\n\013LeaderQuery" +
-      "\022\022\n\016WHOISTHELEADER\020\001\022\017\n\013THELEADERIS\020\002\"\302\001" +
+      "\022\022\n\016WHOISTHELEADER\020\001\022\017\n\013THELEADERIS\020\002\"\320\001" +
       "\n\013RaftMessage\022+\n\006action\030\001 \002(\0162\033.RaftMess" +
       "age.ElectionAction\022%\n\014request_vote\030\002 \001(\013" +
       "2\017.VoteRequestMsg\022\023\n\013leader_host\030\003 \001(\t\022\021",
-      "\n\tleader_id\030\004 \001(\005\"7\n\016ElectionAction\022\017\n\013R" +
-      "EQUESTVOTE\020\001\022\n\n\006LEADER\020\002\022\010\n\004VOTE\020\003\"N\n\016Vo" +
-      "teRequestMsg\022\024\n\014candidate_id\030\001 \001(\005\022\024\n\014vo" +
-      "te_granted\030\002 \001(\010\022\020\n\010voter_id\030\003 \001(\005B\021\n\rpi" +
-      "pe.electionH\001"
+      "\n\tleader_id\030\004 \001(\005\022\014\n\004term\030\005 \002(\005\"7\n\016Elect" +
+      "ionAction\022\017\n\013REQUESTVOTE\020\001\022\n\n\006LEADER\020\002\022\010" +
+      "\n\004VOTE\020\003\"N\n\016VoteRequestMsg\022\024\n\014candidate_" +
+      "id\030\001 \001(\005\022\024\n\014vote_granted\030\002 \001(\010\022\020\n\010voter_" +
+      "id\030\003 \001(\005B\021\n\rpipe.electionH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2478,7 +2564,7 @@ public final class Election {
     internal_static_RaftMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_RaftMessage_descriptor,
-        new java.lang.String[] { "Action", "RequestVote", "LeaderHost", "LeaderId", });
+        new java.lang.String[] { "Action", "RequestVote", "LeaderHost", "LeaderId", "Term", });
     internal_static_VoteRequestMsg_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_VoteRequestMsg_fieldAccessorTable = new

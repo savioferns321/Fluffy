@@ -1,6 +1,7 @@
 package gash.router.server;
 
 import java.rmi.UnexpectedException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +9,15 @@ import org.slf4j.LoggerFactory;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.persistence.Dbhandler;
 import gash.router.persistence.RiakHandler;
+import gash.router.raft.leaderelection.ElectionManagement;
 import gash.server.util.MessageGeneratorUtil;
+import global.Global.GlobalCommandMessage;
 import io.netty.channel.Channel;
 import pipe.common.Common.Task;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
-public class InboundCommander extends Thread{
+public class InboundCommander extends Thread {
 
 	private QueueManager manager;
 	protected static Logger logger = LoggerFactory.getLogger(InboundCommander.class);
@@ -29,8 +32,8 @@ public class InboundCommander extends Thread{
 	@Override
 	public void run() {
 
-		//Poll the queue for messages
-		while(true){
+		// Poll the queue for messages
+		while (true) {
 			boolean isSuccess = false;
 			try {
 				CommandMessageChannelCombo currCombo = manager.dequeueInboundCommmand();
@@ -89,7 +92,36 @@ public class InboundCommander extends Thread{
 					//Get the no. of chunks in the file FROM ITS OWN DB, although the file is to be read from another node.
 					int chunkCount = Dbhandler.getChuncks(currMsg.getTask().getFilename());	
 					
-					if(currMsg.getTask().getNoOfChunks() == 1 && RiakHandler.getFile(currMsg.getTask().getFilename()) != null){
+					if (chunkCount == 0) {
+						// File is not present in this cluster
+						GlobalCommandMessage globalCommandMessage = MessageGeneratorUtil.getInstance()
+								.generateReadRequestGlobalCommmandMessage(currMsg.getTask().getFilename(),
+										NodeChannelManager.currentLeaderID);
+
+						// Fetch the Global Command Message Adapters channel to
+						// forward request
+						Channel globalCommandAdapterChannel = NodeChannelManager.getGlobalCommandAdapterChannel();
+						if (globalCommandAdapterChannel != null)
+							logger.debug("The channel has been created with global command adapter channel");
+						else{
+							globalCommandAdapterChannel = ElectionManagement.globalChannel;
+						}
+						if (globalCommandAdapterChannel != null && globalCommandAdapterChannel.isActive()
+								&& globalCommandAdapterChannel.isWritable()) {
+							/*
+							 * The client map generally saves requestID and
+							 * Client channel mapping but in this case the map
+							 * will store filename as the key
+							 */
+							ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = NodeChannelManager
+									.getClientChannelMap();
+							clientChannelMap.put(currMsg.getTask().getFilename(), currCombo);
+							manager.enqueueGlobalOutboundCommand(globalCommandMessage, globalCommandAdapterChannel);
+						} else {
+							logger.error(
+									"The Global Channel is not available to handle " + globalCommandAdapterChannel);
+						}
+					} else if(currMsg.getTask().getNoOfChunks() == 1 && RiakHandler.getFile(currMsg.getTask().getFilename()) != null){
 						//Fetch from in-memory db
 						
 						//Generate proper command message to sent to client.
@@ -101,7 +133,7 @@ public class InboundCommander extends Thread{
 						currChannel.flush();
 		
 					}
-					else if(chunkCount != 0){
+					else{
 						//Setting the chunk count to be decremented each time this file's chunk is sent back to the client.
 						currCombo.setChunkCount(chunkCount);
 						

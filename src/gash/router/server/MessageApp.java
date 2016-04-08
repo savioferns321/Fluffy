@@ -27,15 +27,16 @@ public class MessageApp {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 0) {
-			System.out.println("usage: server <config file>");
+		if (args.length < 2) {
+			System.out.println("usage: server <Config File> <Global Config File>");
 			System.exit(1);
 		}
 
 		File cf = new File(args[0]);
-		try {
+		File globalCf = new File(args[1]);
 		
-			MessageServer svr = new MessageServer(cf);
+		try {
+			MessageServer svr = new MessageServer(cf, globalCf);
 			svr.startServer();
 		} catch (Exception e) {
 			e.printStackTrace();

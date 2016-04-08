@@ -11,11 +11,11 @@ public class RaftStateMachine implements StateMachine {
 
 	static Logger logger = LoggerFactory.getLogger("StateMachine");
 
-	private ElectionState machineState;
+	private static ElectionState machineState;
 
 	public RaftStateMachine() {
 		logger.info("Node became a follower");
-		this.machineState = ElectionState.Follower;
+		machineState = ElectionState.Follower;
 	}
 
 

@@ -11,11 +11,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.container.GlobalRoutingConf;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.work.Work.WorkMessage;
 
 public class NodeChannelManager {
@@ -33,6 +38,8 @@ public class NodeChannelManager {
 	public static String currentLeaderAddress;
 	public static boolean amIPartOfNetwork = true;
 	private static int delay = 3000;
+	private static Channel globalCommandAdapterChannel;
+	private static ConcurrentHashMap<Integer, Channel> globalCommandChannel = new ConcurrentHashMap<Integer, Channel>();
 
 	
 	public static void setNodeId(int nodeId) {
@@ -59,7 +66,7 @@ public class NodeChannelManager {
 	public static int numberOfActiveChannels() {
 		return node2ChannelMap.size();
 	}
-	
+
 	public static Channel getChannelByNodeId(int nodeId) {
 		return node2ChannelMap.get(nodeId);
 	}
@@ -116,6 +123,7 @@ public class NodeChannelManager {
 					
 			ChannelFuture cf = channel.write(message);
 			channel.flush();
+
 			cf.awaitUninterruptibly();
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.info("Failed to write the message to the channel ");
@@ -136,10 +144,10 @@ public class NodeChannelManager {
 					addToNode2ChannelMap(inboundEdges, outboundEdges);
 					System.out.println("node2Channel Map : " + node2ChannelMap.toString());
 					// Make it efficient
-					Thread.sleep(NodeChannelManager.delay);
+					//Thread.sleep(NodeChannelManager.delay);
 				}
 
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				logger.error("An error has occured ", e);
 			}
 		}
@@ -244,4 +252,44 @@ public class NodeChannelManager {
 		}
 
 	}
+
+	public static Channel getChannelByHostAndPort(ServerState state, GlobalRoutingConf globalRoutingConf) {
+		Bootstrap b = new Bootstrap();
+		NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup();
+		WorkInit workInit = new WorkInit(state, false);
+
+		try {
+			b.group(nioEventLoopGroup).channel(NioSocketChannel.class).handler(workInit);
+			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
+			b.option(ChannelOption.TCP_NODELAY, true);
+			b.option(ChannelOption.SO_KEEPALIVE, true);
+			// Make the connection attempt.
+		} catch (Exception e) {
+			logger.error("Could not connect to the host " + globalRoutingConf.getGlobalCommandHost() + " at port "
+					+ globalRoutingConf.getGlobalCommandPort());
+			return null;
+		}
+		logger.debug("GlobalRoutingConf" + globalRoutingConf.toString());
+		return b.connect(globalRoutingConf.getGlobalCommandHost(), globalRoutingConf.getGlobalCommandPort())
+				.syncUninterruptibly().channel();
+
+	}
+
+	public static Channel getGlobalCommandAdapterChannel() {
+		if (!NodeChannelManager.globalCommandChannel.isEmpty()) {
+			NodeChannelManager.globalCommandChannel.get(5);
+		}
+		return globalCommandAdapterChannel;
+	}
+
+	public static void setGlobalCommandAdapterChannel(GlobalRoutingConf globalRoutingConf,
+			Channel globalCommandAdapterChannel) {
+		NodeChannelManager.globalCommandChannel.put(globalRoutingConf.getNodeId(), globalCommandAdapterChannel);
+		NodeChannelManager.globalCommandAdapterChannel = globalCommandAdapterChannel;
+	}
+
+	public static ConcurrentHashMap<String, CommandMessageChannelCombo> getClientChannelMap() {
+		return clientChannelMap;
+	}
+
 }

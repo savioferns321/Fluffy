@@ -28,10 +28,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import deven.monitor.client.MonitorClient;
+import gash.router.cluster.GlobalEdgeMonitor;
+import gash.router.cluster.GlobalInit;
+import gash.router.cluster.GlobalServerState;
+import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
 import gash.router.raft.leaderelection.MessageBuilder;
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.tasks.NoOpBalancer;
 import gash.router.server.tasks.TaskList;
@@ -47,6 +52,8 @@ import pipe.monitor.Monitor.ClusterMonitor;
 public class MessageServer {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 	private static long tick=0;
+	private String monitorHost;
+	private int monitorPort;
 
 	protected static HashMap<Integer, ServerBootstrap> bootstrap = new HashMap<Integer, ServerBootstrap>();
 
@@ -54,6 +61,8 @@ public class MessageServer {
 	// public static final String sPoolSize = "pool.size";
 
 	protected RoutingConf conf;
+	protected GlobalRoutingConf globalConf;
+
 	protected boolean background = true;
 	public static int nodeId;
 	
@@ -67,12 +76,14 @@ public class MessageServer {
 	 * 
 	 * @param cfg
 	 */
-	public MessageServer(File cfg) {
+	public MessageServer(File cfg, File globalCfg) {
 		init(cfg);
+		initGlobalConfig(globalCfg);
 	}
 
-	public MessageServer(RoutingConf conf) {
+	public MessageServer(RoutingConf conf, GlobalRoutingConf globalConf) {
 		this.conf = conf;
+		this.globalConf = globalConf;
 	}
 
 	public void release() {
@@ -83,10 +94,16 @@ public class MessageServer {
 		QueueManager.initManager();
 		DataReplicationManager.initDataReplicationManager();
 		MessageGeneratorUtil.initGenerator();
-		MessageGeneratorUtil.setRoutingConf(conf);
+		MessageGeneratorUtil.setRoutingConf(conf, globalConf);
 		MessageBuilder.setRoutingConf(conf);
-		StartWorkCommunication comm = new StartWorkCommunication(conf);
+
+
+		StartGlobalCommunication globalComm = new StartGlobalCommunication(this.globalConf);
+		logger.info("Starting global communication");
+		Thread gThread = new Thread(globalComm);
+		gThread.start();
 		
+		StartWorkCommunication comm = new StartWorkCommunication(conf);
 		logger.info("Work starting");
 
 		// We always start the worker in the background
@@ -118,9 +135,11 @@ public class MessageServer {
 		if (NodeChannelManager.amIPartOfNetwork) {
 			while (!ElectionManagement.isReadyForElection())
 				;
-			ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf);
+			ElectionManagement electionManagement = ElectionManagement.initElectionManagement(conf,
+					globalConf);
 			ElectionManagement.startElection();
 		}
+
 
 	}
 	
@@ -162,7 +181,36 @@ public class MessageServer {
 		}
 	}
 
+	private void initGlobalConfig(File globalCfg) {
+		if (!globalCfg.exists())
+			throw new RuntimeException(globalCfg.getAbsolutePath() + " not found");
+		// resource initialization - how message are processed
+		BufferedInputStream br = null;
+		try {
+			byte[] raw = new byte[(int) globalCfg.length()];
+			br = new BufferedInputStream(new FileInputStream(globalCfg));
+			br.read(raw);
+			this.globalConf = JsonUtil.decode(new String(raw), GlobalRoutingConf.class);
+			if (!verifyGlobalConf(this.globalConf))
+				throw new RuntimeException("verification of configuration failed");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	private boolean verifyConf(RoutingConf conf) {
+		return (conf != null);
+	}
+
+	private boolean verifyGlobalConf(GlobalRoutingConf conf) {
 		return (conf != null);
 	}
 
@@ -297,6 +345,78 @@ public class MessageServer {
 	}
 
 	/**
+	 * initialize netty communication
+	 * 
+	 * @param port
+	 *            The port to listen to
+	 */
+	private static class StartGlobalCommunication implements Runnable {
+		GlobalRoutingConf globalRoutingConfig;
+		GlobalServerState state;
+
+		public StartGlobalCommunication(GlobalRoutingConf conf) {
+			if (conf == null)
+				throw new RuntimeException("missing global conf");
+			this.globalRoutingConfig = conf;
+			state = new GlobalServerState();
+			state.setConf(conf);
+
+			GlobalEdgeMonitor gemon = new GlobalEdgeMonitor(state);
+			Thread t = new Thread(gemon);
+			t.start();
+		}
+
+		public void run() {
+			// construct boss and worker threads (num threads = number of cores)
+
+			EventLoopGroup bossGroup = new NioEventLoopGroup();
+			EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+			try {
+				ServerBootstrap b = new ServerBootstrap();
+				System.out.println("Global Command Host & Port ::: " + globalRoutingConfig.getGlobalCommandHost()
+						+ globalRoutingConfig.getGlobalCommandPort());
+
+				bootstrap.put(globalRoutingConfig.getGlobalCommandPort(), b);
+
+				b.group(bossGroup, workerGroup);
+				b.channel(NioServerSocketChannel.class);
+				b.option(ChannelOption.SO_BACKLOG, 100);
+				b.option(ChannelOption.TCP_NODELAY, true);
+				b.option(ChannelOption.SO_KEEPALIVE, true);
+				// b.option(ChannelOption.MESSAGE_SIZE_ESTIMATOR);
+
+				boolean compressComm = false;
+				b.childHandler(new GlobalInit(globalRoutingConfig, compressComm));
+
+				// Start the server.
+				logger.info("Starting Global Command server (" + globalRoutingConfig.getNodeId()
+						+ "), listening on port = " + globalRoutingConfig.getGlobalCommandPort());
+				ChannelFuture f = b.bind(globalRoutingConfig.getGlobalCommandPort()).syncUninterruptibly();
+
+				logger.info(f.channel().localAddress() + " -> open: " + f.channel().isOpen() + ", write: "
+						+ f.channel().isWritable() + ", act: " + f.channel().isActive());
+
+				// block until the server socket is closed.
+				f.channel().closeFuture().sync();
+
+			} catch (Exception ex) {
+				// on bind().sync()
+				logger.error("Failed to setup handler.", ex);
+			} finally {
+				// Shut down all event loops to terminate all threads.
+				bossGroup.shutdownGracefully();
+				workerGroup.shutdownGracefully();
+
+				// shutdown monitor
+				GlobalEdgeMonitor emon = state.getEmon();
+				if (emon != null)
+					emon.shutdown();
+			}
+		}
+	}
+
+	/**
 	 * help with processing the configuration information
 	 * 
 	 * @author gash
@@ -355,6 +475,13 @@ public class MessageServer {
 			
 		}
 		
+	}
+	
+	public void setMonitorHost(String monitorHost) {
+		this.monitorHost = monitorHost;
+	}
+	public void setMonitorPort(int monitorPort) {
+		this.monitorPort = monitorPort;
 	}
 
 

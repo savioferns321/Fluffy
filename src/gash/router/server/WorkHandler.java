@@ -20,13 +20,16 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
+import gash.router.raft.leaderelection.ElectionTImer;
 import gash.router.raft.leaderelection.MessageBuilder;
+import gash.router.raft.leaderelection.RandomTimeoutGenerator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -83,13 +86,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		try {
 			
 			if (msg.getStateOfLeader() == StateOfLeader.LEADERALIVE) {
-				// exec.shutdownNow();
-				// int currentTimeout = RandomTimeoutGenerator.randTimeout() *
-				// this.state.getConf().getNodeId();
-				// exec = Executors.newSingleThreadScheduledExecutor();
-				// exec.schedule(new ElectionTImer(), (long) currentTimeout,
-				// TimeUnit.MILLISECONDS);
-				// System.out.println("Leader is Alive ");
+				System.out.println("Leader is Alive ");
+
+				exec.shutdownNow();
+				int currentTimeout = RandomTimeoutGenerator.randTimeout() * state.getConf().getNodeId();
+				exec = Executors.newSingleThreadScheduledExecutor();
+				//ElectionManagement.becomeFollower();
+				exec.schedule(new ElectionTImer(), (long) currentTimeout, TimeUnit.MILLISECONDS);
 				// Thread.sleep(1000);
 				// electionTimer.purge();
 				// this.startElectionTimer();
@@ -203,7 +206,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				WorkMessage.Builder rb = WorkMessage.newBuilder();
 				rb.setPing(true);
 				// channel.writeAndFlush(rb.build());
-			} else if (msg.getHeader().getElection()) {
+			} else if (msg.getHeader().hasElection() && msg.getHeader().getElection()) {
 				// call the election handler to handle this request
 				System.out.println(" ---- Message for election has come ---- ");
 				ElectionManagement.processElectionMessage(channel, msg);
@@ -284,7 +287,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
 		InetAddress inetAddress = socketAddress.getAddress();
 		logger.error(inetAddress.getHostAddress());
-		state.getEmon().getOutboundEdges().removeNodeByIp(inetAddress.getHostAddress());
+		//state.getEmon().getOutboundEdges().removeNodeByIp(inetAddress.getHostAddress());
 	}
 
 }

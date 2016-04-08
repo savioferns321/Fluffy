@@ -12,11 +12,12 @@ echo server home = $SVR_HOME
 #cd ${SVR_HOME}
 
 JAVA_MAIN='gash.router.server.MessageApp'
-JAVA_ARGS="$1"
+JAVA_ARGS_1="$1"
+JAVA_ARGS_2="$2"
 echo -e "\n** config: ${JAVA_ARGS} **\n"
 
 # superceded by http://www.oracle.com/technetwork/java/tuning-139912.html
 JAVA_TUNE='-server -Xms500m -Xmx1000m'
 
 
-java ${JAVA_TUNE} -cp .:${SVR_HOME}/lib/'*':${SVR_HOME}/classes ${JAVA_MAIN} ${JAVA_ARGS} 
+java ${JAVA_TUNE} -cp .:${SVR_HOME}/lib/'*':${SVR_HOME}/classes ${JAVA_MAIN} ${JAVA_ARGS_1} ${JAVA_ARGS_2} 

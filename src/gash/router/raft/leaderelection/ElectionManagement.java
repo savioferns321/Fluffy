@@ -8,28 +8,35 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.server.NodeChannelManager;
+import gash.router.server.ServerState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import pipe.election.Election.RaftMessage.ElectionAction;
+import pipe.election.Election.RaftMessage;
 import pipe.work.Work.WorkMessage;
 
 public class ElectionManagement {
+	protected static Logger logger = LoggerFactory.getLogger("ElectionManagement");
 
 	protected static AtomicReference<ElectionManagement> instance = new AtomicReference<ElectionManagement>();
 
 	private static RoutingConf routingConf = null;
+	private static GlobalRoutingConf globalRoutingConf = null;
 	private static RaftStateMachine raftStateMachine;
 	private static Timer electionTimer;
-	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
-	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 1;
+	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap;
+	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 2;
 	private static int currentVoteCount = 1;
-
-	private static Logger logger;
+	public static Channel globalChannel;
+	private static long currentTimeoutTime = 0;
+	private static ConcurrentHashMap<Integer, Boolean> voteCastedInCurrentTerm;
+	private static int currentTerm = 0;
+	private static boolean isLeaderAlive = false;
 
 	public ElectionManagement() {
-		logger = LoggerFactory.getLogger(getClass());
+
 	}
 
 	public static ElectionManagement getInstance() {
@@ -39,11 +46,15 @@ public class ElectionManagement {
 		return instance.get();
 	}
 
-	public static ElectionManagement initElectionManagement(RoutingConf routingConf) {
+	public static ElectionManagement initElectionManagement(RoutingConf routingConf,
+			GlobalRoutingConf globalRoutingConf) {
 		ElectionManagement.routingConf = routingConf;
 		ElectionManagement.raftStateMachine = new RaftStateMachine();
-		electionTimer = new Timer();
-
+		ElectionManagement.globalRoutingConf = globalRoutingConf;
+		ElectionManagement.electionTimer = new Timer();
+		ElectionManagement.voteCastedInCurrentTerm = new ConcurrentHashMap<Integer, Boolean>();
+		ElectionManagement.voteCastedInCurrentTerm.put(currentTerm, false);
+		ElectionManagement.voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
 		MessageBuilder.setRoutingConf(routingConf);
 		instance.compareAndSet(null, new ElectionManagement());
 		return instance.get();
@@ -60,7 +71,8 @@ public class ElectionManagement {
 	private static void sendMessage() throws Exception {
 		if (raftStateMachine.isCandidate()) {
 			System.out.println("------ Building the election Message -----");
-			WorkMessage electionMessage = MessageBuilder.buildElectionMessage();
+			currentTimeoutTime = System.currentTimeMillis();
+			WorkMessage electionMessage = MessageBuilder.buildElectionMessage(currentTimeoutTime, currentTerm);
 			System.out.println("Election Message " + electionMessage.toString());
 			NodeChannelManager.broadcast(electionMessage);
 		}
@@ -68,58 +80,149 @@ public class ElectionManagement {
 
 	// To process incoming election work messages from other nodes
 	public static synchronized void processElectionMessage(Channel incomingChannel, WorkMessage electionWorkMessage) {
-		// If this node receives any Request Vote message
-		if (electionWorkMessage.getRaftMessage().getAction() == ElectionAction.REQUESTVOTE) {
-			if (raftStateMachine.isFollower()) {
-				WorkMessage electionResponseMessage = MessageBuilder.buildElectionResponseMessage(
-						electionWorkMessage.getRaftMessage().getRequestVote().getCandidateId(), true);
-				if (!voteCheckMap.containsKey(routingConf.getNodeId())) {
-					voteCheckMap.put(routingConf.getNodeId(), true);
-				}
-				System.out.println("Vote Casted in favour of : "
-						+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
-				// incomingChannel.writeAndFlush(electionResponseMessage);
-				
-				ChannelFuture cf = incomingChannel.write(electionResponseMessage);
-				incomingChannel.flush();
-				cf.awaitUninterruptibly();
-				if (cf.isDone() && !cf.isSuccess()) {
-					logger.error("Failed to send replication message to server");
-				}
-			}
-		}
+		RaftMessage raftMessage = electionWorkMessage.getRaftMessage();
 
-		// If the other node is casting vote in the favor of this node
-		if (electionWorkMessage.getRaftMessage().getAction() == ElectionAction.VOTE && raftStateMachine.isCandidate()) {
-			// Count the votes, If there is majority, send out leader message to
-			// all.
-			// To check whether the this request vote is for current node or not
-			if (electionWorkMessage.getRaftMessage().getRequestVote().getCandidateId() == routingConf.getNodeId()) {
-				boolean amILeader = decideIfLeader(electionWorkMessage);
-				if (amILeader) {
-					try {
-						raftStateMachine.becomeLeader();
-						System.out.println("Node " + routingConf.getNodeId() + " became leader");
-						WorkMessage leaderResponseMessage = MessageBuilder
-								.buildLeaderResponseMessage(routingConf.getNodeId());
-						NodeChannelManager.broadcast(leaderResponseMessage);
-						// Current Node is the leader
-						NodeChannelManager.currentLeaderID = routingConf.getNodeId();
-						NodeChannelManager.currentLeaderAddress = leaderResponseMessage.getRaftMessage()
-								.getLeaderHost();
-						
-						//Start the scheduler to send node status to the monitor.
-						
-					} catch (Exception exception) {
-						System.out.println("An error has occured while broadcasting the message.");
+		switch (raftMessage.getAction()) {
+		case REQUESTVOTE:
+			// Check if the current term is less than the new term i.e. new
+			// election has begin
+			if (currentTerm < raftMessage.getTerm()) {
+				currentTerm = raftMessage.getTerm();
+				if (voteCastedInCurrentTerm != null)
+					ElectionManagement.voteCastedInCurrentTerm.put(currentTerm, false);
+				else {
+					ElectionManagement.voteCastedInCurrentTerm = new ConcurrentHashMap<Integer, Boolean>();
+					ElectionManagement.voteCastedInCurrentTerm.put(currentTerm, false);
+				}
+
+			}
+		
+
+			switch (ElectionManagement.raftStateMachine.getState()) {
+			case Follower:
+				// If this node receives any Request Vote message and has not
+				// yet voted in current term
+				if (!voteCastedInCurrentTerm.get(currentTerm)) {
+					WorkMessage electionResponseMessage = MessageBuilder.buildElectionResponseMessage(
+							electionWorkMessage.getRaftMessage().getRequestVote().getCandidateId(), true,
+							electionWorkMessage.getRaftMessage().getTerm());
+					if (!voteCheckMap.containsKey(routingConf.getNodeId())) {
+						voteCheckMap.put(routingConf.getNodeId(), true);
+					}
+					logger.debug("Vote Casted in favour of : "
+							+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
+					ChannelFuture cf = incomingChannel.write(electionResponseMessage);
+					incomingChannel.flush();
+
+					cf.awaitUninterruptibly();
+					voteCastedInCurrentTerm.put(currentTerm, true);
+				} else {
+					logger.debug("Already casted vote for this term, Not casting again");
+				}
+				break;
+			case Candidate:
+				/*
+				 * Vote request has come to a candidate node. Various conditions
+				 * are possible in this situation
+				 */
+				if (currentTimeoutTime < electionWorkMessage.getHeader().getTime()) {
+					// Discard this vote request as the current candidate is the
+					// real one to be considered for leader.
+
+				} else {
+					// The message from the sender candidate is correct and
+					// should be considered. Stepping down to follower state
+					// TODO check if we need to send out any response
+					raftStateMachine.becomeFollower();
+				}
+				break;
+			case Leader:
+				logger.debug("The leader received the vote request");
+				// Check if the term is the current one or new term
+
+				if (currentTerm < raftMessage.getTerm()) {
+					currentTerm = raftMessage.getTerm();
+					raftStateMachine.becomeFollower();
+
+					WorkMessage electionResponseMessage = MessageBuilder.buildElectionResponseMessage(
+							electionWorkMessage.getRaftMessage().getRequestVote().getCandidateId(), true,
+							electionWorkMessage.getRaftMessage().getTerm());
+					if (!voteCheckMap.containsKey(routingConf.getNodeId())) {
+						voteCheckMap.put(routingConf.getNodeId(), true);
+					}
+					logger.debug("Vote Casted in favour of : "
+							+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
+					incomingChannel.writeAndFlush(electionResponseMessage);
+					voteCastedInCurrentTerm.put(currentTerm, true);
+				} else {
+					logger.debug("The current leader is the correct Leader");
+				}
+
+				break;
+
+			default:
+				break;
+			}// End of raftStateMachine Switch case
+
+			break;
+		case VOTE:
+			// If the other node is casting vote in the favor of this node
+			if (raftStateMachine.isCandidate()) {
+				/*
+				 * Count the votes, If there is majority, send out leader
+				 * message to all. To check whether the this request vote is for
+				 * current node or not
+				 */
+				if (electionWorkMessage.getRaftMessage().getRequestVote().getCandidateId() == routingConf.getNodeId()) {
+					boolean amILeader = decideIfLeader(electionWorkMessage);
+					if (amILeader) {
+						try {
+							currentTimeoutTime = System.currentTimeMillis();
+							raftStateMachine.becomeLeader();
+							System.out.println("Node " + routingConf.getNodeId() + " became leader");
+							WorkMessage leaderResponseMessage = MessageBuilder
+									.buildLeaderResponseMessage(routingConf.getNodeId(), currentTerm);
+							NodeChannelManager.broadcast(leaderResponseMessage);
+							// Current Node is the leader
+							NodeChannelManager.currentLeaderID = routingConf.getNodeId();
+							NodeChannelManager.currentLeaderAddress = leaderResponseMessage.getRaftMessage()
+									.getLeaderHost();
+
+							/*
+							 * Once the leader is up, leader should be connected
+							 * to the Global Command Message Adapter Running on
+							 * one of the hosts in the cluster
+							 */
+							ServerState serverState = new ServerState();
+							serverState.setConf(routingConf);
+							Channel globalAdaptersChannel = NodeChannelManager.getChannelByHostAndPort(serverState,
+									globalRoutingConf);
+							if (globalAdaptersChannel != null && globalAdaptersChannel.isActive()
+									&& globalAdaptersChannel.isWritable()) {
+								/*
+								 * The channel created should be active and
+								 * writable to be considered for communication
+								 */
+								System.out.println("Global Adapters Channel " + globalAdaptersChannel);
+								NodeChannelManager.setGlobalCommandAdapterChannel(globalRoutingConf,
+										globalAdaptersChannel);
+								globalChannel = globalAdaptersChannel;
+							} else {
+								logger.error("The global channel could not be created" + globalAdaptersChannel);
+							}
+
+						} catch (Exception exception) {
+							System.out.println("An error has occured while broadcasting the message.");
+						}
+					} else {
+						logger.debug("Still needs votes to win");
 					}
 				}
+
 			}
-		}
-
-		if (electionWorkMessage.getRaftMessage().getAction() == ElectionAction.LEADER) {
+			break;
+		case LEADER:
 			try {
-
 				System.out.println("Current Leader ID : " + electionWorkMessage.getRaftMessage().getLeaderId());
 				// Saving current leader id in NodeChannelManager to use it
 				// across the node
@@ -127,8 +230,12 @@ public class ElectionManagement {
 				NodeChannelManager.currentLeaderAddress = electionWorkMessage.getRaftMessage().getLeaderHost();
 
 			} catch (Exception exception) {
-				System.out.println("Something is not correct");
+				logger.error("Something is not correct", exception);
 			}
+
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -136,14 +243,20 @@ public class ElectionManagement {
 		// TODO put logic to count the number of votes received so far and
 		// decide the leader
 		if (electionWorkMessage.getRaftMessage().getRequestVote().getVoteGranted()) {
-			/*
-			 * currentVoteCount++; if (currentVoteCount >
-			 * ((NodeChannelManager.getNode2ChannelMap().size() / 2) + 1))
-			 * return true; else return false;
-			 */
-			return true;
+
+			currentVoteCount++;
+			if (currentVoteCount >= ((NodeChannelManager.getNode2ChannelMap().size() / 2 + 1)))
+				return true;
+			else
+				return false;
+
+			// return true;
 		}
 		return false;
+	}
+
+	public static void becomeFollower() {
+		ElectionManagement.raftStateMachine.becomeFollower();
 	}
 
 	public static void resetElection() {
@@ -151,6 +264,8 @@ public class ElectionManagement {
 		raftStateMachine.becomeFollower();
 		NodeChannelManager.currentLeaderID = 0;
 		voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
+		currentVoteCount = 0;
+		ElectionManagement.initElectionManagement(routingConf,globalRoutingConf);
 	}
 
 	private static void startElectionTimer() {
@@ -175,6 +290,8 @@ public class ElectionManagement {
 			if (raftStateMachine.isFollower() && !voteCheckMap.containsKey(routingConf.getNodeId())) {
 				raftStateMachine.becomeCandidate();
 				try {
+					currentTerm++;
+
 					ElectionManagement.sendMessage();
 				} catch (Exception exception) {
 					System.out.println("An error has occured while sending message");

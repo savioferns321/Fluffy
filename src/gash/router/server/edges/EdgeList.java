@@ -21,7 +21,7 @@ import gash.router.server.NodeChannelManager;
 import io.netty.channel.Channel;
 
 public class EdgeList {
-	protected ConcurrentHashMap<Integer, EdgeInfo> map = new ConcurrentHashMap<Integer, EdgeInfo>();
+	public ConcurrentHashMap<Integer, EdgeInfo> map = new ConcurrentHashMap<Integer, EdgeInfo>();
 
 	public EdgeList() {
 	}
@@ -94,9 +94,9 @@ public class EdgeList {
 	public void clear() {
 		map.clear();
 	}
-	
-	public boolean isEmpty(){
-		if(map.size()>0){
+
+	public boolean isEmpty() {
+		if (map.size() > 0) {
 			return false;
 		}
 		return true;

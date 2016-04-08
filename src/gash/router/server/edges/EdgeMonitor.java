@@ -321,6 +321,15 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.nodeState = nodeState;
 	}
 
+	public void removeNodeByIp(String ip) {
+		for (Integer curr : outboundEdges.map.keySet()) {
+			if (outboundEdges.map.get(curr).getHost().equals(ip)) {
+				outboundEdges.map.remove(curr);
+				NodeChannelManager.node2ChannelMap.remove(curr);
+			}
+		}
+	}
+
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection

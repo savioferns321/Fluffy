@@ -41,6 +41,7 @@ class BasicClient:
         if len(message) > 1024:
             print('message exceeds 1024 size')
             
+        print('something')    
         builder = MessageBuilder()
         msg = builder.encode(MessageType.msg,self.name,message,'')
         self.sd.send(msg)

@@ -6,6 +6,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.cluster.InboundGlobalCommander;
+import gash.router.cluster.OutboundGlobalCommander;
+import global.Global.GlobalCommandMessage;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
@@ -31,6 +34,11 @@ public class QueueManager {
 	protected LinkedBlockingDeque<WorkMessageChannelCombo> outboundWorkQ;
 	protected InboundWorker inboundWorker;
 	protected OutboundWorker outboundWorker;
+
+	protected LinkedBlockingDeque<GlobalCommandMessageChannelCombo> inboundGlobalCommandQ;
+	protected LinkedBlockingDeque<GlobalCommandMessageChannelCombo> outboundGlobalCommandQ;
+	protected InboundGlobalCommander inboundGlobalCommander;
+	protected OutboundGlobalCommander outboundGlobalCommander;
 
 	public static QueueManager initManager() {
 		instance.compareAndSet(null, new QueueManager());
@@ -59,6 +67,30 @@ public class QueueManager {
 		inboundWorker.start();
 		outboundWorker = new OutboundWorker(this);
 		outboundWorker.start();
+
+		inboundGlobalCommandQ = new LinkedBlockingDeque<QueueManager.GlobalCommandMessageChannelCombo>();
+		outboundGlobalCommandQ = new LinkedBlockingDeque<QueueManager.GlobalCommandMessageChannelCombo>();
+		inboundGlobalCommander = new InboundGlobalCommander(this);
+		inboundGlobalCommander.start();
+		outboundGlobalCommander = new OutboundGlobalCommander(this);
+		outboundGlobalCommander.start();
+	}
+
+	public LinkedBlockingDeque<GlobalCommandMessageChannelCombo> getInboundGlobalCommandQ() {
+		return inboundGlobalCommandQ;
+	}
+
+	public void setInboundGlobalCommandQ(LinkedBlockingDeque<GlobalCommandMessageChannelCombo> inboundGlobalCommandQ) {
+		this.inboundGlobalCommandQ = inboundGlobalCommandQ;
+	}
+
+	public LinkedBlockingDeque<GlobalCommandMessageChannelCombo> getOutboundGlobalCommandQ() {
+		return outboundGlobalCommandQ;
+	}
+
+	public void setOutboundGlobalCommandQ(
+			LinkedBlockingDeque<GlobalCommandMessageChannelCombo> outboundGlobalCommandQ) {
+		this.outboundGlobalCommandQ = outboundGlobalCommandQ;
 	}
 
 	/*
@@ -159,6 +191,63 @@ public class QueueManager {
 	/*
 	 * End of Work Message methods
 	 */
+/*
+	 * Functions for Global Command Messages
+	 */
+	public void enqueueGlobalInboundCommmand(GlobalCommandMessage message, Channel ch) {
+		try {
+			GlobalCommandMessageChannelCombo entry = new GlobalCommandMessageChannelCombo(ch, message);
+			inboundGlobalCommandQ.put(entry);
+		} catch (InterruptedException e) {
+			logger.error("message not enqueued for processing", e);
+		}
+	}
+
+	public GlobalCommandMessageChannelCombo dequeueGlobalInboundCommmand() throws InterruptedException {
+		return inboundGlobalCommandQ.take();
+	}
+
+	public void enqueueGlobalOutboundCommand(GlobalCommandMessage message, Channel ch) {
+		try {
+			GlobalCommandMessageChannelCombo entry = new GlobalCommandMessageChannelCombo(ch, message);
+			outboundGlobalCommandQ.put(entry);
+		} catch (InterruptedException e) {
+			logger.error("message not enqueued for processing", e);
+		}
+	}
+
+	public GlobalCommandMessageChannelCombo dequeueGlobalOutboundCommmand() throws InterruptedException {
+		return outboundGlobalCommandQ.take();
+	}
+
+	public void returnGlobalOutboundCommand(GlobalCommandMessageChannelCombo msg) throws InterruptedException {
+		outboundGlobalCommandQ.putFirst(msg);
+	}
+
+	public void returnGlobalInboundCommand(GlobalCommandMessageChannelCombo msg) throws InterruptedException {
+		inboundGlobalCommandQ.putFirst(msg);
+	}
+
+	public class GlobalCommandMessageChannelCombo {
+		private Channel channel;
+		private GlobalCommandMessage globalCommandMessage;
+
+		public GlobalCommandMessageChannelCombo(Channel channel, GlobalCommandMessage globalCommandMessage) {
+			super();
+			this.channel = channel;
+			this.globalCommandMessage = globalCommandMessage;
+		}
+
+		public Channel getChannel() {
+			return channel;
+		}
+
+		public GlobalCommandMessage getGlobalCommandMessage() {
+			return globalCommandMessage;
+		}
+
+	}
+
 
 	
 

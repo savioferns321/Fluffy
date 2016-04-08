@@ -7,11 +7,15 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.persistence.MessageDetails;
+import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
+import global.Global.GlobalCommandMessage;
+import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;
@@ -21,10 +25,14 @@ import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkMessage.Worktype;
 import pipe.work.Work.WorkSteal;
 import routing.Pipe.CommandMessage;
+import storage.Storage.Action;
+import storage.Storage.Query;
+import storage.Storage.Response;
 
 public class MessageGeneratorUtil {
 
 	private static RoutingConf conf;
+	private static GlobalRoutingConf globalRoutingConf;
 
 	protected static Logger logger = LoggerFactory.getLogger(MessageGeneratorUtil.class);
 	protected static AtomicReference<MessageGeneratorUtil> instance = new AtomicReference<MessageGeneratorUtil>();
@@ -342,7 +350,147 @@ public class MessageGeneratorUtil {
 	public WorkMessage generateHeartbeatResponse(){
 		return null;
 	}
+	
+	/**
+	 * Global Message construction
+	 */
+	public GlobalCommandMessage generateReadRequestGlobalCommmandMessage(String fileName, int nodeID) {
+		GlobalCommandMessage.Builder builder = GlobalCommandMessage.newBuilder();
+		Query.Builder queryBuilder = Query.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
 
+		headerBuilder.setNodeId(nodeID);
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		queryBuilder.setAction(Action.GET);
+		queryBuilder.setKey(fileName);
+
+		builder.setHeader(headerBuilder);
+		builder.setQuery(queryBuilder);
+
+		return builder.build();
+	}
+
+	public WorkMessage convertGlobalCommandMessage2WorkMessage(GlobalCommandMessage globalCommandMessage) {
+
+		Response globalMessageResponse = globalCommandMessage.getResponse();
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(MessageServer.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb.build());
+		// TODO Set the secret
+		wb.setSecret(1234);
+		wb.setRequestId(globalMessageResponse.getKey());
+		wb.setWorktype(Worktype.SLAVE_READ_DONE);
+
+		Task.Builder tb = Task.newBuilder();
+		tb.setChunkNo(globalMessageResponse.getSequenceNo());
+		tb.setChunk(globalMessageResponse.getData());
+		tb.setNoOfChunks(globalMessageResponse.getMetaData().getSeqSize());
+		tb.setTaskType(TaskType.READ);
+		tb.setFilename(globalMessageResponse.getKey());
+		tb.setSender(String.valueOf(globalCommandMessage.getHeader().getNodeId()));
+		if (globalMessageResponse.getSequenceNo() == globalMessageResponse.getMetaData().getSeqSize()) {
+			wb.setIsProcessed(true);
+		} else {
+			wb.setIsProcessed(false);
+		}
+
+		wb.setTask(tb.build());
+		addLeaderFieldToWorkMessage(wb);
+		return wb.build();
+	}
+
+	public CommandMessage convertGlobalCommandMessage2CommandMessage(GlobalCommandMessage globalCommandMessage) {
+		CommandMessage.Builder commandBuilder = CommandMessage.newBuilder();
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(MessageServer.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb);
+
+		Task.Builder tb = Task.newBuilder();
+		tb.setChunk(globalCommandMessage.getQuery().getData());
+		wb.setTask(tb);
+
+		wb.setSecret(1234);
+		wb.setIsProcessed(false);
+		wb.setWorktype(Worktype.LEADER_WRITE);
+		addLeaderFieldToWorkMessage(wb);
+		return commandBuilder.build();
+	}
+
+	public GlobalCommandMessage generateReadResonseGlobalCommmandMessage(String fileName, byte[] currentByte,
+			int chunkId, int totalChunks) {
+		GlobalCommandMessage.Builder builder = GlobalCommandMessage.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
+		Response.Builder responseBuilder = Response.newBuilder();
+
+		headerBuilder.setNodeId(MessageServer.getNodeId());
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		responseBuilder.setAction(Action.GET);
+		responseBuilder.setKey(fileName);
+		responseBuilder.setData(ByteString.copyFrom(currentByte));
+		responseBuilder.setSuccess(true);
+		responseBuilder.setSequenceNo(chunkId);
+
+		builder.setHeader(headerBuilder);
+		builder.setResponse(responseBuilder);
+
+		return builder.build();
+	}
+
+	public GlobalCommandMessage generateReadFailResponseGlobalCommmandMessage(String fileName) {
+		GlobalCommandMessage.Builder builder = GlobalCommandMessage.newBuilder();
+
+		Response.Builder responseBuilder = Response.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
+		Failure.Builder eb = Failure.newBuilder();
+
+		eb.setId(conf.getNodeId());
+		eb.setRefId(conf.getNodeId());
+		eb.setMessage("The requested file is not available on our cluster");
+
+		headerBuilder.setNodeId(conf.getNodeId());
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		responseBuilder.setAction(Action.GET);
+		responseBuilder.setKey(fileName);
+		responseBuilder.setSuccess(false);
+		responseBuilder.setFailure(eb);
+
+		builder.setHeader(headerBuilder);
+		builder.setResponse(responseBuilder);
+
+		return builder.build();
+	}
+
+	public GlobalCommandMessage generateWriteResponseToGlobalCommandAdapter(GlobalCommandMessage globalCommandMessage,
+			boolean isSuccess) {
+		GlobalCommandMessage.Builder builder = GlobalCommandMessage.newBuilder();
+		Header.Builder headerBuilder = Header.newBuilder();
+		Response.Builder responseBuilder = Response.newBuilder();
+
+		headerBuilder.setNodeId(MessageServer.getNodeId());
+		headerBuilder.setTime(System.currentTimeMillis());
+
+		responseBuilder.setAction(Action.STORE);
+		responseBuilder.setKey(globalCommandMessage.getQuery().getKey());
+		responseBuilder.setSuccess(isSuccess);
+		responseBuilder.setSequenceNo(globalCommandMessage.getQuery().getSequenceNo());
+
+		builder.setHeader(headerBuilder);
+		builder.setResponse(responseBuilder);
+
+		return builder.build();
+
+	}
 
 	private void addLeaderFieldToWorkMessage(WorkMessage.Builder wb) {
 		if (NodeChannelManager.currentLeaderID == 0) {
@@ -359,4 +507,8 @@ public class MessageGeneratorUtil {
 		MessageGeneratorUtil.conf = routingConf;
 	}
 
+	public static void setRoutingConf(RoutingConf routingConf, GlobalRoutingConf globalRoutingConf) {
+		MessageGeneratorUtil.conf = routingConf;
+		MessageGeneratorUtil.globalRoutingConf = globalRoutingConf;
+	}
 }

@@ -15,7 +15,7 @@ import pipe.work.Work.WorkMessage.StateOfLeader;
 public class MessageBuilder {
 	private static RoutingConf routingConf;
 
-	public static WorkMessage buildElectionMessage() {
+	public static WorkMessage buildElectionMessage(long electionTimeoutTime, int currentTerm) {
 		WorkMessage.Builder workMessageBuilder = WorkMessage.newBuilder();
 		Header.Builder headerBuilder = Header.newBuilder();
 		RaftMessage.Builder raftMessageBuilder = RaftMessage.newBuilder();
@@ -23,12 +23,13 @@ public class MessageBuilder {
 
 		headerBuilder.setElection(true);
 		headerBuilder.setNodeId(routingConf.getNodeId());
-		headerBuilder.setTime(System.currentTimeMillis());
+		headerBuilder.setTime(electionTimeoutTime);
 
 		voteRequestMsgBuilder.setCandidateId(routingConf.getNodeId());
 
 		raftMessageBuilder.setAction(ElectionAction.REQUESTVOTE);
-
+		raftMessageBuilder.setTerm(currentTerm);
+		
 		raftMessageBuilder.setRequestVote(voteRequestMsgBuilder);
 		workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
 		workMessageBuilder.setRaftMessage(raftMessageBuilder);
@@ -37,7 +38,7 @@ public class MessageBuilder {
 		return workMessageBuilder.build();
 	}
 
-	public static WorkMessage buildElectionResponseMessage(int candidateId, boolean response) {
+	public static WorkMessage buildElectionResponseMessage(int candidateId, boolean response, int currentTerm) {
 		WorkMessage.Builder workMessageBuilder = WorkMessage.newBuilder();
 		Header.Builder headerBuilder = Header.newBuilder();
 		RaftMessage.Builder raftMessageBuilder = RaftMessage.newBuilder();
@@ -52,7 +53,7 @@ public class MessageBuilder {
 
 		raftMessageBuilder.setAction(ElectionAction.VOTE);
 		raftMessageBuilder.setRequestVote(voteRequestMsgBuilder);
-
+		raftMessageBuilder.setTerm(currentTerm);
 		workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERUNKNOWN);
 		workMessageBuilder.setRaftMessage(raftMessageBuilder);
 		workMessageBuilder.setSecret(1234);
@@ -60,7 +61,7 @@ public class MessageBuilder {
 		return workMessageBuilder.build();
 	}
 
-	public static WorkMessage buildLeaderResponseMessage(int leaderId) {
+	public static WorkMessage buildLeaderResponseMessage(int leaderId, int currentTerm) {
 		WorkMessage.Builder workMessageBuilder = WorkMessage.newBuilder();
 		Header.Builder headerBuilder = Header.newBuilder();
 		RaftMessage.Builder raftMessageBuilder = RaftMessage.newBuilder();
@@ -72,7 +73,8 @@ public class MessageBuilder {
 		raftMessageBuilder.setAction(ElectionAction.LEADER);
 		raftMessageBuilder.setLeaderId(leaderId);
 		raftMessageBuilder.setLeaderHost(HostAddressResolver.getLocalHostAddress());
-
+		raftMessageBuilder.setTerm(currentTerm);
+		
 		workMessageBuilder.setStateOfLeader(StateOfLeader.LEADERALIVE);
 		workMessageBuilder.setRaftMessage(raftMessageBuilder);
 		workMessageBuilder.setHeader(headerBuilder);
