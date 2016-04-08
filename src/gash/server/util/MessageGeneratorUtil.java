@@ -10,7 +10,6 @@ import com.google.protobuf.ByteString;
 import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.persistence.MessageDetails;
-import gash.router.raft.leaderelection.NodeState;
 import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
@@ -140,6 +139,7 @@ public class MessageGeneratorUtil {
 		Task.Builder tb = Task.newBuilder();
 		tb.setChunkNo(1);
 		tb.setNoOfChunks(1);
+		tb.setChunk(ByteString.copyFrom(fileBytes));
 		tb.setFilename(fileName);
 		
 		cb.setTask(tb);

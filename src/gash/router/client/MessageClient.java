@@ -20,8 +20,6 @@ import java.net.UnknownHostException;
 
 import com.google.protobuf.ByteString;
 
-import gash.router.server.NodeChannelManager;
-import gash.router.server.edges.EdgeMonitor;
 import pipe.common.Common.Header;
 import pipe.common.Common.Task;
 import pipe.common.Common.Task.TaskType;

@@ -129,8 +129,7 @@ public class InboundCommander extends Thread {
 								currMsg.getTask().getFilename());
 						
 						//Writing directly back to client
-						currChannel.write(message);
-						currChannel.flush();
+						QueueManager.getInstance().enqueueOutboundCommand(message, currChannel);
 		
 					}
 					else{
