@@ -10,9 +10,9 @@ import com.google.protobuf.ByteString;
 import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.persistence.MessageDetails;
-import gash.router.server.MessageServer;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
+import gash.router.server.application.MessageServer;
 import global.Global.GlobalCommandMessage;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
@@ -501,10 +501,6 @@ public class MessageGeneratorUtil {
 		} else {
 			wb.setStateOfLeader(StateOfLeader.LEADERKNOWN);
 		}
-	}
-
-	public static void setRoutingConf(RoutingConf routingConf) {
-		MessageGeneratorUtil.conf = routingConf;
 	}
 
 	public static void setRoutingConf(RoutingConf routingConf, GlobalRoutingConf globalRoutingConf) {

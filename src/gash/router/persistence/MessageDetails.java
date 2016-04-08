@@ -5,13 +5,13 @@ package gash.router.persistence;
  * Stores the file details in terms of chunks from Mongo.
  *
  */
-public class MessageDetails{
+public class MessageDetails {
 	private String fileName;
 	private byte[] byteData;
 	private int noOfChuncks;
 	private int chunckId;
-	
-	public MessageDetails(String fileName, byte[] bytedata,int noofchunck,int chunckid){
+
+	public MessageDetails(String fileName, byte[] bytedata, int noofchunck, int chunckid) {
 		this.fileName = fileName;
 		this.byteData = bytedata;
 		this.noOfChuncks = noofchunck;
@@ -49,6 +49,5 @@ public class MessageDetails{
 	public void setChunckId(int chunckId) {
 		this.chunckId = chunckId;
 	}
-	
-	
+
 }

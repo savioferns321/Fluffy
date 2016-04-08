@@ -15,6 +15,7 @@ import gash.router.container.GlobalRoutingConf;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
+import gash.router.server.model.CommandMessageChannelCombo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -32,7 +33,7 @@ public class NodeChannelManager {
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
 	private static Queue<Integer> roundRobinQ = new LinkedBlockingQueue<Integer>();
 	private static Queue<Integer> workStealQ = new LinkedBlockingQueue<Integer>();
-	private static int nodeId=0;
+	private static int nodeId = 0;
 
 	public static int currentLeaderID;
 	public static String currentLeaderAddress;
@@ -41,10 +42,10 @@ public class NodeChannelManager {
 	private static Channel globalCommandAdapterChannel;
 	private static ConcurrentHashMap<Integer, Channel> globalCommandChannel = new ConcurrentHashMap<Integer, Channel>();
 
-	
 	public static void setNodeId(int nodeId) {
 		NodeChannelManager.nodeId = nodeId;
 	}
+
 	public static NodeChannelManager getInstance() {
 		if (instance.get() == null)
 			instance.compareAndSet(null, new NodeChannelManager());
@@ -79,7 +80,7 @@ public class NodeChannelManager {
 	public static Channel getNextReadChannel() {
 		if (!roundRobinQ.isEmpty()) {
 			Integer nodeId = roundRobinQ.remove();
-			if(nodeId == currentLeaderID){
+			if (nodeId == currentLeaderID) {
 				roundRobinQ.add(nodeId);
 				nodeId = roundRobinQ.remove();
 			}
@@ -92,25 +93,25 @@ public class NodeChannelManager {
 		logger.info("No channel found ");
 		return null;
 	}
-	
+
 	// Returns next available channel sending worksteal task
-		public static Channel getNextChannelForSteal() {
-			if (!workStealQ.isEmpty()) {
-				Integer nodeId = workStealQ.remove();
-				if(nodeId == currentLeaderID){
-					workStealQ.add(nodeId);
-					nodeId = workStealQ.remove();
-				}
-				if (node2ChannelMap.containsKey(nodeId)) {
-					System.out.println("Node Channel was found");
-					workStealQ.add(nodeId);
-					return node2ChannelMap.get(nodeId);
-				}
+	public static Channel getNextChannelForSteal() {
+		if (!workStealQ.isEmpty()) {
+			Integer nodeId = workStealQ.remove();
+			if (nodeId == currentLeaderID) {
 				workStealQ.add(nodeId);
+				nodeId = workStealQ.remove();
 			}
-			logger.info("No channel found ");
-			return null;
+			if (node2ChannelMap.containsKey(nodeId)) {
+				System.out.println("Node Channel was found");
+				workStealQ.add(nodeId);
+				return node2ChannelMap.get(nodeId);
+			}
+			workStealQ.add(nodeId);
 		}
+		logger.info("No channel found ");
+		return null;
+	}
 
 	public static synchronized void broadcast(WorkMessage message) throws Exception {
 		if (node2ChannelMap.isEmpty()) {
@@ -120,7 +121,7 @@ public class NodeChannelManager {
 		Collection<Channel> allChannel = node2ChannelMap.values();
 		for (Channel channel : allChannel) {
 			System.out.println("Sending message to Channel " + channel.toString());
-					
+
 			ChannelFuture cf = channel.write(message);
 			channel.flush();
 
@@ -144,7 +145,7 @@ public class NodeChannelManager {
 					addToNode2ChannelMap(inboundEdges, outboundEdges);
 					System.out.println("node2Channel Map : " + node2ChannelMap.toString());
 					// Make it efficient
-					//Thread.sleep(NodeChannelManager.delay);
+					// Thread.sleep(NodeChannelManager.delay);
 				}
 
 			} catch (Exception e) {

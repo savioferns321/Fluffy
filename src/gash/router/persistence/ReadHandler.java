@@ -26,7 +26,7 @@ public class ReadHandler {
 	public static ReadHandler getInstance() {
 		return instance.get();
 	}
-	
+
 	public void readFile(WorkMessage workmessage) {
 		ConcurrentHashMap<Integer, Channel> node2ChannelMap = NodeChannelManager.getNode2ChannelMap();
 		if (node2ChannelMap != null && !node2ChannelMap.isEmpty()) {
@@ -41,15 +41,15 @@ public class ReadHandler {
 
 		}
 	}
-	
-	public void readFileDB(WorkMessage workmessage){
-		//String fileName = workmessage.getFileName();
-		Dbhandler dbhandler = new Dbhandler();
-		//int hash = dbhandler.getFile(fileName);
-		//return hash;
-		
+
+	public void readFileDB(WorkMessage workmessage) {
+		// String fileName = workmessage.getFileName();
+		DatabaseHandler dbhandler = new DatabaseHandler();
+		// int hash = dbhandler.getFile(fileName);
+		// return hash;
+
 	}
-	
+
 	private class ReadFile implements Runnable {
 		private WorkMessage workmessage;
 		private Channel nodeChannel;
@@ -62,16 +62,15 @@ public class ReadHandler {
 		@Override
 		public void run() {
 			if (this.nodeChannel.isOpen() && this.nodeChannel.isActive()) {
-				//this.nodeChannel.writeAndFlush(workmessage);
-				
+				// this.nodeChannel.writeAndFlush(workmessage);
+
 				ChannelFuture cf = this.nodeChannel.write(workmessage);
 				this.nodeChannel.flush();
 				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.error("Failed to send replication message to server");
 				}
-				
-				
+
 			} else {
 				logger.error("The nodeChannel to " + nodeChannel.localAddress() + " is not active");
 			}

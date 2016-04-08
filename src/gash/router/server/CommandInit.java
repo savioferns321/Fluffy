@@ -1,6 +1,7 @@
 package gash.router.server;
 
 import gash.router.container.RoutingConf;
+import gash.router.server.handler.CommandHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

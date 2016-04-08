@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gash.router.server.QueueManager;
-import gash.router.server.QueueManager.GlobalCommandMessageChannelCombo;
+import gash.router.server.model.GlobalCommandMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
 public class OutboundGlobalCommander extends Thread {

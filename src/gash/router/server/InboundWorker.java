@@ -3,9 +3,12 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.persistence.Dbhandler;
+import gash.router.cache.RiakHandler;
+import gash.router.persistence.DatabaseHandler;
 import gash.router.persistence.MessageDetails;
-import gash.router.persistence.RiakHandler;
+import gash.router.server.application.MessageServer;
+import gash.router.server.model.CommandMessageChannelCombo;
+import gash.router.server.model.WorkMessageChannelCombo;
 import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
 import pipe.common.Common.Task;
@@ -39,10 +42,10 @@ public class InboundWorker extends Thread {
 				if(currWork.hasSteal()){
 					logger.info("Handling a stolen msg ");
 					//NodeState.getInstance().incrementStolen();
-					int chunkCount = Dbhandler.getChuncks(t.getFilename());
+					int chunkCount = DatabaseHandler.getChuncks(t.getFilename());
 					for (int i = 1; i <= chunkCount; i++) {
 						//Get the file chunks
-						MessageDetails details = Dbhandler.getFilewithChunckId(t.getFilename(), i);
+						MessageDetails details = DatabaseHandler.getFilewithChunckId(t.getFilename(), i);
 						//Construct a work message for each chunk. Set the destination as the leader. Set the message type as SLAVE_READ_DONE
 						WorkMessage msg = MessageGeneratorUtil.getInstance().generateStolenDelegationRespMsg(t, details.getByteData(), i, chunkCount, currWork.getRequestId());
 						//Send these messages to the outbound work queue
@@ -56,10 +59,10 @@ public class InboundWorker extends Thread {
 					case LEADER_READ:
 						//Message from leader to READ a file stored on this machine
 						logger.info(" Received msg to read a file on this system ");
-						int chunkCount = Dbhandler.getChuncks(t.getFilename());
+						int chunkCount = DatabaseHandler.getChuncks(t.getFilename());
 						for (int i = 1; i <= chunkCount; i++) {
 							//Get the file chunks
-							MessageDetails details = Dbhandler.getFilewithChunckId(t.getFilename(), i);
+							MessageDetails details = DatabaseHandler.getFilewithChunckId(t.getFilename(), i);
 							//Construct a work message for each chunk. Set the destination as the leader. Set the message type as SLAVE_READ_DONE
 							WorkMessage msg = MessageGeneratorUtil.getInstance().generateDelegationRespMsg(t, details.getByteData(), i, chunkCount, currWork.getRequestId());
 							//Send these messages to the outbound work queue
@@ -106,7 +109,7 @@ public class InboundWorker extends Thread {
 						}
 						else{
 							// persistent DB depending on chunk size
-							Dbhandler.addFile(t.getFilename(), t.getChunk().toByteArray(), t.getNoOfChunks(), t.getChunkNo());
+							DatabaseHandler.addFile(t.getFilename(), t.getChunk().toByteArray(), t.getNoOfChunks(), t.getChunkNo());
 						}
 						
 						//Generate a work message with flag for Worktype SLAVE_WRITTEN.

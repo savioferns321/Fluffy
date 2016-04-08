@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.cluster.InboundGlobalCommander;
 import gash.router.cluster.OutboundGlobalCommander;
+import gash.router.server.model.CommandMessageChannelCombo;
+import gash.router.server.model.GlobalCommandMessageChannelCombo;
+import gash.router.server.model.WorkMessageChannelCombo;
 import global.Global.GlobalCommandMessage;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
@@ -51,6 +54,10 @@ public class QueueManager {
 		return instance.get();
 	}
 
+	public LinkedBlockingDeque<WorkMessageChannelCombo> getInboundWorkQ() {
+		return inboundWorkQ;
+	}
+
 	public QueueManager() {
 		logger.info(" Started the Manager ");
 
@@ -68,8 +75,8 @@ public class QueueManager {
 		outboundWorker = new OutboundWorker(this);
 		outboundWorker.start();
 
-		inboundGlobalCommandQ = new LinkedBlockingDeque<QueueManager.GlobalCommandMessageChannelCombo>();
-		outboundGlobalCommandQ = new LinkedBlockingDeque<QueueManager.GlobalCommandMessageChannelCombo>();
+		inboundGlobalCommandQ = new LinkedBlockingDeque<GlobalCommandMessageChannelCombo>();
+		outboundGlobalCommandQ = new LinkedBlockingDeque<GlobalCommandMessageChannelCombo>();
 		inboundGlobalCommander = new InboundGlobalCommander(this);
 		inboundGlobalCommander.start();
 		outboundGlobalCommander = new OutboundGlobalCommander(this);
@@ -171,27 +178,27 @@ public class QueueManager {
 	public void returnInboundWork(WorkMessageChannelCombo msg) throws InterruptedException {
 		inboundWorkQ.putFirst(msg);
 	}
-	
-	public int getInboundCommQSize(){
+
+	public int getInboundCommQSize() {
 		return inboundCommQ.size();
 	}
-	
-	public int getOutboundCommQSize(){
+
+	public int getOutboundCommQSize() {
 		return outboundCommQ.size();
 	}
-	
-	public int getInboundWorkQSize(){
+
+	public int getInboundWorkQSize() {
 		return inboundWorkQ.size();
 	}
-	
-	public int getOutboundWorkQSize(){
+
+	public int getOutboundWorkQSize() {
 		return outboundWorkQ.size();
 	}
 
 	/*
 	 * End of Work Message methods
 	 */
-/*
+	/*
 	 * Functions for Global Command Messages
 	 */
 	public void enqueueGlobalInboundCommmand(GlobalCommandMessage message, Channel ch) {
@@ -227,28 +234,5 @@ public class QueueManager {
 	public void returnGlobalInboundCommand(GlobalCommandMessageChannelCombo msg) throws InterruptedException {
 		inboundGlobalCommandQ.putFirst(msg);
 	}
-
-	public class GlobalCommandMessageChannelCombo {
-		private Channel channel;
-		private GlobalCommandMessage globalCommandMessage;
-
-		public GlobalCommandMessageChannelCombo(Channel channel, GlobalCommandMessage globalCommandMessage) {
-			super();
-			this.channel = channel;
-			this.globalCommandMessage = globalCommandMessage;
-		}
-
-		public Channel getChannel() {
-			return channel;
-		}
-
-		public GlobalCommandMessage getGlobalCommandMessage() {
-			return globalCommandMessage;
-		}
-
-	}
-
-
-	
 
 }

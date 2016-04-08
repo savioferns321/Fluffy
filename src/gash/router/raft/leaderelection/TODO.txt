@@ -1,9 +1,0 @@
-	
-	  0. Create functions for random time generator and timer 
-	  1. Start the Election timeout 
-	  2. If the timeout is over, make this node as Candidate
-	  3. Form the WorkMessage with LeaderElection flag true and corresponding message 
-	  4. Send the Message to all the nodes in NodeChannelManager 
-	  
-	  5.
-	 

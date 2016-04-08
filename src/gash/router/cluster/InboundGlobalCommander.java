@@ -3,12 +3,12 @@ package gash.router.cluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.persistence.DataReplicationManager;
-import gash.router.persistence.Dbhandler;
+import gash.router.persistence.DatabaseHandler;
 import gash.router.persistence.MessageDetails;
+import gash.router.persistence.replication.DataReplicationManager;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.QueueManager;
-import gash.router.server.QueueManager.GlobalCommandMessageChannelCombo;
+import gash.router.server.model.GlobalCommandMessageChannelCombo;
 import gash.server.util.MessageGeneratorUtil;
 import global.Global.GlobalCommandMessage;
 import io.netty.channel.Channel;
@@ -44,7 +44,7 @@ public class InboundGlobalCommander extends Thread {
 					// client and asynchronously start replication on the
 					// remaining servers.
 					try {
-						Dbhandler.addFile(globalCommandMessage.getQuery().getKey(),
+						DatabaseHandler.addFile(globalCommandMessage.getQuery().getKey(),
 								globalCommandMessage.getQuery().getData().toByteArray(),
 								globalCommandMessage.getQuery().getMetadata().getSeqSize(),
 								globalCommandMessage.getQuery().getSequenceNo());
@@ -100,7 +100,7 @@ public class InboundGlobalCommander extends Thread {
 						// Forward message to the same nodes work port
 						String fileName = globalCommandMessage.getQuery().getKey();
 						logger.info(" Received msg to read a file on this system ");
-						int chunkCount = Dbhandler.getChuncks(fileName);
+						int chunkCount = DatabaseHandler.getChuncks(fileName);
 						if (chunkCount == 0) {
 							// File is not available in this cluster, send a
 							// response mentioning file could not be located on
@@ -113,7 +113,7 @@ public class InboundGlobalCommander extends Thread {
 						} else {
 							for (int index = 1; index <= chunkCount; index++) {
 								// Get the file chunks
-								MessageDetails details = Dbhandler.getFilewithChunckId(fileName, index);
+								MessageDetails details = DatabaseHandler.getFilewithChunckId(fileName, index);
 
 								// Construct a work message for each chunk. Set
 								// the destination as the leader. Set the

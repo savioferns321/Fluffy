@@ -12,6 +12,9 @@ import gash.router.container.GlobalRoutingConf;
 import gash.router.container.RoutingConf;
 import gash.router.server.NodeChannelManager;
 import gash.router.server.ServerState;
+import gash.server.util.Constants;
+import gash.server.util.MessageBuilder;
+import gash.server.util.RandomTimeoutGenerator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import pipe.election.Election.RaftMessage;
@@ -24,16 +27,14 @@ public class ElectionManagement {
 
 	private static RoutingConf routingConf = null;
 	private static GlobalRoutingConf globalRoutingConf = null;
-	private static RaftStateMachine raftStateMachine;
+	private static RaftNodeStateMachine raftStateMachine;
 	private static Timer electionTimer;
 	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap;
-	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 2;
 	private static int currentVoteCount = 1;
 	public static Channel globalChannel;
 	private static long currentTimeoutTime = 0;
 	private static ConcurrentHashMap<Integer, Boolean> voteCastedInCurrentTerm;
 	private static int currentTerm = 0;
-	private static boolean isLeaderAlive = false;
 
 	public ElectionManagement() {
 
@@ -49,7 +50,7 @@ public class ElectionManagement {
 	public static ElectionManagement initElectionManagement(RoutingConf routingConf,
 			GlobalRoutingConf globalRoutingConf) {
 		ElectionManagement.routingConf = routingConf;
-		ElectionManagement.raftStateMachine = new RaftStateMachine();
+		ElectionManagement.raftStateMachine = new RaftNodeStateMachine();
 		ElectionManagement.globalRoutingConf = globalRoutingConf;
 		ElectionManagement.electionTimer = new Timer();
 		ElectionManagement.voteCastedInCurrentTerm = new ConcurrentHashMap<Integer, Boolean>();
@@ -61,7 +62,7 @@ public class ElectionManagement {
 	}
 
 	public static boolean isReadyForElection() {
-		return NodeChannelManager.numberOfActiveChannels() >= MINIMUM_NUMBER_OF_NODES_REQUIRED ? true : false;
+		return NodeChannelManager.numberOfActiveChannels() >= Constants.MINIMUM_NUMBER_OF_NODES_REQUIRED ? true : false;
 	}
 
 	public static void startElection() {
@@ -96,7 +97,6 @@ public class ElectionManagement {
 				}
 
 			}
-		
 
 			switch (ElectionManagement.raftStateMachine.getState()) {
 			case Follower:
@@ -265,7 +265,7 @@ public class ElectionManagement {
 		NodeChannelManager.currentLeaderID = 0;
 		voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
 		currentVoteCount = 0;
-		ElectionManagement.initElectionManagement(routingConf,globalRoutingConf);
+		ElectionManagement.initElectionManagement(routingConf, globalRoutingConf);
 	}
 
 	private static void startElectionTimer() {
