@@ -2446,6 +2446,48 @@ public final class Work {
      * </pre>
      */
     pipe.election.Election.RaftMessageOrBuilder getRaftMessageOrBuilder();
+
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    boolean hasMonitorMsg();
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    pipe.monitor.Monitor.ClusterMonitor getMonitorMsg();
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    pipe.monitor.Monitor.ClusterMonitorOrBuilder getMonitorMsgOrBuilder();
+
+    /**
+     * <code>optional bool isStolen = 20;</code>
+     *
+     * <pre>
+     *repeated int32 nextNodeIds = 20;
+     * </pre>
+     */
+    boolean hasIsStolen();
+    /**
+     * <code>optional bool isStolen = 20;</code>
+     *
+     * <pre>
+     *repeated int32 nextNodeIds = 20;
+     * </pre>
+     */
+    boolean getIsStolen();
   }
   /**
    * Protobuf type {@code WorkMessage}
@@ -2671,6 +2713,24 @@ public final class Work {
                 steal_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000020;
+              break;
+            }
+            case 154: {
+              pipe.monitor.Monitor.ClusterMonitor.Builder subBuilder = null;
+              if (payloadCase_ == 19) {
+                subBuilder = ((pipe.monitor.Monitor.ClusterMonitor) payload_).toBuilder();
+              }
+              payload_ = input.readMessage(pipe.monitor.Monitor.ClusterMonitor.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((pipe.monitor.Monitor.ClusterMonitor) payload_);
+                payload_ = subBuilder.buildPartial();
+              }
+              payloadCase_ = 19;
+              break;
+            }
+            case 160: {
+              bitField0_ |= 0x00040000;
+              isStolen_ = input.readBool();
               break;
             }
           }
@@ -2926,6 +2986,7 @@ public final class Work {
       NEWNODE(9),
       FLAGROUTING(10),
       RAFTMESSAGE(17),
+      MONITORMSG(19),
       PAYLOAD_NOT_SET(0);
       private int value = 0;
       private PayloadCase(int value) {
@@ -2942,6 +3003,7 @@ public final class Work {
           case 9: return NEWNODE;
           case 10: return FLAGROUTING;
           case 17: return RAFTMESSAGE;
+          case 19: return MONITORMSG;
           case 0: return PAYLOAD_NOT_SET;
           default: throw new java.lang.IllegalArgumentException(
             "Value is undefined for this oneof enum.");
@@ -3362,6 +3424,67 @@ public final class Work {
       return pipe.election.Election.RaftMessage.getDefaultInstance();
     }
 
+    public static final int MONITORMSG_FIELD_NUMBER = 19;
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    public boolean hasMonitorMsg() {
+      return payloadCase_ == 19;
+    }
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    public pipe.monitor.Monitor.ClusterMonitor getMonitorMsg() {
+      if (payloadCase_ == 19) {
+         return (pipe.monitor.Monitor.ClusterMonitor) payload_;
+      }
+      return pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+    }
+    /**
+     * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+     *
+     * <pre>
+     *Added this field to be populated by our server
+     * </pre>
+     */
+    public pipe.monitor.Monitor.ClusterMonitorOrBuilder getMonitorMsgOrBuilder() {
+      if (payloadCase_ == 19) {
+         return (pipe.monitor.Monitor.ClusterMonitor) payload_;
+      }
+      return pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+    }
+
+    public static final int ISSTOLEN_FIELD_NUMBER = 20;
+    private boolean isStolen_;
+    /**
+     * <code>optional bool isStolen = 20;</code>
+     *
+     * <pre>
+     *repeated int32 nextNodeIds = 20;
+     * </pre>
+     */
+    public boolean hasIsStolen() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    /**
+     * <code>optional bool isStolen = 20;</code>
+     *
+     * <pre>
+     *repeated int32 nextNodeIds = 20;
+     * </pre>
+     */
+    public boolean getIsStolen() {
+      return isStolen_;
+    }
+
     private void initFields() {
       header_ = pipe.common.Common.Header.getDefaultInstance();
       secret_ = 0L;
@@ -3371,6 +3494,7 @@ public final class Work {
       steal_ = pipe.work.Work.WorkSteal.getDefaultInstance();
       worktype_ = pipe.work.Work.WorkMessage.Worktype.LEADER_WRITE;
       stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
+      isStolen_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3436,6 +3560,12 @@ public final class Work {
           return false;
         }
       }
+      if (hasMonitorMsg()) {
+        if (!getMonitorMsg().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -3496,6 +3626,12 @@ public final class Work {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeMessage(18, steal_);
+      }
+      if (payloadCase_ == 19) {
+        output.writeMessage(19, (pipe.monitor.Monitor.ClusterMonitor) payload_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeBool(20, isStolen_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3576,6 +3712,14 @@ public final class Work {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(18, steal_);
+      }
+      if (payloadCase_ == 19) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, (pipe.monitor.Monitor.ClusterMonitor) payload_);
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(20, isStolen_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3729,6 +3873,8 @@ public final class Work {
         bitField0_ = (bitField0_ & ~0x00000040);
         stateOfLeader_ = pipe.work.Work.WorkMessage.StateOfLeader.LEADERALIVE;
         bitField0_ = (bitField0_ & ~0x00000080);
+        isStolen_ = false;
+        bitField0_ = (bitField0_ & ~0x00040000);
         payloadCase_ = 0;
         payload_ = null;
         return this;
@@ -3854,6 +4000,17 @@ public final class Work {
             result.payload_ = raftMessageBuilder_.build();
           }
         }
+        if (payloadCase_ == 19) {
+          if (monitorMsgBuilder_ == null) {
+            result.payload_ = payload_;
+          } else {
+            result.payload_ = monitorMsgBuilder_.build();
+          }
+        }
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        result.isStolen_ = isStolen_;
         result.bitField0_ = to_bitField0_;
         result.payloadCase_ = payloadCase_;
         onBuilt();
@@ -3897,6 +4054,9 @@ public final class Work {
         if (other.hasStateOfLeader()) {
           setStateOfLeader(other.getStateOfLeader());
         }
+        if (other.hasIsStolen()) {
+          setIsStolen(other.getIsStolen());
+        }
         switch (other.getPayloadCase()) {
           case ERR: {
             mergeErr(other.getErr());
@@ -3932,6 +4092,10 @@ public final class Work {
           }
           case RAFTMESSAGE: {
             mergeRaftMessage(other.getRaftMessage());
+            break;
+          }
+          case MONITORMSG: {
+            mergeMonitorMsg(other.getMonitorMsg());
             break;
           }
           case PAYLOAD_NOT_SET: {
@@ -3997,6 +4161,12 @@ public final class Work {
         }
         if (hasRaftMessage()) {
           if (!getRaftMessage().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasMonitorMsg()) {
+          if (!getMonitorMsg().isInitialized()) {
             
             return false;
           }
@@ -5602,6 +5772,225 @@ public final class Work {
         return raftMessageBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.monitor.Monitor.ClusterMonitor, pipe.monitor.Monitor.ClusterMonitor.Builder, pipe.monitor.Monitor.ClusterMonitorOrBuilder> monitorMsgBuilder_;
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public boolean hasMonitorMsg() {
+        return payloadCase_ == 19;
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public pipe.monitor.Monitor.ClusterMonitor getMonitorMsg() {
+        if (monitorMsgBuilder_ == null) {
+          if (payloadCase_ == 19) {
+            return (pipe.monitor.Monitor.ClusterMonitor) payload_;
+          }
+          return pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+        } else {
+          if (payloadCase_ == 19) {
+            return monitorMsgBuilder_.getMessage();
+          }
+          return pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public Builder setMonitorMsg(pipe.monitor.Monitor.ClusterMonitor value) {
+        if (monitorMsgBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          payload_ = value;
+          onChanged();
+        } else {
+          monitorMsgBuilder_.setMessage(value);
+        }
+        payloadCase_ = 19;
+        return this;
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public Builder setMonitorMsg(
+          pipe.monitor.Monitor.ClusterMonitor.Builder builderForValue) {
+        if (monitorMsgBuilder_ == null) {
+          payload_ = builderForValue.build();
+          onChanged();
+        } else {
+          monitorMsgBuilder_.setMessage(builderForValue.build());
+        }
+        payloadCase_ = 19;
+        return this;
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public Builder mergeMonitorMsg(pipe.monitor.Monitor.ClusterMonitor value) {
+        if (monitorMsgBuilder_ == null) {
+          if (payloadCase_ == 19 &&
+              payload_ != pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance()) {
+            payload_ = pipe.monitor.Monitor.ClusterMonitor.newBuilder((pipe.monitor.Monitor.ClusterMonitor) payload_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            payload_ = value;
+          }
+          onChanged();
+        } else {
+          if (payloadCase_ == 19) {
+            monitorMsgBuilder_.mergeFrom(value);
+          }
+          monitorMsgBuilder_.setMessage(value);
+        }
+        payloadCase_ = 19;
+        return this;
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public Builder clearMonitorMsg() {
+        if (monitorMsgBuilder_ == null) {
+          if (payloadCase_ == 19) {
+            payloadCase_ = 0;
+            payload_ = null;
+            onChanged();
+          }
+        } else {
+          if (payloadCase_ == 19) {
+            payloadCase_ = 0;
+            payload_ = null;
+          }
+          monitorMsgBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public pipe.monitor.Monitor.ClusterMonitor.Builder getMonitorMsgBuilder() {
+        return getMonitorMsgFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      public pipe.monitor.Monitor.ClusterMonitorOrBuilder getMonitorMsgOrBuilder() {
+        if ((payloadCase_ == 19) && (monitorMsgBuilder_ != null)) {
+          return monitorMsgBuilder_.getMessageOrBuilder();
+        } else {
+          if (payloadCase_ == 19) {
+            return (pipe.monitor.Monitor.ClusterMonitor) payload_;
+          }
+          return pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .ClusterMonitor monitorMsg = 19;</code>
+       *
+       * <pre>
+       *Added this field to be populated by our server
+       * </pre>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          pipe.monitor.Monitor.ClusterMonitor, pipe.monitor.Monitor.ClusterMonitor.Builder, pipe.monitor.Monitor.ClusterMonitorOrBuilder> 
+          getMonitorMsgFieldBuilder() {
+        if (monitorMsgBuilder_ == null) {
+          if (!(payloadCase_ == 19)) {
+            payload_ = pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
+          }
+          monitorMsgBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              pipe.monitor.Monitor.ClusterMonitor, pipe.monitor.Monitor.ClusterMonitor.Builder, pipe.monitor.Monitor.ClusterMonitorOrBuilder>(
+                  (pipe.monitor.Monitor.ClusterMonitor) payload_,
+                  getParentForChildren(),
+                  isClean());
+          payload_ = null;
+        }
+        payloadCase_ = 19;
+        return monitorMsgBuilder_;
+      }
+
+      private boolean isStolen_ ;
+      /**
+       * <code>optional bool isStolen = 20;</code>
+       *
+       * <pre>
+       *repeated int32 nextNodeIds = 20;
+       * </pre>
+       */
+      public boolean hasIsStolen() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      /**
+       * <code>optional bool isStolen = 20;</code>
+       *
+       * <pre>
+       *repeated int32 nextNodeIds = 20;
+       * </pre>
+       */
+      public boolean getIsStolen() {
+        return isStolen_;
+      }
+      /**
+       * <code>optional bool isStolen = 20;</code>
+       *
+       * <pre>
+       *repeated int32 nextNodeIds = 20;
+       * </pre>
+       */
+      public Builder setIsStolen(boolean value) {
+        bitField0_ |= 0x00040000;
+        isStolen_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool isStolen = 20;</code>
+       *
+       * <pre>
+       *repeated int32 nextNodeIds = 20;
+       * </pre>
+       */
+      public Builder clearIsStolen() {
+        bitField0_ = (bitField0_ & ~0x00040000);
+        isStolen_ = false;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:WorkMessage)
     }
 
@@ -5648,30 +6037,32 @@ public final class Work {
   static {
     java.lang.String[] descriptorData = {
       "\n\nwork.proto\032\014common.proto\032\016election.pro" +
-      "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
-      "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
-      "2\n.WorkState\"-\n\013RoutingConf\022\016\n\006nodeIp\030\001 " +
-      "\003(\t\022\016\n\006nodeId\030\002 \003(\t\"h\n\tWorkSteal\022\'\n\tstea" +
-      "ltype\030\001 \002(\0162\024.WorkSteal.StealType\"2\n\tSte" +
-      "alType\022\021\n\rSTEAL_REQUEST\020\001\022\022\n\016STEAL_RESPO" +
-      "NSE\020\002\"\234\005\n\013WorkMessage\022\027\n\006header\030\001 \002(\0132\007." +
-      "Header\022\016\n\006secret\030\002 \002(\003\022$\n\016routingEntries" +
-      "\030\013 \001(\0132\014.RoutingConf\022\023\n\013isProcessed\030\r \001(",
-      "\010\022\021\n\trequestId\030\016 \001(\t\022\031\n\005steal\030\022 \001(\0132\n.Wo" +
-      "rkSteal\022\'\n\010worktype\030\017 \001(\0162\025.WorkMessage." +
-      "Worktype\0221\n\rstateOfLeader\030\020 \002(\0162\032.WorkMe" +
-      "ssage.StateOfLeader\022\027\n\003err\030\003 \001(\0132\010.Failu" +
-      "reH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004beat\030\005 \001(\0132\n.Hea" +
-      "rtbeatH\000\022\025\n\004task\030\006 \001(\0132\005.TaskH\000\022\033\n\005state" +
-      "\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006leader\030\010 \001(\0132\r.L" +
-      "eaderStatusH\000\022\021\n\007newNode\030\t \001(\010H\000\022\025\n\013flag" +
-      "Routing\030\n \001(\010H\000\022#\n\013raftMessage\030\021 \001(\0132\014.R" +
-      "aftMessageH\000\"U\n\010Worktype\022\020\n\014LEADER_WRITE",
-      "\020\001\022\021\n\rSLAVE_WRITTEN\020\002\022\017\n\013LEADER_READ\020\003\022\023" +
-      "\n\017SLAVE_READ_DONE\020\004\"T\n\rStateOfLeader\022\017\n\013" +
-      "LEADERALIVE\020\001\022\016\n\nLEADERDEAD\020\002\022\021\n\rLEADERU" +
-      "NKNOWN\020\003\022\017\n\013LEADERKNOWN\020\004B\t\n\007payloadB\r\n\t" +
-      "pipe.workH\001"
+      "to\032\rmonitor.proto\"0\n\tWorkState\022\020\n\010enqueu" +
+      "ed\030\001 \002(\005\022\021\n\tprocessed\030\002 \002(\005\"&\n\tHeartbeat" +
+      "\022\031\n\005state\030\001 \002(\0132\n.WorkState\"-\n\013RoutingCo" +
+      "nf\022\016\n\006nodeIp\030\001 \003(\t\022\016\n\006nodeId\030\002 \003(\t\"h\n\tWo" +
+      "rkSteal\022\'\n\tstealtype\030\001 \002(\0162\024.WorkSteal.S" +
+      "tealType\"2\n\tStealType\022\021\n\rSTEAL_REQUEST\020\001" +
+      "\022\022\n\016STEAL_RESPONSE\020\002\"\325\005\n\013WorkMessage\022\027\n\006" +
+      "header\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022$\n" +
+      "\016routingEntries\030\013 \001(\0132\014.RoutingConf\022\023\n\013i",
+      "sProcessed\030\r \001(\010\022\021\n\trequestId\030\016 \001(\t\022\031\n\005s" +
+      "teal\030\022 \001(\0132\n.WorkSteal\022\'\n\010worktype\030\017 \001(\016" +
+      "2\025.WorkMessage.Worktype\0221\n\rstateOfLeader" +
+      "\030\020 \002(\0162\032.WorkMessage.StateOfLeader\022\027\n\003er" +
+      "r\030\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004b" +
+      "eat\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\0132\005." +
+      "TaskH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006l" +
+      "eader\030\010 \001(\0132\r.LeaderStatusH\000\022\021\n\007newNode\030" +
+      "\t \001(\010H\000\022\025\n\013flagRouting\030\n \001(\010H\000\022#\n\013raftMe" +
+      "ssage\030\021 \001(\0132\014.RaftMessageH\000\022%\n\nmonitorMs",
+      "g\030\023 \001(\0132\017.ClusterMonitorH\000\022\020\n\010isStolen\030\024" +
+      " \001(\010\"U\n\010Worktype\022\020\n\014LEADER_WRITE\020\001\022\021\n\rSL" +
+      "AVE_WRITTEN\020\002\022\017\n\013LEADER_READ\020\003\022\023\n\017SLAVE_" +
+      "READ_DONE\020\004\"T\n\rStateOfLeader\022\017\n\013LEADERAL" +
+      "IVE\020\001\022\016\n\nLEADERDEAD\020\002\022\021\n\rLEADERUNKNOWN\020\003" +
+      "\022\017\n\013LEADERKNOWN\020\004B\t\n\007payloadB\r\n\tpipe.wor" +
+      "kH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5686,6 +6077,7 @@ public final class Work {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           pipe.common.Common.getDescriptor(),
           pipe.election.Election.getDescriptor(),
+          pipe.monitor.Monitor.getDescriptor(),
         }, assigner);
     internal_static_WorkState_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -5716,9 +6108,10 @@ public final class Work {
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Steal", "Worktype", "StateOfLeader", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "RaftMessage", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "RoutingEntries", "IsProcessed", "RequestId", "Steal", "Worktype", "StateOfLeader", "Err", "Ping", "Beat", "Task", "State", "Leader", "NewNode", "FlagRouting", "RaftMessage", "MonitorMsg", "IsStolen", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
+    pipe.monitor.Monitor.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

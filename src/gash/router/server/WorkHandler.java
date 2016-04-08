@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
 import gash.router.raft.leaderelection.MessageBuilder;
-import gash.router.server.QueueManager.WorkMessageChannelCombo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,8 +34,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Task.TaskType;
 import pipe.election.Election.LeaderStatus.LeaderQuery;
-import pipe.election.Election.LeaderStatus.LeaderState;
-import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkState;
@@ -78,12 +75,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			return;
 		}
 
-		System.out.println(msg.getAllFields());
+		//System.out.println(msg.getAllFields());
 		/*
 		 * if (debug) PrintUtil.printWork(msg);
 		 */
 		// TODO How can you implement this without if-else statements?
 		try {
+			
 			if (msg.getStateOfLeader() == StateOfLeader.LEADERALIVE) {
 				// exec.shutdownNow();
 				// int currentTimeout = RandomTimeoutGenerator.randTimeout() *
@@ -99,15 +97,16 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				WorkMessage buildNewNodeLeaderStatusResponseMessage = MessageBuilder
 						.buildNewNodeLeaderStatusResponseMessage(NodeChannelManager.currentLeaderID,
 								NodeChannelManager.currentLeaderAddress);
-				while(!channel.isWritable()){
-					//Looping until channel is writable
-				}
-				ChannelFuture cf = channel.writeAndFlush(buildNewNodeLeaderStatusResponseMessage);
+				
+				ChannelFuture cf = channel.write(buildNewNodeLeaderStatusResponseMessage);
+				channel.flush();
+				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("Failed to write the message to the channel ");
 				}				
 
 				// Sent the newly discovered node all the data on this node.
+				logger.info("Attempting to auto-replicate to node : "+channel.remoteAddress().toString());
 				DataReplicationManager.getInstance().replicateToNewNode(channel);
 
 			} else if (msg.hasLeader() && msg.getLeader().getAction() == LeaderQuery.THELEADERIS) {
@@ -118,7 +117,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			}
 
 			if (msg.hasBeat() && msg.getStateOfLeader() != StateOfLeader.LEADERALIVE) {
-				
+
 				logger.info("heartbeat received from "+msg.getHeader().getNodeId());	
 
 			}else if(msg.hasSteal()){
@@ -128,7 +127,6 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 					logger.info("------Stealing work from node:------ "+msg.getHeader().getNodeId());
 					QueueManager.getInstance().enqueueInboundWork(msg, channel);
-					// TODO Increment worksteal counter
 					logger.info("------A task was stolen from another node------");
 
 					break;
@@ -184,10 +182,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			} else if (msg.hasNewNode()) {
 				logger.info("NEW NODE TRYING TO CONNECT " + msg.getHeader().getNodeId());
 				WorkMessage wm = state.getEmon().createRoutingMsg();
-				while(!channel.isWritable()){
-					//Looping until channel is writable
-				}
-				ChannelFuture cf = channel.writeAndFlush(wm);
+				
+				ChannelFuture cf = channel.write(wm);
+				channel.flush();
+				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("Failed to write the message to the channel ");
 				}
@@ -233,10 +231,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			eb.setMessage(e.getMessage());
 			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
 			rb.setErr(eb);
-			while(!channel.isWritable()){
-				//Looping until channel is writable
-			}
-			ChannelFuture cf = channel.writeAndFlush(rb.build());
+			
+			ChannelFuture cf = channel.write(rb.build());
+			channel.flush();
+			cf.awaitUninterruptibly();
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.info("Failed to write the message to the channel ");
 			}

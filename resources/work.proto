@@ -4,6 +4,7 @@ option java_package = "pipe.work";
 
 import "common.proto";
 import "election.proto";
+import "monitor.proto";
 
 message WorkState {
    required int32 enqueued = 1;
@@ -54,7 +55,7 @@ message WorkMessage {
       SLAVE_READ_DONE = 4;
    }
 
-
+	
    
    optional Worktype worktype = 15;
    required StateOfLeader stateOfLeader = 16;
@@ -90,5 +91,11 @@ message WorkMessage {
       //RaftMessage
       RaftMessage raftMessage=17;
       
+     //Added this field to be populated by our server
+     ClusterMonitor monitorMsg = 19;
+ 
    }
+   //repeated int32 nextNodeIds = 20;
+   optional bool isStolen = 20;
+ 
 }

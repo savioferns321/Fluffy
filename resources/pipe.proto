@@ -24,7 +24,4 @@ message CommandMessage {
    //Added this field to be populated by our server
    optional ClusterMonitor monitorMsg = 7;
    
-   repeated int32 nextNodeIds = 8;
-   
-   
 }

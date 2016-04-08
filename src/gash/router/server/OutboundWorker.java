@@ -3,7 +3,6 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.server.QueueManager.WorkMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
 public class OutboundWorker extends Thread{
@@ -32,6 +31,7 @@ public class OutboundWorker extends Thread{
 
 				if (msg.getChannel()!= null && msg.getChannel().isOpen()) {
 					boolean rtn = false;
+					MessageServer.processed++;
 					
 					ChannelFuture cf = msg.getChannel().write(msg.getWorkMessage());
 					msg.getChannel().flush();
@@ -39,8 +39,11 @@ public class OutboundWorker extends Thread{
 					rtn = cf.isSuccess();
 					if(rtn)
 						logger.info("Wrote msg to the channel ? "+rtn);
-					if (!rtn)
+					if (!rtn){
+						MessageServer.processed--;
 						manager.returnOutboundWork(msg);
+					}
+						
 
 
 				} else {

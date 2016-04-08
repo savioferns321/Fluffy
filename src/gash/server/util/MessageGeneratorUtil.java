@@ -19,7 +19,6 @@ import pipe.monitor.Monitor.ClusterMonitor;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkMessage.StateOfLeader;
 import pipe.work.Work.WorkMessage.Worktype;
-import pipe.work.Work.WorkState;
 import pipe.work.Work.WorkSteal;
 import routing.Pipe.CommandMessage;
 
@@ -40,7 +39,11 @@ public class MessageGeneratorUtil {
 	}
 
 	public static MessageGeneratorUtil getInstance(){
-		return instance.get();
+		MessageGeneratorUtil mgu = instance.get();
+		if(mgu == null){
+			logger.error(" Error while getting instance of MessageGeneratorUtil ");
+		}
+		return mgu;
 	}
 
 	/**
@@ -77,7 +80,7 @@ public class MessageGeneratorUtil {
 	 */
 	public CommandMessage generateClientResponseMsg(boolean isSuccess){
 		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(MessageServer.getNodeId());
+		hb.setNodeId(conf.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
 		CommandMessage.Builder rb = CommandMessage.newBuilder();
@@ -100,7 +103,7 @@ public class MessageGeneratorUtil {
 
 		Header.Builder hb = Header.newBuilder();
 		//TODO Get node ID
-		hb.setNodeId(MessageServer.getNodeId());
+		hb.setNodeId(conf.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
@@ -116,14 +119,34 @@ public class MessageGeneratorUtil {
 		return wb.build();
 	}
 	
-	
-	public WorkMessage generateStealMessage(){
+	public CommandMessage generateRiakFileMessage(byte[] fileBytes,String fileName){
 
 		Header.Builder hb = Header.newBuilder();
 		//TODO Get node ID
 		hb.setNodeId(MessageServer.getNodeId());
 		hb.setTime(System.currentTimeMillis());
+
+		CommandMessage.Builder cb = CommandMessage.newBuilder();
+		cb.setHeader(hb.build());
 		
+		Task.Builder tb = Task.newBuilder();
+		tb.setChunkNo(1);
+		tb.setNoOfChunks(1);
+		tb.setFilename(fileName);
+		
+		cb.setTask(tb);
+		cb.setMessage("Success");
+		return cb.build();
+	}
+
+
+	public WorkMessage generateStealMessage(){
+
+		Header.Builder hb = Header.newBuilder();
+		//TODO Get node ID
+		hb.setNodeId(conf.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+
 		WorkSteal.Builder stealMessage = WorkSteal.newBuilder();
 		stealMessage.setStealtype(pipe.work.Work.WorkSteal.StealType.STEAL_REQUEST);
 
@@ -134,10 +157,10 @@ public class MessageGeneratorUtil {
 		wb.setSecret(1234);
 		addLeaderFieldToWorkMessage(wb);
 		wb.setSteal(stealMessage);
-		
+
 		return wb.build();
 	}
-	
+
 
 	/**
 	 * This message is sent from the slave to the leader when leader has requested a READ. A msg is generated for each file chunk.
@@ -146,7 +169,7 @@ public class MessageGeneratorUtil {
 	public WorkMessage generateDelegationRespMsg(Task t, byte[] currentByte, int chunkId, int totalChunks, String requestId){
 		Header.Builder hb = Header.newBuilder();
 		//TODO Get node ID
-		hb.setNodeId(MessageServer.getNodeId());
+		hb.setNodeId(conf.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
@@ -174,6 +197,44 @@ public class MessageGeneratorUtil {
 
 		return wb.build();
 	}
+	
+	/**
+	 * This message is sent from the slave to the leader when leader has requested a READ. A msg is generated for each file chunk.
+	 * @return
+	 */
+	public WorkMessage generateStolenDelegationRespMsg(Task t, byte[] currentByte, int chunkId, int totalChunks, String requestId){
+		Header.Builder hb = Header.newBuilder();
+		//TODO Get node ID
+		hb.setNodeId(conf.getNodeId());
+		hb.setTime(System.currentTimeMillis());
+
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb.build());
+		//TODO Set the secret
+		wb.setSecret(1234);
+		wb.setRequestId(requestId);
+		wb.setWorktype(Worktype.SLAVE_READ_DONE);
+		wb.setIsStolen(true);
+
+		Task.Builder tb = Task.newBuilder();
+		tb.setChunkNo(chunkId);
+		tb.setChunk(ByteString.copyFrom(currentByte));
+		tb.setNoOfChunks(totalChunks);
+		tb.setTaskType(TaskType.READ);
+		tb.setFilename(t.getFilename());
+		tb.setSender(t.getSender());
+		if(chunkId == totalChunks){
+			wb.setIsProcessed(true);
+		}else{
+			wb.setIsProcessed(false);
+		}
+
+		wb.setTask(tb.build());
+		addLeaderFieldToWorkMessage(wb);
+
+		return wb.build();
+	}
+	
 
 	/**
 	 * Generates a Command Message from the Work Message sent by the slave node and sends it to the client.
@@ -203,21 +264,21 @@ public class MessageGeneratorUtil {
 	public WorkMessage generateReplicationAckMessage(WorkMessage message){
 		Header.Builder hb = Header.newBuilder();
 		//TODO Get node ID
-		hb.setNodeId(MessageServer.getNodeId());
+		hb.setNodeId(conf.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
 		/*Task.Builder tb = Task.newBuilder(message.getTask());
 		tb.clearChunk();
 		tb.clearChunkNo();
 		tb.clearNoOfChunks();*/
-		
+
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb.build());
 		wb.setWorktype(Worktype.SLAVE_WRITTEN);
 		//TODO Set the secret
 		wb.setSecret(1234);
 		//wb.setTask(tb.build());
-		
+
 		addLeaderFieldToWorkMessage(wb);
 
 		return wb.build();
@@ -225,8 +286,9 @@ public class MessageGeneratorUtil {
 
 
 	public WorkMessage generateNewNodeReplicationMsg(MessageDetails details,String sender){
+		logger.info("Generating new node replication message from node "+sender);
 		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(MessageServer.getNodeId());
+		hb.setNodeId(conf.getNodeId());
 		hb.setTime(System.currentTimeMillis());
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
@@ -249,55 +311,22 @@ public class MessageGeneratorUtil {
 		return wb.build();
 	}
 
-	/**
-	 * Generates a message from the 1st node that the Monitor connects to. This method 
-	 * creates a list of all the nodes in the network ending at the creator's own node ID.
-	 * The idea is that when this message is passed around the nodes, each node will add
-	 * his current status to the monitor message contained in the command message and will
-	 * pass the message to the next node in the nodes list.
-	 * @param message
-	 * @return
-	 */
-	public CommandMessage initializeMonitorMsg(CommandMessage message, boolean isFirstNode, String requestID){
-
-		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(MessageServer.getNodeId());
-		hb.setTime(System.currentTimeMillis());
-		ClusterMonitor.Builder cmb = ClusterMonitor.newBuilder(message.getMonitorMsg());
+	
+	public ClusterMonitor generateNodeStatusMessage(long tickVal){
+		ClusterMonitor.Builder cmb = ClusterMonitor.newBuilder();
+		QueueManager queueManager = QueueManager.getInstance();
+		cmb.setClusterId(420);
+		cmb.addEnqueued(queueManager.getInboundCommQSize()+queueManager.getOutboundWorkQSize());
+		cmb.addProcessed(MessageServer.processed);
+		cmb.addStolen(MessageServer.stolen);
+		cmb.setNumNodes(NodeChannelManager.node2ChannelMap.size()+1);
+		cmb.addProcessId(0);
+		cmb.setTick(tickVal);
 		
-		cmb.setProcessId(MessageServer.getNodeId(),MessageServer.getNodeId());
-		//TODO Get the queue sizes.
-		cmb.setEnqueued(MessageServer.getNodeId(), QueueManager.getInstance().getInboundCommQSize()+
-				QueueManager.getInstance().getInboundWorkQSize());
-		//cmb.setProcessed(MessageServer.getNodeId(), NodeState.getInstance().getProcessed());
-		cmb.setProcessed(MessageServer.getNodeId(), 0);
-		//cmb.setStolen(MessageServer.getNodeId(), NodeState.getInstance().getStolen());
-		cmb.setStolen(MessageServer.getNodeId(), 0);
-		cmb.setTick(cmb.getTick()+1);
-
-		//Initialize the circle of nodes in the network.
-		CommandMessage.Builder cb = CommandMessage.newBuilder(message);
-		cb.setMonitorMsg(cmb.build());
-		cb.setHeader(hb.build());
-
-		if(isFirstNode){
-			//TODO Get the cluster ID from the routing conf.
-			cmb.setClusterId(1);
-			cmb.setNumNodes(NodeChannelManager.getNode2ChannelMap().size()+1);
-			//Build the nextNodeIds field. Populate it with the IDs of all the nodes in the network.
-			for(Integer nodeID : NodeChannelManager.getNode2ChannelMap().keySet()){
-				cb.getNextNodeIdsList().add(nodeID);
-			}
-			//Add the current node ID to the list.
-			cb.getNextNodeIdsList().add(MessageServer.getNodeId());
-			//Set the request ID
-			cb.setMessage(requestID);
-
-		}
-		return cb.build();
-
+		return cmb.build();
 	}
 
+	
 	/**
 	 * Generates a Heartbeat msg sent from leader to slave.
 	 * @return

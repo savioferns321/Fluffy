@@ -27,7 +27,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.monitor.Monitor.ClusterMonitor;
-import routing.Pipe.CommandMessage;
 
 public class MonitorClient {
 	
@@ -68,14 +67,13 @@ public class MonitorClient {
 		group.shutdownGracefully();
 	}
 	
-	public boolean write(CommandMessage msg) {
+	public boolean write(ClusterMonitor msg) {
 		if (msg == null)
 			return false;
 		else if (channel == null)
 			throw new RuntimeException("missing channel");
 
 		ChannelFuture cf = connect().writeAndFlush(msg);
-		cf.awaitUninterruptibly();
 		if (cf.isDone() && !cf.isSuccess()) {
 			System.out.println("failed to send message to server");
 			return false;

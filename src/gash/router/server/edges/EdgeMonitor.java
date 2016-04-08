@@ -90,10 +90,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 								System.out.println("Channel connected to: " + oneIp.getHostAddress());
 								WorkMessage wm = createNewNode();
-								while(!newNodeChannel.isWritable()){
-									//Looping until channel is writable
-								}
-								ChannelFuture cf = newNodeChannel.writeAndFlush(wm);
+								
+								ChannelFuture cf = newNodeChannel.write(wm);
+								newNodeChannel.flush();
+								cf.awaitUninterruptibly();
 								if (cf.isDone() && !cf.isSuccess()) {
 									logger.info("Failed to write the message to the channel ");
 								}
@@ -113,10 +113,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					// Send a discovery message to the first node that the new
 					// node finds
 					WorkMessage discoveryMessage = MessageBuilder.buildNewNodeLeaderStatusMessage();
-					while(!discoveryChannel.isWritable()){
-						//Looping until channel is writable
-					}
-					ChannelFuture cf = discoveryChannel.writeAndFlush(discoveryMessage);
+					logger.info("I'm a new node. I shall now try to get the data from the cluster automatically");
+					ChannelFuture cf = discoveryChannel.write(discoveryMessage);
+					discoveryChannel.flush();
+					cf.awaitUninterruptibly();
 					if (cf.isDone() && !cf.isSuccess()) {
 						logger.info("Failed to write the message to the channel ");
 					}
@@ -236,10 +236,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						if (ei.isActive() && ei.getChannel() != null) {
 							if (NodeChannelManager.currentLeaderID == this.state.getConf().getNodeId()) {
 								WorkMessage wm = createHB(ei);
-								while(!ei.getChannel().isWritable()){
-									//Looping until channel is writable
-								}
-								ChannelFuture cf = ei.getChannel().writeAndFlush(wm);
+								
+								ChannelFuture cf = ei.getChannel().write(wm);
+								ei.getChannel().flush();
+								cf.awaitUninterruptibly();
 								if (cf.isDone() && !cf.isSuccess()) {
 									logger.info("Failed to write the message to the channel ");
 								}

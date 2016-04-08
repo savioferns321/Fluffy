@@ -23,7 +23,7 @@ public class ElectionManagement {
 	private static RaftStateMachine raftStateMachine;
 	private static Timer electionTimer;
 	private static ConcurrentHashMap<Integer, Boolean> voteCheckMap = new ConcurrentHashMap<Integer, Boolean>();
-	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 3;
+	private static final int MINIMUM_NUMBER_OF_NODES_REQUIRED = 1;
 	private static int currentVoteCount = 1;
 
 	private static Logger logger;
@@ -79,10 +79,10 @@ public class ElectionManagement {
 				System.out.println("Vote Casted in favour of : "
 						+ electionResponseMessage.getRaftMessage().getRequestVote().getCandidateId());
 				// incomingChannel.writeAndFlush(electionResponseMessage);
-				while (!incomingChannel.isWritable()) {
-					// Looping until channel is writable
-				}
-				ChannelFuture cf = incomingChannel.writeAndFlush(electionResponseMessage);
+				
+				ChannelFuture cf = incomingChannel.write(electionResponseMessage);
+				incomingChannel.flush();
+				cf.awaitUninterruptibly();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.error("Failed to send replication message to server");
 				}
@@ -107,6 +107,9 @@ public class ElectionManagement {
 						NodeChannelManager.currentLeaderID = routingConf.getNodeId();
 						NodeChannelManager.currentLeaderAddress = leaderResponseMessage.getRaftMessage()
 								.getLeaderHost();
+						
+						//Start the scheduler to send node status to the monitor.
+						
 					} catch (Exception exception) {
 						System.out.println("An error has occured while broadcasting the message.");
 					}

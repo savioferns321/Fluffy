@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.persistence.Dbhandler;
 import gash.router.persistence.MessageDetails;
-import gash.router.raft.leaderelection.NodeState;
-import gash.router.server.QueueManager.CommandMessageChannelCombo;
-import gash.router.server.QueueManager.WorkMessageChannelCombo;
+import gash.router.persistence.RiakHandler;
 import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
 import pipe.common.Common.Task;
@@ -46,7 +44,7 @@ public class InboundWorker extends Thread {
 						//Get the file chunks
 						MessageDetails details = Dbhandler.getFilewithChunckId(t.getFilename(), i);
 						//Construct a work message for each chunk. Set the destination as the leader. Set the message type as SLAVE_READ_DONE
-						WorkMessage msg = MessageGeneratorUtil.getInstance().generateDelegationRespMsg(t, details.getByteData(), i, chunkCount, currWork.getRequestId());
+						WorkMessage msg = MessageGeneratorUtil.getInstance().generateStolenDelegationRespMsg(t, details.getByteData(), i, chunkCount, currWork.getRequestId());
 						//Send these messages to the outbound work queue
 						Channel leaderChannel = NodeChannelManager.getChannelByNodeId(NodeChannelManager.currentLeaderID);
 						manager.enqueueOutboundWork(msg, leaderChannel);
@@ -89,14 +87,28 @@ public class InboundWorker extends Thread {
 						CommandMessage outputMsg = MessageGeneratorUtil.getInstance().forwardChunkToClient(currWork);
 						//Send the generated command message to the outbound command queue.
 						manager.enqueueOutboundCommand(outputMsg, cliChannel);
+						
+						//Checking if this is part of a stolen message
+						if(currWork.hasIsStolen() && currWork.getIsStolen()){
+							logger.info("This is part of a stolen work Message ");
+							MessageServer.stolen++;
+						}
 
 						break;
 
 					case LEADER_WRITE:
 						//Message from a leader to replicate/write some data.
 						logger.info("Got message to replicate some data ");
-						//Write the data to in memory db / persistent DB depending on chunk size
-						Dbhandler.addFile(t.getFilename(), t.getChunk().toByteArray(), t.getNoOfChunks(), t.getChunkNo());
+						
+						if(t.getNoOfChunks() == 1){
+							//Write the data to in memory db 
+							RiakHandler.storeFile(t.getFilename(), t.getChunk().toByteArray());
+						}
+						else{
+							// persistent DB depending on chunk size
+							Dbhandler.addFile(t.getFilename(), t.getChunk().toByteArray(), t.getNoOfChunks(), t.getChunkNo());
+						}
+						
 						//Generate a work message with flag for Worktype SLAVE_WRITTEN.
 						WorkMessage wm = MessageGeneratorUtil.getInstance().generateReplicationAckMessage(currWork);
 						//Send this message to the outbound queue
@@ -115,8 +127,8 @@ public class InboundWorker extends Thread {
 						break;
 					}
 				}
-				/*logger.info("Is my Inbound Work Queue empty? :" + manager.inboundWorkQ.isEmpty());
-				while(manager.inboundWorkQ.isEmpty())	//Node is free.. Ask other nodes for work
+				logger.info("Is my Inbound Work Queue empty? :" + manager.inboundWorkQ.isEmpty());
+				if(manager.inboundWorkQ.isEmpty())	//Node is free.. Ask other nodes for work
 				{
 					//select a node for checking if it has pending tasks and stealing them
 					Channel stealChannel = NodeChannelManager.getNextChannelForSteal();
@@ -128,9 +140,9 @@ public class InboundWorker extends Thread {
 						manager.enqueueOutboundWork(workStealReqMessage, stealChannel);
 
 						logger.info("Sending work steal request message");
-						Thread.sleep(5000);
+						//Thread.sleep(5000);
 					}					
-				}*/
+				}
 			}
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage());

@@ -21,6 +21,7 @@ import routing.Pipe.CommandMessage;
 
 public class MonitorClientApp implements MonitorListener{
 	private MonitorClient mc;
+	private static int count = 0;
 	
 	public MonitorClientApp(MonitorClient mc) {
 		init(mc);
@@ -31,7 +32,7 @@ public class MonitorClientApp implements MonitorListener{
 		this.mc.addListener(this);
 	}
 	
-	private CommandMessage sendDummyMessage() {
+	public ClusterMonitor sendDummyMessage() {
 		/*
 		 * This message should be created and sent by only one node inside the cluster.
 		 */
@@ -39,33 +40,40 @@ public class MonitorClientApp implements MonitorListener{
 		//Build the message to be sent to monitor server
 		ClusterMonitor.Builder cm = ClusterMonitor.newBuilder();
 		//your cluster ID
-		cm.setClusterId(-1);
+		cm.setClusterId(420);
 		//No of nodes in your cluster
-		cm.setNumNodes(2);
+		cm.setNumNodes(4);
 		//Node Id = Process Id
-		cm.addProcessId(0);
+		
 		cm.addProcessId(1);
+		cm.addProcessId(2);
+		cm.addProcessId(3);
+		cm.addProcessId(4);
 		//Set processId,No of EnquedTask for that processId
-		cm.addEnqueued(5);
-		cm.addEnqueued(5);
+		cm.addEnqueued(0);
+		cm.addEnqueued(0);
+		cm.addEnqueued(0);
+		cm.addEnqueued(1);
 		//Set processId,No of ProcessedTask for that processId
-		cm.addProcessed(3);
-		cm.addProcessed(3);
+		cm.addProcessed(2);
+		cm.addProcessed(1);
+		cm.addProcessed(0);
+		cm.addProcessed(0);
 		//Set processId,No of StolenTask for that processId
-		cm.addStolen(2);
-		cm.addStolen(2);
+		cm.addStolen(0);
+		cm.addStolen(0);
+		cm.addStolen(0);
+		cm.addStolen(0);
 		//Increment tick every time you send the message, or else it would be ignored
 		// Tick starts from 0
-		cm.setTick(0);
+		cm.setTick(count++);
 		
 		Header.Builder hb = Header.newBuilder();
-		hb.setNodeId(-1);
+		hb.setNodeId(4);
 		hb.setTime(System.currentTimeMillis());
 		
-		CommandMessage.Builder cb = CommandMessage.newBuilder();
-		cb.setMonitorMsg(cm.build());
-		cb.setHeader(hb.build());
-		return cb.build();
+		
+		return cm.build();
 	}
 	
 	@Override
@@ -75,16 +83,42 @@ public class MonitorClientApp implements MonitorListener{
 	}
 
 	@Override
-	public void onMessage(CommandMessage msg) {
-		// TODO Auto-generated method stub
+	public void onMessage(CommandMessage cmdMsg) {
+		if(cmdMsg.hasMonitorMsg()){
+			ClusterMonitor msg = cmdMsg.getMonitorMsg();
+
+			if (msg == null) {
+				System.out.println("ERROR: Unexpected content - " + msg);
+				return;
+			}
+			System.out.println("Count : "+count);
+			count++;
+			System.out.println("Tick : "+msg.getTick()+" Cluster ID :"+msg.getClusterId()+"  #Nodes : "+msg.getNumNodes()+"\nProcess ID's");
+			for(int i=0;i<msg.getProcessIdCount();i++){
+				System.out.print(msg.getProcessId(i)+" ");
+			}
+			System.out.println("\nNo of task enqueued");
+			for(int i=0;i<msg.getEnqueuedCount();i++){
+				System.out.print(msg.getEnqueued(i)+" ");
+			}
+			System.out.println("\nNo of task Processed");
+			for(int i=0;i<msg.getProcessedCount();i++){
+				System.out.print(msg.getProcessed(i));
+			}
+			System.out.println("\nNo of task Stolen");
+			for(int i=0;i<msg.getStolenCount();i++){
+				System.out.print(msg.getStolen(i)+" ");
+			}
+		
+		}
 	}
 	
 	public static void main(String[] args) {
 		/*
 		 * Set host and port of Monitor Server
 		 */
-		String host = "192.168.0.4";
-		int port = 5100;
+		String host = "192.168.1.22";
+		int port = 5000;
 
 		try {
 			
@@ -95,7 +129,7 @@ public class MonitorClientApp implements MonitorListener{
 			// do stuff w/ the connection
 			System.out.println("Creating message");
 			//Send a dummy monitor message to a node in our cluster
-			CommandMessage msg = ma.sendDummyMessage();
+			ClusterMonitor msg = ma.sendDummyMessage();
 			System.out.println("Sending generated message");
 			mc.write(msg);
 			

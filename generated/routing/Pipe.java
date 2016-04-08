@@ -115,19 +115,6 @@ public final class Pipe {
      * </pre>
      */
     pipe.monitor.Monitor.ClusterMonitorOrBuilder getMonitorMsgOrBuilder();
-
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    java.util.List<java.lang.Integer> getNextNodeIdsList();
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    int getNextNodeIdsCount();
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    int getNextNodeIds(int index);
   }
   /**
    * Protobuf type {@code CommandMessage}
@@ -249,27 +236,6 @@ public final class Pipe {
               bitField0_ |= 0x00000040;
               break;
             }
-            case 64: {
-              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
-                nextNodeIds_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000080;
-              }
-              nextNodeIds_.add(input.readInt32());
-              break;
-            }
-            case 66: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080) && input.getBytesUntilLimit() > 0) {
-                nextNodeIds_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000080;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                nextNodeIds_.add(input.readInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -278,9 +244,6 @@ public final class Pipe {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
-          nextNodeIds_ = java.util.Collections.unmodifiableList(nextNodeIds_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -540,33 +503,10 @@ public final class Pipe {
       return monitorMsg_;
     }
 
-    public static final int NEXTNODEIDS_FIELD_NUMBER = 8;
-    private java.util.List<java.lang.Integer> nextNodeIds_;
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    public java.util.List<java.lang.Integer>
-        getNextNodeIdsList() {
-      return nextNodeIds_;
-    }
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    public int getNextNodeIdsCount() {
-      return nextNodeIds_.size();
-    }
-    /**
-     * <code>repeated int32 nextNodeIds = 8;</code>
-     */
-    public int getNextNodeIds(int index) {
-      return nextNodeIds_.get(index);
-    }
-
     private void initFields() {
       header_ = pipe.common.Common.Header.getDefaultInstance();
       task_ = pipe.common.Common.Task.getDefaultInstance();
       monitorMsg_ = pipe.monitor.Monitor.ClusterMonitor.getDefaultInstance();
-      nextNodeIds_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -630,9 +570,6 @@ public final class Pipe {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeMessage(7, monitorMsg_);
       }
-      for (int i = 0; i < nextNodeIds_.size(); i++) {
-        output.writeInt32(8, nextNodeIds_.get(i));
-      }
       getUnknownFields().writeTo(output);
     }
 
@@ -671,15 +608,6 @@ public final class Pipe {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, monitorMsg_);
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < nextNodeIds_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(nextNodeIds_.get(i));
-        }
-        size += dataSize;
-        size += 1 * getNextNodeIdsList().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -819,8 +747,6 @@ public final class Pipe {
           monitorMsgBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000040);
-        nextNodeIds_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
         payloadCase_ = 0;
         payload_ = null;
         return this;
@@ -891,11 +817,6 @@ public final class Pipe {
         } else {
           result.monitorMsg_ = monitorMsgBuilder_.build();
         }
-        if (((bitField0_ & 0x00000080) == 0x00000080)) {
-          nextNodeIds_ = java.util.Collections.unmodifiableList(nextNodeIds_);
-          bitField0_ = (bitField0_ & ~0x00000080);
-        }
-        result.nextNodeIds_ = nextNodeIds_;
         result.bitField0_ = to_bitField0_;
         result.payloadCase_ = payloadCase_;
         onBuilt();
@@ -921,16 +842,6 @@ public final class Pipe {
         }
         if (other.hasMonitorMsg()) {
           mergeMonitorMsg(other.getMonitorMsg());
-        }
-        if (!other.nextNodeIds_.isEmpty()) {
-          if (nextNodeIds_.isEmpty()) {
-            nextNodeIds_ = other.nextNodeIds_;
-            bitField0_ = (bitField0_ & ~0x00000080);
-          } else {
-            ensureNextNodeIdsIsMutable();
-            nextNodeIds_.addAll(other.nextNodeIds_);
-          }
-          onChanged();
         }
         switch (other.getPayloadCase()) {
           case PING: {
@@ -1720,72 +1631,6 @@ public final class Pipe {
         return monitorMsgBuilder_;
       }
 
-      private java.util.List<java.lang.Integer> nextNodeIds_ = java.util.Collections.emptyList();
-      private void ensureNextNodeIdsIsMutable() {
-        if (!((bitField0_ & 0x00000080) == 0x00000080)) {
-          nextNodeIds_ = new java.util.ArrayList<java.lang.Integer>(nextNodeIds_);
-          bitField0_ |= 0x00000080;
-         }
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public java.util.List<java.lang.Integer>
-          getNextNodeIdsList() {
-        return java.util.Collections.unmodifiableList(nextNodeIds_);
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public int getNextNodeIdsCount() {
-        return nextNodeIds_.size();
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public int getNextNodeIds(int index) {
-        return nextNodeIds_.get(index);
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public Builder setNextNodeIds(
-          int index, int value) {
-        ensureNextNodeIdsIsMutable();
-        nextNodeIds_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public Builder addNextNodeIds(int value) {
-        ensureNextNodeIdsIsMutable();
-        nextNodeIds_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public Builder addAllNextNodeIds(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureNextNodeIdsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, nextNodeIds_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 nextNodeIds = 8;</code>
-       */
-      public Builder clearNextNodeIds() {
-        nextNodeIds_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000080);
-        onChanged();
-        return this;
-      }
-
       // @@protoc_insertion_point(builder_scope:CommandMessage)
     }
 
@@ -1812,12 +1657,12 @@ public final class Pipe {
   static {
     java.lang.String[] descriptorData = {
       "\n\npipe.proto\032\014common.proto\032\rmonitor.prot" +
-      "o\"\326\001\n\016CommandMessage\022\027\n\006header\030\001 \002(\0132\007.H" +
+      "o\"\301\001\n\016CommandMessage\022\027\n\006header\030\001 \002(\0132\007.H" +
       "eader\022\023\n\004task\030\002 \001(\0132\005.Task\022\016\n\004ping\030\003 \001(\010" +
       "H\000\022\021\n\007message\030\004 \001(\tH\000\022\027\n\003err\030\005 \001(\0132\010.Fai" +
       "lureH\000\022\025\n\013fileContent\030\006 \001(\014H\000\022#\n\nmonitor" +
-      "Msg\030\007 \001(\0132\017.ClusterMonitor\022\023\n\013nextNodeId" +
-      "s\030\010 \003(\005B\t\n\007payloadB\013\n\007routingH\001"
+      "Msg\030\007 \001(\0132\017.ClusterMonitorB\t\n\007payloadB\013\n" +
+      "\007routingH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1838,7 +1683,7 @@ public final class Pipe {
     internal_static_CommandMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_CommandMessage_descriptor,
-        new java.lang.String[] { "Header", "Task", "Ping", "Message", "Err", "FileContent", "MonitorMsg", "NextNodeIds", "Payload", });
+        new java.lang.String[] { "Header", "Task", "Ping", "Message", "Err", "FileContent", "MonitorMsg", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.monitor.Monitor.getDescriptor();
   }

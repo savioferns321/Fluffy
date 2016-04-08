@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import gash.router.persistence.DataReplicationManager;
 import gash.router.persistence.Dbhandler;
-import gash.router.server.QueueManager.CommandMessageChannelCombo;
+import gash.router.persistence.RiakHandler;
 import gash.server.util.MessageGeneratorUtil;
 import io.netty.channel.Channel;
 import pipe.common.Common.Task;
@@ -51,14 +51,15 @@ public class InboundCommander extends Thread{
 					try {
 						
 						//If file size has only 1 chunk, write to in memory DB, else write to the standard DB.
-						/*if(currTask.getNoOfChunks() == 1){
-							//TODO Write to in memory DB
-							//Dbhandler.addFile(task.getFilename(), currCombo.getCommandMessage().getFileContent().toByteArray());
-						}else{*/
+						if(currTask.getNoOfChunks() == 1){
+							
+							RiakHandler.storeFile(currTask.getFilename(), currMsg.getTask().getChunk().toByteArray());
+							
+						}else{
 							//TODO Write to standard DB
 							Dbhandler.addFile(currTask.getFilename(), currMsg.getTask().getChunk().toByteArray(), currTask.getNoOfChunks(), currTask.getChunkNo());
 							isSuccess = true;
-						//}
+						}
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -87,7 +88,20 @@ public class InboundCommander extends Thread{
 					
 					//Get the no. of chunks in the file FROM ITS OWN DB, although the file is to be read from another node.
 					int chunkCount = Dbhandler.getChuncks(currMsg.getTask().getFilename());	
-					if(chunkCount != 0){
+					
+					if(currMsg.getTask().getNoOfChunks() == 1 && RiakHandler.getFile(currMsg.getTask().getFilename()) != null){
+						//Fetch from in-memory db
+						
+						//Generate proper command message to sent to client.
+						CommandMessage message = MessageGeneratorUtil.getInstance().generateRiakFileMessage(RiakHandler.getFile(currMsg.getTask().getFilename()),
+								currMsg.getTask().getFilename());
+						
+						//Writing directly back to client
+						currChannel.write(message);
+						currChannel.flush();
+		
+					}
+					else if(chunkCount != 0){
 						//Setting the chunk count to be decremented each time this file's chunk is sent back to the client.
 						currCombo.setChunkCount(chunkCount);
 						

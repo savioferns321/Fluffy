@@ -132,7 +132,7 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = "192.168.0.4";
+		String host = "192.168.1.22";
 		int port = 5101;
 
 		try {
@@ -141,8 +141,8 @@ public class DemoApp implements CommListener {
 
 			// do stuff w/ the connection
 			//da.ping(2);
-			da.sendReadTasks();
-			//da.splitFile(new File("introductions3.pdf"));
+			//da.sendReadTasks();
+			da.splitFile(new File("introductions3.pdf"));
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();

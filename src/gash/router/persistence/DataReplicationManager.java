@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -58,6 +57,7 @@ public class DataReplicationManager {
 	
 	public void replicateToNewNode(Channel channel){
 		
+		logger.info("Started replicating to new node ");
 		//DB handler returns a list of Work Messages with 
 		Map<String, ArrayList<MessageDetails>> fileMap = Dbhandler.getAllFilesForReplication();	
 		for(String filename : fileMap.keySet()){
@@ -65,10 +65,10 @@ public class DataReplicationManager {
 				try {
 					WorkMessage workMessage = MessageGeneratorUtil.getInstance().generateNewNodeReplicationMsg(details, InetAddress.getLocalHost().getHostAddress());
 					//channel.writeAndFlush(workMessage);
-					while(!channel.isWritable()){
-						//Looping until channel is writable
-					}
-					ChannelFuture cf = channel.writeAndFlush(workMessage);
+					
+					ChannelFuture cf = channel.write(workMessage);
+					channel.flush();
+					cf.awaitUninterruptibly();
 					if (cf.isDone() && !cf.isSuccess()) {
 						logger.error("Failed to send replication message to server");
 					}

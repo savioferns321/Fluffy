@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.server.QueueManager.CommandMessageChannelCombo;
 import gash.router.server.edges.EdgeInfo;
 import gash.router.server.edges.EdgeList;
 import gash.router.server.edges.EdgeMonitor;
@@ -28,12 +27,17 @@ public class NodeChannelManager {
 	public static ConcurrentHashMap<String, CommandMessageChannelCombo> clientChannelMap = new ConcurrentHashMap<String, CommandMessageChannelCombo>();
 	private static Queue<Integer> roundRobinQ = new LinkedBlockingQueue<Integer>();
 	private static Queue<Integer> workStealQ = new LinkedBlockingQueue<Integer>();
+	private static int nodeId=0;
 
 	public static int currentLeaderID;
 	public static String currentLeaderAddress;
 	public static boolean amIPartOfNetwork = true;
 	private static int delay = 3000;
 
+	
+	public static void setNodeId(int nodeId) {
+		NodeChannelManager.nodeId = nodeId;
+	}
 	public static NodeChannelManager getInstance() {
 		if (instance.get() == null)
 			instance.compareAndSet(null, new NodeChannelManager());
@@ -109,10 +113,10 @@ public class NodeChannelManager {
 		Collection<Channel> allChannel = node2ChannelMap.values();
 		for (Channel channel : allChannel) {
 			System.out.println("Sending message to Channel " + channel.toString());
-			while(!channel.isWritable()){
-				//Looping until channel is writable
-			}			
-			ChannelFuture cf = channel.writeAndFlush(message);
+					
+			ChannelFuture cf = channel.write(message);
+			channel.flush();
+			cf.awaitUninterruptibly();
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.info("Failed to write the message to the channel ");
 			}

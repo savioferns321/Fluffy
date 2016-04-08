@@ -46,15 +46,15 @@ public class QueueManager {
 	public QueueManager() {
 		logger.info(" Started the Manager ");
 
-		inboundCommQ = new LinkedBlockingDeque<QueueManager.CommandMessageChannelCombo>();
-		outboundCommQ = new LinkedBlockingDeque<QueueManager.CommandMessageChannelCombo>();
+		inboundCommQ = new LinkedBlockingDeque<CommandMessageChannelCombo>();
+		outboundCommQ = new LinkedBlockingDeque<CommandMessageChannelCombo>();
 		inboundCommmander = new InboundCommander(this);
 		inboundCommmander.start();
 		outboundCommmander = new OutboundCommander(this);
 		outboundCommmander.start();
 
-		inboundWorkQ = new LinkedBlockingDeque<QueueManager.WorkMessageChannelCombo>();
-		outboundWorkQ = new LinkedBlockingDeque<QueueManager.WorkMessageChannelCombo>();
+		inboundWorkQ = new LinkedBlockingDeque<WorkMessageChannelCombo>();
+		outboundWorkQ = new LinkedBlockingDeque<WorkMessageChannelCombo>();
 		inboundWorker = new InboundWorker(this);
 		inboundWorker.start();
 		outboundWorker = new OutboundWorker(this);
@@ -160,73 +160,6 @@ public class QueueManager {
 	 * End of Work Message methods
 	 */
 
-	/**
-	 * Object which is stored in the Master's queue. Channel is stored so we can
-	 * directly send a response to the client on this channel. It only handles
-	 * Command messages.
-	 * 
-	 * @author savio
-	 *
-	 */
-	public class CommandMessageChannelCombo {
-		private Channel channel;
-		private CommandMessage commandMessage;
-		private int chunkCount = 0;
-
-		public CommandMessageChannelCombo(Channel channel, CommandMessage commandMessage) {
-			super();
-			this.channel = channel;
-			this.commandMessage = commandMessage;
-		}
-
-		public Channel getChannel() {
-			return channel;
-		}
-
-		public CommandMessage getCommandMessage() {
-			return commandMessage;
-		}
-
-		public void setChunkCount(int chunkCount) {
-			this.chunkCount = chunkCount;
-		}
-
-		public int getChunkCount() {
-			return chunkCount;
-		}
-
-		public synchronized void decrementChunkCount() {
-			chunkCount--;
-		}
-
-	}
-
-	/**
-	 * Object which is stored in the Master's queue. Channel is stored so we can
-	 * directly send a response to the client on this channel. It only handles
-	 * Work messages.
-	 * 
-	 * @author savio
-	 *
-	 */
-	public class WorkMessageChannelCombo {
-		private Channel channel;
-		private WorkMessage workMessage;
-
-		public WorkMessageChannelCombo(Channel channel, WorkMessage workMessage) {
-			super();
-			this.channel = channel;
-			this.workMessage = workMessage;
-		}
-
-		public Channel getChannel() {
-			return channel;
-		}
-
-		public WorkMessage getWorkMessage() {
-			return workMessage;
-		}
-
-	}
+	
 
 }

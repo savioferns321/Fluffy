@@ -20,16 +20,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import deven.monitor.client.MonitorClient;
 import gash.router.container.RoutingConf;
+import gash.router.persistence.DataReplicationManager;
 import gash.router.raft.leaderelection.ElectionManagement;
 import gash.router.raft.leaderelection.MessageBuilder;
-import gash.router.raft.leaderelection.NodeState;
-import gash.router.persistence.DataReplicationManager;
 import gash.router.server.edges.EdgeMonitor;
 import gash.router.server.tasks.NoOpBalancer;
 import gash.router.server.tasks.TaskList;
@@ -40,9 +42,11 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import pipe.monitor.Monitor.ClusterMonitor;
 
 public class MessageServer {
 	protected static Logger logger = LoggerFactory.getLogger("server");
+	private static long tick=0;
 
 	protected static HashMap<Integer, ServerBootstrap> bootstrap = new HashMap<Integer, ServerBootstrap>();
 
@@ -51,7 +55,10 @@ public class MessageServer {
 
 	protected RoutingConf conf;
 	protected boolean background = true;
-	private static int nodeId;
+	public static int nodeId;
+	
+	public static int processed= 0 ;
+	public static int stolen =0 ;
 
 	// State of the node (Leader/Non-leader, LeaderIP and LeaderID)
 
@@ -79,6 +86,7 @@ public class MessageServer {
 		MessageGeneratorUtil.setRoutingConf(conf);
 		MessageBuilder.setRoutingConf(conf);
 		StartWorkCommunication comm = new StartWorkCommunication(conf);
+		
 		logger.info("Work starting");
 
 		// We always start the worker in the background
@@ -99,6 +107,12 @@ public class MessageServer {
 
 		// Starting the node manager
 		NodeChannelManager.initNodeChannelManager();
+		
+		//Starting the monitor poller
+		MonitorClient client = MonitorClient.initConnection("169.254.1.2", 5000);
+		MonitorScheduler ms = new MonitorScheduler(client);
+		Timer timer =  new Timer(false);
+		timer.schedule(ms, 1000, 1000);
 
 		// Check for leader election to happen
 		if (NodeChannelManager.amIPartOfNetwork) {
@@ -109,6 +123,8 @@ public class MessageServer {
 		}
 
 	}
+	
+	
 
 	/**
 	 * static because we need to get a handle to the factory from the shutdown
@@ -131,6 +147,7 @@ public class MessageServer {
 			conf = JsonUtil.decode(new String(raw), RoutingConf.class);
 			if (!verifyConf(conf))
 				throw new RuntimeException("verification of configuration failed");
+			System.out.println(" ---- >"+conf.getNodeId());
 			nodeId = conf.getNodeId();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -318,5 +335,27 @@ public class MessageServer {
 			}
 		}
 	}
+	
+	public class MonitorScheduler extends TimerTask{
+
+		MonitorClient ma;
+		
+		public MonitorScheduler(MonitorClient client) {
+			this.ma = client;
+		}
+		@Override
+		public void run() {
+			try {
+				//logger.info("Trying to ping the monitor now ");
+				ClusterMonitor clusterMonitor = MessageGeneratorUtil.getInstance().generateNodeStatusMessage(tick++);
+				ma.write(clusterMonitor);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+		}
+		
+	}
+
 
 }

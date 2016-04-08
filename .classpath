@@ -11,5 +11,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/mongo-java-driver-3.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/protobuf-java-2.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/json-20160212.jar"/>
+	<classpathentry kind="lib" path="lib/riak-client-2.0.5.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -3,7 +3,6 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.server.QueueManager.CommandMessageChannelCombo;
 import io.netty.channel.ChannelFuture;
 
 public class OutboundCommander extends Thread{
