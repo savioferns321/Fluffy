@@ -4,9 +4,13 @@
 
 
 In the terminal, navigate to the folder directory where the project files are located.
-Run the shell script build_pb.sh to build the .proto files as follows : ./build_pb.sh
+Run the shell script build_pb.sh to build the .proto files as follows : 
+
+./build_pb.sh
+
 Run the ant build script build.xml to build the project. 
 Run the shell script startServer.sh and provide the following arguments to run it. 
+
 <routing-conf-filename> <global-routing-conf-filename> <isMonitorEnabled>
 
 <routing-conf-filename> - The file which contains the routing information for the node. 
