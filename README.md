@@ -1,6 +1,6 @@
 <b>Installation instructions</b>
 
-<i>Note : Please download/refer to the file "Fluffy - project report.docx" to read more about the project</i>
+<i>Note : Please download/refer to the file "<b>Fluffy - project report.docx</b>" to read more about the project</i>
 
 
 In the terminal, navigate to the folder directory where the project files are located.
