@@ -1,4 +1,6 @@
-Installation instructions
+<b>Installation instructions<b>
+
+Note : Please download/refer to the file "Fluffy - project report.docx" to read more about the project
 
 In the terminal, navigate to the folder directory where the project files are located.
 Run the shell script build_pb.sh to build the .proto files as follows : ./build_pb.sh
